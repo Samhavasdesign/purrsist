@@ -87,7 +87,9 @@ export function BacklogItemRow({ item, showTag = false }: Props) {
   }
 
   return (
-    <li className={styles.item}>
+    <li
+      className={`${styles.item} ${styles[`item_${item.significance}`]}`}
+    >
       <div className={styles.itemMain}>
         <SignificanceDot value={item.significance} />
         <div className={styles.itemBody}>

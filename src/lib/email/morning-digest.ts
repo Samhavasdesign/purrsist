@@ -177,6 +177,16 @@ export async function runMorningDigestJob(): Promise<{
     if (!users.length) break;
 
     for (const user of users) {
+      if (user.is_anonymous) {
+        results.push({
+          userId: user.id,
+          email: null,
+          status: "skipped",
+          reason: "anonymous",
+        });
+        continue;
+      }
+
       const email = user.email;
       if (!email) {
         results.push({

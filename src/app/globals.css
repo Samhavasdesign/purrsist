@@ -1,6 +1,54 @@
 @import "tailwindcss";
 
 :root {
+  /* Purrsist — grounded light theme (current default) */
+  --background: #f7f1e7;
+  --foreground: #241d14;
+  --surface: #fffdf8;
+  --border: #e6dcc8;
+  --muted: #8a7d5f;
+  --accent: #7a3a20;
+  --accent-hover: #5c2c17;
+  --accent-foreground: #f7f1e7;
+  --accent-soft: rgba(122, 58, 32, 0.12);
+  --danger: #e07a6a;
+  --success: #8fbf8a;
+
+  /* Category tokens — full-bleed Must-Do/Should-Do/Quick-Win block backgrounds */
+  --must-do-bg: #e3c2a8;
+  --must-do-fg: #7a3a20;
+  --must-do-border: #a86e48;
+
+  --should-do-bg: #e8d59c;
+  --should-do-fg: #6b4f0e;
+  --should-do-border: #b5943c;
+
+  --quick-win-bg: #cfdcc2;
+  --quick-win-fg: #3d5230;
+  --quick-win-done-fg: #5c6b50;
+
+  /* Headings/page titles/section labels use the display serif; body/UI stays Geist Sans */
+  --font-display: var(--font-source-serif), serif;
+
+  /* Radii for the category blocks introduced by the light-theme redesign */
+  --radius-block: 1.125rem; /* 18px */
+  --radius-row: 0.875rem; /* 14px */
+
+  /* Shared control sizes — native checkboxes + decorative check indicators */
+  --check-size: 1rem; /* 16px */
+
+  /* Shared app content grid — keep screens + top bar aligned */
+  --app-content-max: 40rem;
+  --app-content-pad-x: 1.25rem;
+  --app-content-pad-top: 1.5rem;
+  --app-content-pad-bottom: 5.5rem;
+}
+
+/*
+ * Original dark theme — preserved but not currently active anywhere.
+ * Nothing sets data-theme="dark" yet; wire up a toggle later to use it.
+ */
+:root[data-theme="dark"] {
   --background: #0c0b09;
   --foreground: #f4efe6;
   --surface: #161410;
@@ -13,11 +61,20 @@
   --danger: #e07a6a;
   --success: #8fbf8a;
 
-  /* Shared app content grid — keep screens + top bar aligned */
-  --app-content-max: 40rem;
-  --app-content-pad-x: 1.25rem;
-  --app-content-pad-top: 1.5rem;
-  --app-content-pad-bottom: 5.5rem;
+  --must-do-bg: color-mix(in srgb, #e07a6a 16%, var(--surface));
+  --must-do-fg: #e07a6a;
+  --must-do-border: color-mix(in srgb, #e07a6a 45%, var(--border));
+
+  --should-do-bg: color-mix(in srgb, #d4a853 16%, var(--surface));
+  --should-do-fg: #d4a853;
+  --should-do-border: color-mix(in srgb, #d4a853 45%, var(--border));
+
+  --quick-win-bg: color-mix(in srgb, #8fbf8a 16%, var(--surface));
+  --quick-win-fg: #8fbf8a;
+  --quick-win-done-fg: color-mix(in srgb, #8fbf8a 70%, var(--muted));
+
+  /* Dark theme keeps its original all-Geist look, no serif headings */
+  --font-display: var(--font-geist-sans);
 }
 
 @media (min-width: 640px) {
@@ -126,4 +183,13 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Native checkboxes — same box size everywhere (Today, habits, capture, etc.) */
+input[type="checkbox"] {
+  width: var(--check-size);
+  height: var(--check-size);
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--accent);
 }

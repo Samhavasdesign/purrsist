@@ -20,5 +20,5 @@ Source of truth: [`/docs/PRD.md`](../../docs/PRD.md). Prefer the PRD over assump
 
 - Single-user MVP: no multi-user, sharing, or social features
 - Secrets (`ANTHROPIC_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, Resend keys) stay server-only
-- Auth is email/password only (no OAuth in v1)
+- Auth is email/password, plus anonymous “Try it” sessions that convert to email/password later (no OAuth in v1)
 - Build order: ship **v1.0** core loop before **v1.1** retention features (PRD §7)

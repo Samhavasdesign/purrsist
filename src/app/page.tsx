@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TryItButton } from "@/components/auth/try-it-button";
 import styles from "./home.module.css";
 
 export default function HomePage() {
@@ -23,10 +24,11 @@ export default function HomePage() {
           consistent — morning to week&apos;s end.
         </p>
         <div className={styles.actions}>
-          <Link className={styles.cta} href="/signup">
+          <TryItButton className={styles.cta}>Try it</TryItButton>
+          <Link className={styles.secondary} href="/signup">
             Create account
           </Link>
-          <Link className={styles.secondary} href="/login">
+          <Link className={styles.navLink} href="/login">
             I already have one
           </Link>
         </div>

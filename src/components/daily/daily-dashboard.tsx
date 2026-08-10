@@ -453,6 +453,8 @@ export function DailyDashboard({
         }}
       />
 
+      <hr className={styles.sectionRule} />
+
       {GROUPS.map((group) => {
         const extras = extrasForKind(localEntry, group.kind);
         const sectionComplete = sectionCompleteByKind[group.kind];
@@ -473,7 +475,10 @@ export function DailyDashboard({
         }
 
         return (
-          <section key={group.title} className={styles.section}>
+          <section
+            key={group.title}
+            className={`${styles.section} ${styles[`section_${group.significance}`]}`}
+          >
             <div className={styles.sectionHead}>
               <div className={styles.sectionTitleRow}>
                 <div className={styles.sectionTitleCluster}>
@@ -683,11 +688,15 @@ export function DailyDashboard({
         );
       })}
 
+      <hr className={styles.sectionRule} />
+
       <HabitManager
         date={localEntry.date}
         habits={habits}
         readOnly={!editable}
       />
+
+      <hr className={styles.sectionRule} />
 
       <ReminderManager entry={localEntry} readOnly={!editable} />
     </div>

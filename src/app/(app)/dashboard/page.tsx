@@ -1,6 +1,7 @@
 import { QuickAdd } from "@/components/capture/quick-add";
+import { TrialBanner } from "@/components/auth/trial-banner";
 import { DailyDashboard } from "@/components/daily/daily-dashboard";
-import { requireUser } from "@/lib/auth";
+import { isAnonymousUser, requireUser } from "@/lib/auth";
 import { getOrCreateTodayEntry } from "@/lib/daily/entry";
 import { listHabitsForDate } from "@/lib/daily/habits";
 import {
@@ -16,6 +17,7 @@ import styles from "./dashboard.module.css";
 
 export default async function DashboardPage() {
   const user = await requireUser();
+  const anonymous = isAnonymousUser(user);
   const entry = await getOrCreateTodayEntry(user.id);
   const habits = await listHabitsForDate(user.id, entry.date);
 
@@ -46,6 +48,7 @@ export default async function DashboardPage() {
 
   return (
     <main className={styles.page}>
+      {anonymous ? <TrialBanner /> : null}
       <DailyDashboard
         entry={entry}
         habits={habits}

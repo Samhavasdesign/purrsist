@@ -119,12 +119,20 @@ export function AuthForm({ mode }: AuthFormProps) {
             <Link className={styles.link} href="/signup">
               Sign up
             </Link>
+            {" · "}
+            <Link className={styles.link} href="/">
+              Try it first
+            </Link>
           </>
         ) : (
           <>
             Already have an account?{" "}
             <Link className={styles.link} href="/login">
               Sign in
+            </Link>
+            {" · "}
+            <Link className={styles.link} href="/">
+              Try it first
             </Link>
           </>
         )}

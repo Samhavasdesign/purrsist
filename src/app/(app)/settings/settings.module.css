@@ -18,6 +18,7 @@
 
 .title {
   margin: 0;
+  font-family: var(--font-display);
   font-size: clamp(2rem, 5vw, 2.5rem);
   font-weight: 600;
   letter-spacing: -0.035em;
@@ -72,8 +73,10 @@
   border-color: var(--muted);
 }
 
-@media (min-width: 640px) {
-  .page {
-    padding: 2rem 2rem 5.5rem;
-  }
+.signOutHint {
+  margin: 0;
+  max-width: 22rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--muted);
 }

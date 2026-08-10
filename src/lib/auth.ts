@@ -19,3 +19,8 @@ export async function requireUser(): Promise<User> {
   }
   return user;
 }
+
+/** True for Supabase anonymous (try-before-signup) sessions. */
+export function isAnonymousUser(user: User): boolean {
+  return user.is_anonymous === true;
+}

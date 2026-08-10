@@ -18,6 +18,7 @@
 
 .title {
   margin: 0;
+  font-family: var(--font-display);
   font-size: clamp(2rem, 5vw, 2.5rem);
   font-weight: 600;
   letter-spacing: -0.035em;
@@ -69,9 +70,10 @@
 
 .sectionTitle {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -93,6 +95,51 @@
   border: 1px solid var(--border);
   border-radius: 1rem;
   background: var(--surface);
+}
+
+.item_red {
+  background: var(--must-do-bg);
+  border-color: var(--must-do-border);
+}
+
+.item_yellow {
+  background: var(--should-do-bg);
+  border-color: var(--should-do-border);
+}
+
+.item_green {
+  background: var(--quick-win-bg);
+  border-color: color-mix(in srgb, var(--quick-win-fg) 45%, var(--quick-win-bg));
+}
+
+.item_red .itemMeta,
+.item_red .metaDate {
+  color: var(--must-do-fg);
+}
+
+.item_yellow .itemMeta,
+.item_yellow .metaDate {
+  color: var(--should-do-fg);
+}
+
+.item_green .itemMeta,
+.item_green .metaDate {
+  color: var(--quick-win-fg);
+}
+
+.item_red .actionBtn {
+  border-color: var(--must-do-border);
+  color: var(--must-do-fg);
+}
+
+.item_yellow .actionBtn {
+  border-color: var(--should-do-border);
+  color: var(--should-do-fg);
+}
+
+.item_green .actionBtn {
+  border-color: color-mix(in srgb, var(--quick-win-fg) 45%, var(--quick-win-bg));
+  color: var(--quick-win-fg);
 }
 
 .itemMain {
@@ -209,8 +256,8 @@
 .actionBtnPrimary {
   border: none;
   border-radius: 999px;
-  background: var(--accent);
-  color: var(--accent-foreground);
+  background: var(--foreground);
+  color: var(--background);
   padding: 0.4rem 0.85rem;
   font-size: 0.75rem;
   font-weight: 600;
@@ -218,7 +265,7 @@
 }
 
 .actionBtnPrimary:hover:not(:disabled) {
-  background: var(--accent-hover);
+  background: color-mix(in srgb, var(--foreground) 85%, transparent);
 }
 
 .actionBtn:disabled,
@@ -256,15 +303,15 @@
 }
 
 .sig_red {
-  background: #e07a6a;
+  background: var(--must-do-fg);
 }
 
 .sig_yellow {
-  background: #d4a853;
+  background: var(--should-do-fg);
 }
 
 .sig_green {
-  background: #8fbf8a;
+  background: var(--quick-win-fg);
 }
 
 .reviewShell {

@@ -15,10 +15,8 @@
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  border: 1px solid var(--border);
+  border: 0.5px solid transparent;
   border-radius: 0.9rem;
-  background: var(--surface);
-  color: var(--muted);
   padding: 0.7rem 0.5rem;
   font-size: 0.8125rem;
   font-weight: 500;
@@ -29,25 +27,39 @@
     transform 160ms ease;
 }
 
+.sig_red {
+  background: var(--must-do-bg);
+  color: var(--must-do-fg);
+}
+
+.sig_yellow {
+  background: var(--should-do-bg);
+  color: var(--should-do-fg);
+}
+
+.sig_green {
+  background: var(--quick-win-bg);
+  color: var(--quick-win-fg);
+}
+
 .sigBtn:hover {
-  color: var(--foreground);
+  filter: brightness(0.97);
 }
 
 .sigSelected {
-  color: var(--foreground);
   transform: translateY(-1px);
 }
 
 .sig_red.sigSelected {
-  border-color: #e07a6a;
+  border-color: var(--must-do-fg);
 }
 
 .sig_yellow.sigSelected {
-  border-color: var(--accent);
+  border-color: var(--should-do-fg);
 }
 
 .sig_green.sigSelected {
-  border-color: #8fbf8a;
+  border-color: var(--quick-win-fg);
 }
 
 .sigDot {
@@ -58,15 +70,15 @@
 }
 
 .sig_red .sigDot {
-  background: #e07a6a;
+  background: var(--must-do-fg);
 }
 
 .sig_yellow .sigDot {
-  background: var(--accent);
+  background: var(--should-do-fg);
 }
 
 .sig_green .sigDot {
-  background: #8fbf8a;
+  background: var(--quick-win-fg);
 }
 
 .sigLabel {
@@ -104,13 +116,15 @@
 }
 
 .submit {
+  align-self: center;
+  flex-shrink: 0;
   border: none;
   border-radius: 999px;
   background: var(--accent);
   color: var(--accent-foreground);
-  padding: 0 1.15rem;
-  font-size: 0.875rem;
-  font-weight: 600;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
   cursor: pointer;
   transition:
     background-color 160ms ease,
@@ -139,6 +153,8 @@
 }
 
 .backlogToggle input {
+  width: var(--check-size);
+  height: var(--check-size);
   margin-top: 0.15rem;
   accent-color: var(--accent);
   flex-shrink: 0;
