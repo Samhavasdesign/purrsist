@@ -47,17 +47,24 @@ export function AuthForm({ mode }: AuthFormProps) {
       return;
     }
 
-    const { error: signUpError } = await supabase.auth.signUp({
+    const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
       },
     });
 
     if (signUpError) {
       setError(signUpError.message);
       setLoading(false);
+      return;
+    }
+
+    // Confirm-email off → session exists; land immediately (PRD §5).
+    if (data.session) {
+      router.push("/dashboard");
+      router.refresh();
       return;
     }
 

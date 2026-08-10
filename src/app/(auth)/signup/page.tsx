@@ -9,7 +9,7 @@ export default function SignupPage() {
           <p className={styles.mark}>Purrsist</p>
           <h1 className={styles.title}>Create your account</h1>
           <p className={styles.subtitle}>
-            Email and password only — simple, private, ready when you are.
+            Email and password — that&apos;s the only setup step.
           </p>
         </div>
         <AuthForm mode="signup" />

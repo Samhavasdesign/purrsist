@@ -1,0 +1,140 @@
+.layer {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.25rem 1rem 0;
+  animation: layerIn 220ms ease;
+}
+
+.leaving {
+  animation: layerOut 420ms ease forwards;
+}
+
+.confetti {
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  width: 0;
+  height: 0;
+}
+
+.piece {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--size);
+  height: calc(var(--size) * 1.65);
+  border-radius: 0.15rem;
+  background: var(--color);
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(0deg) scale(0.4);
+  animation: confettiBurst var(--duration) cubic-bezier(0.16, 1, 0.3, 1)
+    var(--delay) forwards;
+}
+
+.pieceRound {
+  border-radius: 999px;
+  height: var(--size);
+}
+
+.toast {
+  position: relative;
+  z-index: 1;
+  min-width: min(18rem, calc(100vw - 2rem));
+  max-width: 22rem;
+  margin-top: 0.35rem;
+  padding: 0.95rem 1.15rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: color-mix(in srgb, var(--surface) 92%, var(--accent));
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent);
+  animation: toastIn 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.toastTitle {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.toastSub {
+  margin: 0.2rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+@keyframes layerIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes layerOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes confettiBurst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(0deg) scale(0.35);
+  }
+  10% {
+    opacity: 1;
+  }
+  65% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(
+        calc(-50% + var(--dx)),
+        calc(-50% + var(--dy) + 120px)
+      )
+      rotate(calc(var(--spin) + 240deg)) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer,
+  .leaving,
+  .toast,
+  .piece {
+    animation: none;
+  }
+
+  .piece {
+    display: none;
+  }
+
+  .leaving {
+    opacity: 0;
+  }
+}

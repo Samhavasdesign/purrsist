@@ -1,0 +1,162 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.sigRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.sigBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: var(--surface);
+  color: var(--muted);
+  padding: 0.7rem 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.sigBtn:hover {
+  color: var(--foreground);
+}
+
+.sigSelected {
+  color: var(--foreground);
+  transform: translateY(-1px);
+}
+
+.sig_red.sigSelected {
+  border-color: #e07a6a;
+}
+
+.sig_yellow.sigSelected {
+  border-color: var(--accent);
+}
+
+.sig_green.sigSelected {
+  border-color: #8fbf8a;
+}
+
+.sigDot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.sig_red .sigDot {
+  background: #e07a6a;
+}
+
+.sig_yellow .sigDot {
+  background: var(--accent);
+}
+
+.sig_green .sigDot {
+  background: #8fbf8a;
+}
+
+.sigLabel {
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.inputRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: var(--surface);
+  color: var(--foreground);
+  padding: 0.85rem 1rem;
+  font-size: 0.975rem;
+  outline: none;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.input::placeholder {
+  color: var(--muted);
+}
+
+.submit {
+  border: none;
+  border-radius: 0.9rem;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  padding: 0 1.15rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    opacity 160ms ease;
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.backlogToggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  cursor: pointer;
+  user-select: none;
+}
+
+.backlogToggle input {
+  margin-top: 0.15rem;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+.error {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--danger);
+}
+
+.aha {
+  /* Reserved — first-capture uses FirstCaptureAha */
+  display: none;
+}
+
+@media (max-width: 420px) {
+  .sigLabel {
+    font-size: 0.75rem;
+  }
+}

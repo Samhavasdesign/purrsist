@@ -36,11 +36,21 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isAuthRoute =
     pathname.startsWith("/login") || pathname.startsWith("/signup");
-  const isPublicRoute = pathname === "/" || isAuthRoute;
+  const isAuthCallback = pathname.startsWith("/auth/callback");
+  const isCronRoute = pathname.startsWith("/api/cron");
+  const isPublicRoute =
+    pathname === "/" || isAuthRoute || isAuthCallback || isCronRoute;
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  // Signed-in users skip marketing home and land in today's capture (PRD §5).
+  if (user && pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
 

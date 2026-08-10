@@ -1,0 +1,24 @@
+---
+description: Purrsist core stack and product constraints
+alwaysApply: true
+---
+
+# Purrsist — Core
+
+Source of truth: [`/docs/PRD.md`](../../docs/PRD.md). Prefer the PRD over assumptions when scope or behavior is unclear.
+
+## Stack
+
+- **Next.js** (App Router) + **TypeScript** + **Tailwind CSS**
+- **Supabase** — Postgres, email/password auth, SSR clients
+- **Resend** — transactional email (Morning Digest, Weekly Recap, re-engagement)
+- **Anthropic API** — server-side AI sorting at capture time (never expose the key to the browser)
+- **Vercel** — hosting, cron for scheduled jobs
+- **PWA** — single-user, web-first, installable; no React Native / Capacitor in MVP
+
+## Constraints
+
+- Single-user MVP: no multi-user, sharing, or social features
+- Secrets (`ANTHROPIC_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, Resend keys) stay server-only
+- Auth is email/password only (no OAuth in v1)
+- Build order: ship **v1.0** core loop before **v1.1** retention features (PRD §7)

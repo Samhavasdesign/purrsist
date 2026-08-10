@@ -1,0 +1,99 @@
+.page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1.5rem 1.25rem 5.5rem;
+  max-width: 40rem;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  align-self: flex-start;
+  margin: 0 0 0.35rem -0.35rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.backLink:hover {
+  color: var(--foreground);
+}
+
+.backIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 0.975rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding-top: 0.25rem;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.email {
+  margin: 0;
+  font-size: 0.975rem;
+  color: var(--foreground);
+}
+
+.signOut {
+  align-self: flex-start;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  padding: 0.55rem 1rem;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.signOut:hover {
+  color: var(--foreground);
+  border-color: var(--muted);
+}
+
+@media (min-width: 640px) {
+  .page {
+    padding: 2rem 2rem 5.5rem;
+  }
+}

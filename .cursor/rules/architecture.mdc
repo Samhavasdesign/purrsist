@@ -1,0 +1,22 @@
+---
+description: Purrsist data model from PRD §10
+globs: src/app/**/*,src/lib/**/*
+alwaysApply: false
+---
+
+# Purrsist — Architecture / Data Model
+
+Source of truth: [`/docs/PRD.md`](../../docs/PRD.md) §10. Keep schema, types, and queries aligned with this model; do not invent Fitness/Mental entities in MVP.
+
+## Suggested Data Model (PRD §10, verbatim)
+
+- **User** — auth account (email/password or similar simple login) so data syncs across devices/browsers from V1; `last_capture_at` (timestamp, drives the Re-engagement email trigger).
+- **DailyEntry** — `date` (unique per user), `must_do`, `should_do_1`, `should_do_2`, `quick_win_1/2/3` (text + bool each + a `carried_over_from` reference and a `carryover_count` — consecutive days unchecked, reset to 0 when checked or sent to Backlog, triggers the Stagnation nudge at 5), `daily_reminder` (text), `win_status` (derived), `locked` (bool — true once the day has passed), `morning_digest_sent` (bool — whether that day's single Morning Digest has gone out), `notes`.
+- **Habit** — `name`, `active` (bool), `created_at`, `archived_at`.
+- **HabitCheckIn** — `habit_id`, `date`, `done` (bool).
+- **BacklogItem** — `text`, `normalized_text` (lowercased/trimmed, used to detect repeats for habit suggestions), `significance` (red/yellow/green, set at capture — independent of timing), `tag` (task/errand/reminder/shopping — set by AI, user-correctable), `ai_placement` (nullable — which DailyEntry slot, if any, the AI auto-placed it into), `target_date` (nullable — set by AI when date language is detected; presence of this field is what puts an item in the "Upcoming" grouping), `status` (active / done / archived — archived is distinct from done, since Bulk archive clears clutter without counting as an accomplishment), `created_at`, `last_touched_at` (used for stale-item surfacing), `promoted_to` (nullable reference to a DailyEntry slot if manually promoted later).
+- **HabitSuggestionDismissal** — `normalized_text`, `dismissed_at` (so a declined habit suggestion doesn't keep reappearing for that item).
+- **Cat** — a small fixed, pre-made set: `id`, `sequence_order` (determines which one's rescued next — deterministic, not random), `name`, `image` reference.
+- **CatRescued** — `user_id`, `cat_id`, `week_start_date` (which Mon–Sun week it was rescued for) — append-only, nothing is ever removed from this. (Active-day count for the threshold is computed at Weekly Recap time from that week's activity across DailyEntry check-offs, HabitCheckIns, and BacklogItem captures — no new field needed to store it.)
+
+(Fitness and Mental entities — WorkoutType, WorkoutLog, GoalSetting, MacroLog, MentalLog — are deferred to Phase 2; see §12.)
