@@ -35,9 +35,9 @@
 
 .explainer {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.975rem;
   line-height: 1.55;
-  color: color-mix(in srgb, var(--muted) 88%, var(--foreground));
+  color: var(--muted);
 }
 
 .stats {

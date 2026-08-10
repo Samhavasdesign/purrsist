@@ -21,9 +21,11 @@
 
 .sectionHint {
   margin: 0;
-  font-size: 0.8125rem;
-  color: color-mix(in srgb, var(--muted) 85%, transparent);
-  line-height: 1.4;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--muted) 48%, transparent);
 }
 
 .list {
