@@ -12,6 +12,19 @@
   --accent-soft: rgba(212, 168, 83, 0.18);
   --danger: #e07a6a;
   --success: #8fbf8a;
+
+  /* Shared app content grid — keep screens + top bar aligned */
+  --app-content-max: 40rem;
+  --app-content-pad-x: 1.25rem;
+  --app-content-pad-top: 1.5rem;
+  --app-content-pad-bottom: 5.5rem;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --app-content-pad-x: 2rem;
+    --app-content-pad-top: 2rem;
+  }
 }
 
 @theme inline {
