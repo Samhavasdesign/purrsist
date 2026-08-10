@@ -9,7 +9,8 @@ export function AppTopBar() {
   const showBack =
     pathname.startsWith("/backlog") ||
     pathname.startsWith("/archive") ||
-    pathname.startsWith("/habits");
+    pathname.startsWith("/habits") ||
+    pathname.startsWith("/settings");
 
   return (
     <header className={styles.bar}>

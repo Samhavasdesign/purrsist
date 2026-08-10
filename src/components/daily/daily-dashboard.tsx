@@ -457,19 +457,13 @@ export function DailyDashboard({
         const extras = extrasForKind(localEntry, group.kind);
         const sectionComplete = sectionCompleteByKind[group.kind];
         const capacityExpanded = expandedCapacity.has(group.kind);
-        const emptySlots = group.slots.filter(
-          (slot) => !String(localEntry[slotTextColumn(slot)] ?? "").trim(),
-        );
-        const filledSlots = group.slots.filter(
-          (slot) => String(localEntry[slotTextColumn(slot)] ?? "").trim(),
-        );
+        // Default slots (1 / 2 / 3) always show, including blanks at day start.
+        const visibleSlots = group.slots;
         const filledExtras = extras.filter((item) => item.text.trim());
         const emptyExtras = extras.filter((item) => !item.text.trim());
-        const visibleSlots = capacityExpanded ? group.slots : filledSlots;
+        // Extra overflow rows: show filled ones always; empty drafts once expanded via +.
         const visibleExtras = capacityExpanded ? extras : filledExtras;
-        const hiddenEmptyCount = capacityExpanded
-          ? 0
-          : emptySlots.length + emptyExtras.length;
+        const hiddenEmptyCount = capacityExpanded ? 0 : emptyExtras.length;
         const showMoreAffordance =
           editable && !capacityExpanded && hiddenEmptyCount > 0;
 

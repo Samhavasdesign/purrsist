@@ -16,23 +16,13 @@ type Props = {
   readOnly?: boolean;
 };
 
-type ReminderRow = DailyReminderItem & { isDraft?: boolean };
+type ReminderRow = DailyReminderItem;
 
-function emptyDraft(): ReminderRow {
-  return { ...newReminderItem(""), isDraft: true };
-}
-
-function toRows(entry: DailyEntry, readOnly: boolean): ReminderRow[] {
-  const rows: ReminderRow[] = readReminders(entry).map((item) => ({
+function toRows(entry: DailyEntry): ReminderRow[] {
+  return readReminders(entry).map((item) => ({
     id: item.id,
     text: item.text,
   }));
-
-  if (!readOnly && !rows.some((row) => !row.text.trim())) {
-    rows.push(emptyDraft());
-  }
-
-  return rows;
 }
 
 function persistedReminders(rows: ReminderRow[]): DailyReminderItem[] {
@@ -41,83 +31,84 @@ function persistedReminders(rows: ReminderRow[]): DailyReminderItem[] {
     .filter((row) => row.text.length > 0);
 }
 
-function payloadKey(rows: ReminderRow[]) {
-  return JSON.stringify(persistedReminders(rows));
+function serialize(reminders: DailyReminderItem[]) {
+  return JSON.stringify(reminders);
+}
+
+function entrySyncKey(entry: DailyEntry) {
+  return `${entry.id}|${entry.daily_reminder ?? ""}|${entry.notes ?? ""}`;
 }
 
 export function ReminderManager({ entry, readOnly = false }: Props) {
   const router = useRouter();
-  const [rows, setRows] = useState<ReminderRow[]>(() => toRows(entry, readOnly));
+  const [rows, setRows] = useState<ReminderRow[]>(() => toRows(entry));
   const [error, setError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
-  const dirty = useRef(new Set<string>());
   const rowsRef = useRef(rows);
-  const lastSavedKey = useRef(payloadKey(toRows(entry, true)));
+  const dirty = useRef(new Set<string>());
+  const lastSaved = useRef(serialize(persistedReminders(toRows(entry))));
+  const syncKeyRef = useRef(entrySyncKey(entry));
   const inputRefs = useRef(new Map<string, HTMLTextAreaElement>());
   const focusNewest = useRef(false);
-  const saveGen = useRef(0);
+  const saveSeq = useRef(0);
+  const ignoreServerUntil = useRef<string | null>(null);
 
   rowsRef.current = rows;
 
   useEffect(() => {
-    // Don't clobber in-progress edits while dirty or saving.
-    if (pending || dirty.current.size > 0) return;
-    const next = toRows(entry, readOnly);
-    lastSavedKey.current = payloadKey(next);
+    const key = entrySyncKey(entry);
+    if (key === syncKeyRef.current) return;
+    syncKeyRef.current = key;
+
+    if (ignoreServerUntil.current) {
+      const serverPayload = serialize(persistedReminders(toRows(entry)));
+      if (serverPayload !== ignoreServerUntil.current) return;
+      ignoreServerUntil.current = null;
+    }
+
+    if (dirty.current.size > 0 || savingId) return;
+
+    const next = toRows(entry);
+    lastSaved.current = serialize(persistedReminders(next));
     setRows(next);
-  }, [entry, readOnly, pending]);
+  }, [entry, savingId]);
 
   useEffect(() => {
     if (!focusNewest.current) return;
     focusNewest.current = false;
-    const empty = rows.find((row) => !row.text.trim());
-    if (!empty) return;
-    window.setTimeout(() => inputRefs.current.get(empty.id)?.focus(), 30);
+    const newest = rows[rows.length - 1];
+    if (!newest) return;
+    window.setTimeout(() => inputRefs.current.get(newest.id)?.focus(), 30);
   }, [rows]);
 
-  function withTrailingDraft(list: ReminderRow[]): ReminderRow[] {
-    if (readOnly || list.some((row) => !row.text.trim())) return list;
-    return [...list, emptyDraft()];
-  }
+  async function persist(nextRows: ReminderRow[], rowId: string) {
+    const payload = persistedReminders(nextRows);
+    const key = serialize(payload);
+    if (key === lastSaved.current) return;
 
-  async function persist(nextRows: ReminderRow[], saving?: string) {
-    const key = payloadKey(nextRows);
-    if (key === lastSavedKey.current) {
-      setRows(withTrailingDraft(nextRows));
-      return;
-    }
-
-    const gen = ++saveGen.current;
+    const seq = ++saveSeq.current;
     setError(null);
-    setSavingId(saving ?? null);
-    setPending(true);
+    setSavingId(rowId);
 
     try {
-      const result = await updateDailyReminders(
-        entry.id,
-        persistedReminders(nextRows),
-      );
-      if (gen !== saveGen.current) return;
+      const result = await updateDailyReminders(entry.id, payload);
+      if (seq !== saveSeq.current) return;
 
       if (!result.ok) {
         setError(result.error);
         return;
       }
 
+      const saved = result.reminders ?? [];
+      lastSaved.current = serialize(saved);
+      ignoreServerUntil.current = lastSaved.current;
       dirty.current.clear();
-      lastSavedKey.current = JSON.stringify(result.reminders ?? []);
-      const serverRows: ReminderRow[] = (result.reminders ?? []).map((item) => ({
-        id: item.id,
-        text: item.text,
-      }));
-      setRows(withTrailingDraft(serverRows));
+      // Keep any in-progress empty draft rows the user just added.
+      const drafts = nextRows.filter((row) => !row.text.trim());
+      setRows([...saved, ...drafts]);
       router.refresh();
     } finally {
-      if (gen === saveGen.current) {
-        setPending(false);
-        setSavingId(null);
-      }
+      if (seq === saveSeq.current) setSavingId(null);
     }
   }
 
@@ -137,46 +128,44 @@ export function ReminderManager({ entry, readOnly = false }: Props) {
       return;
     }
     focusNewest.current = true;
-    setRows((prev) => [...prev, emptyDraft()]);
+    const draft = newReminderItem("");
+    dirty.current.add(draft.id);
+    setRows((prev) => [...prev, draft]);
   }
 
-  function saveRow(id: string, text: string) {
+  function onBlurSave(id: string, text: string) {
     if (readOnly) return;
 
-    // Run after React finishes any commit that triggered this blur.
-    queueMicrotask(() => {
-      const trimmed = text.trim();
-      let next = rowsRef.current.map((row) =>
-        row.id === id ? { ...row, text: trimmed, isDraft: false } : row,
-      );
+    const trimmed = text.trim();
+    const prev = rowsRef.current.find((row) => row.id === id);
+    const wasEmpty = !prev?.text.trim();
+    const unchanged = (prev?.text.trim() ?? "") === trimmed;
 
-      if (!trimmed) {
-        const filled = next.filter((row) => row.text.trim());
-        next =
-          filled.length === 0
-            ? [emptyDraft()]
-            : withTrailingDraft(next.filter((row) => row.id !== id));
-      } else {
-        next = withTrailingDraft(next);
-      }
+    if (!trimmed && wasEmpty && !dirty.current.has(id)) return;
+    if (unchanged && !dirty.current.has(id)) return;
 
-      dirty.current.delete(id);
-      setRows(next);
-      void persist(next, id);
-    });
+    let next = rowsRef.current.map((row) =>
+      row.id === id ? { ...row, text: trimmed } : row,
+    );
+
+    // Drop blank rows on blur — don't keep an automatic empty shell.
+    if (!trimmed) {
+      next = next.filter((row) => row.id !== id);
+    }
+
+    dirty.current.delete(id);
+    rowsRef.current = next;
+    setRows(next);
+    void persist(next, id);
   }
 
   function onRemove(id: string) {
     if (readOnly) return;
     setError(null);
 
-    const filled = rowsRef.current.filter(
-      (row) => row.id !== id && row.text.trim(),
-    );
-    const next =
-      filled.length === 0 ? [emptyDraft()] : withTrailingDraft(filled);
-
+    const next = rowsRef.current.filter((row) => row.id !== id);
     dirty.current.delete(id);
+    rowsRef.current = next;
     setRows(next);
     void persist(next, id);
   }
@@ -191,7 +180,7 @@ export function ReminderManager({ entry, readOnly = false }: Props) {
               type="button"
               className={styles.addSlotBtn}
               onClick={onAdd}
-              disabled={pending}
+              disabled={Boolean(savingId)}
               aria-label="Add another Daily Reminder"
               title="Add another Daily Reminder"
             >
@@ -208,52 +197,62 @@ export function ReminderManager({ entry, readOnly = false }: Props) {
         </p>
       ) : null}
 
-      <ul className={styles.slotList}>
-        {rows.map((row) => {
-          const isEmpty = !row.text.trim();
-          const isSaving = savingId === row.id && pending;
-          return (
-            <li
-              key={row.id}
-              className={`${styles.slotRow} ${styles.reminderRow} ${isEmpty && !readOnly ? styles.slotEmpty : ""}`}
-            >
-              <div className={styles.slotFields}>
-                <textarea
-                  ref={(node) => {
-                    if (node) inputRefs.current.set(row.id, node);
-                    else inputRefs.current.delete(row.id);
-                  }}
-                  className={styles.reminderInput}
-                  rows={3}
-                  placeholder="A task, affirmation, or don’t-do…"
-                  value={row.text}
-                  disabled={readOnly}
-                  readOnly={readOnly}
-                  aria-label="Daily Reminder"
-                  onChange={(event) => setTextLocal(row.id, event.target.value)}
-                  onBlur={(event) => saveRow(row.id, event.target.value)}
-                />
-                {isSaving ? (
-                  <p className={styles.savingHint}>Saving…</p>
+      {rows.length === 0 ? (
+        <p className={styles.habitsEmpty}>
+          {readOnly
+            ? "No reminder set."
+            : "No reminder yet. Tap + to add one."}
+        </p>
+      ) : (
+        <ul className={styles.slotList}>
+          {rows.map((row) => {
+            const isEmpty = !row.text.trim();
+            const isSaving = savingId === row.id;
+            return (
+              <li
+                key={row.id}
+                className={`${styles.slotRow} ${styles.reminderRow} ${isEmpty && !readOnly ? styles.slotEmpty : ""}`}
+              >
+                <div className={styles.slotFields}>
+                  <textarea
+                    ref={(node) => {
+                      if (node) inputRefs.current.set(row.id, node);
+                      else inputRefs.current.delete(row.id);
+                    }}
+                    className={styles.reminderInput}
+                    rows={3}
+                    placeholder="A task, affirmation, or don’t-do…"
+                    value={row.text}
+                    disabled={readOnly}
+                    readOnly={readOnly}
+                    aria-label="Daily Reminder"
+                    onChange={(event) =>
+                      setTextLocal(row.id, event.target.value)
+                    }
+                    onBlur={(event) => onBlurSave(row.id, event.target.value)}
+                  />
+                  {isSaving ? (
+                    <p className={styles.savingHint}>Saving…</p>
+                  ) : null}
+                </div>
+                {!readOnly ? (
+                  <button
+                    type="button"
+                    className={styles.clearBtn}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => onRemove(row.id)}
+                    disabled={Boolean(savingId)}
+                    aria-label="Clear Daily Reminder"
+                    title="Clear"
+                  >
+                    <span aria-hidden>×</span>
+                  </button>
                 ) : null}
-              </div>
-              {!readOnly ? (
-                <button
-                  type="button"
-                  className={styles.clearBtn}
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => onRemove(row.id)}
-                  disabled={pending || (isEmpty && rows.length <= 1)}
-                  aria-label="Clear Daily Reminder"
-                  title="Clear"
-                >
-                  <span aria-hidden>×</span>
-                </button>
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </section>
   );
 }
