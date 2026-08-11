@@ -1,15 +1,18 @@
 .banner {
   margin: 0;
   padding: 0.7rem 0.9rem;
-  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
-  border-radius: 0.85rem;
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
 .text {
   margin: 0;
-  font-size: 0.8125rem;
-  line-height: 1.45;
+  font-family: var(--font-ui);
+  font-size: var(--text-support-size);
+  font-weight: var(--text-support-weight);
+  letter-spacing: var(--text-support-tracking);
+  line-height: var(--text-support-leading);
   color: var(--muted);
 }
 

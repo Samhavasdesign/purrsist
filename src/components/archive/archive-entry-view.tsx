@@ -5,6 +5,7 @@ import { formatArchiveDate } from "@/lib/daily/entry-rules";
 import {
   extrasForKind,
   KIND_LABELS,
+  KIND_LABELS_PLURAL,
   type DailyItemKind,
 } from "@/lib/daily/extra-items";
 import { readReminders } from "@/lib/daily/reminders";
@@ -28,14 +29,18 @@ const GROUPS: {
   kind: DailyItemKind;
   slots: DailySlot[];
 }[] = [
-  { title: "Must-Do", kind: "must_do", slots: ["must_do"] },
   {
-    title: "Should-Dos",
+    title: KIND_LABELS_PLURAL.must_do,
+    kind: "must_do",
+    slots: ["must_do"],
+  },
+  {
+    title: KIND_LABELS_PLURAL.should_do,
     kind: "should_do",
     slots: ["should_do_1", "should_do_2"],
   },
   {
-    title: "Quick Wins",
+    title: KIND_LABELS_PLURAL.quick_win,
     kind: "quick_win",
     slots: ["quick_win_1", "quick_win_2", "quick_win_3"],
   },
@@ -52,9 +57,9 @@ export function ArchiveEntryView({ entry, habits }: Props) {
           <h2 className={styles.date}>{formatArchiveDate(entry.date)}</h2>
         </div>
         <span
-          className={`${styles.badge} ${win ? styles.badgeWin : styles.badgeOpen}`}
+          className={win ? styles.badge : `${styles.badge} ${styles.badgeOpen}`}
         >
-          {win ? "Win" : "No win"}
+          {win ? "🎉 Win!" : "no win"}
         </span>
       </header>
 

@@ -4,10 +4,9 @@
   gap: 0.4rem;
   margin: 0;
   padding: 1rem 1.1rem;
-  border-radius: 1rem;
-  border: 1px solid color-mix(in srgb, var(--accent) 50%, var(--border));
+  border-radius: var(--radius-lg);
+  border: var(--border-default);
   background: color-mix(in srgb, var(--accent) 14%, var(--surface));
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
   animation: ahaIn 260ms ease;
 }
 
@@ -17,45 +16,40 @@
 
 .eyebrow {
   margin: 0;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-family: var(--font-ui);
+  font-size: var(--text-support-size);
+  font-weight: var(--text-label-weight);
+  letter-spacing: var(--text-support-tracking);
+  line-height: var(--text-support-leading);
+  text-transform: none;
   color: var(--accent);
 }
 
 .reason {
   margin: 0;
-  font-size: 1.05rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-body-size);
   font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.35;
+  letter-spacing: var(--text-body-tracking);
+  line-height: var(--text-body-leading);
   color: var(--foreground);
 }
 
 .sub {
   margin: 0.15rem 0 0;
-  font-size: 0.875rem;
-  line-height: 1.45;
+  font-family: var(--font-ui);
+  font-size: var(--text-support-size);
+  font-weight: var(--text-support-weight);
+  letter-spacing: var(--text-support-tracking);
+  line-height: var(--text-support-leading);
   color: var(--muted);
 }
 
 .dismiss {
   align-self: flex-start;
-  margin-top: 0.45rem;
-  border: none;
-  background: transparent;
-  color: var(--foreground);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  margin-top: 0.25rem;
   text-decoration: underline;
   text-underline-offset: 0.16em;
-  padding: 0;
-  cursor: pointer;
-}
-
-.dismiss:hover {
-  color: var(--accent);
 }
 
 @keyframes ahaIn {

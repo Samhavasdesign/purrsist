@@ -44,15 +44,16 @@
   align-items: center;
   gap: 0.55rem 0.65rem;
   padding: 0.55rem 0.7rem;
-  border: 1px solid var(--border);
-  border-radius: 0.85rem;
+  border: var(--border-default);
+  border-radius: var(--radius-md);
   background: var(--surface);
 }
 
 .checkbox {
   width: var(--check-size);
   height: var(--check-size);
-  accent-color: var(--accent);
+  accent-color: var(--foreground);
+  border-radius: var(--radius-sm);
 }
 
 .name,
@@ -61,7 +62,9 @@
   min-width: 0;
   font: inherit;
   font-size: 0.95rem;
+  font-weight: var(--text-input-weight);
   color: var(--foreground);
+  -webkit-text-fill-color: var(--foreground);
 }
 
 .nameInput {
@@ -69,6 +72,12 @@
   background: transparent;
   outline: none;
   padding: 0.2rem 0;
+  border-radius: var(--radius-sm);
+}
+
+.nameInput:focus-visible {
+  outline: var(--focus-ring-input);
+  outline-offset: var(--focus-ring-input-offset);
 }
 
 .nameInput::placeholder {
@@ -116,13 +125,13 @@
   display: flex;
   gap: 0.5rem;
   padding: 0.55rem 0.7rem;
-  border: 1px dashed var(--border);
-  border-radius: 0.85rem;
+  border: var(--border-width) dashed var(--border);
+  border-radius: var(--radius-md);
 }
 
 .addBtn {
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   background: var(--accent);
   color: var(--accent-foreground);
   padding: 0.45rem 0.9rem;

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { CatPortrait } from "./cat-portraits";
 import styles from "./collection-screen.module.css";
 
 export type MockCat = {
@@ -9,7 +10,6 @@ export type MockCat = {
   name: string;
   /** Monday of the Mon–Sun week this cat was rescued for. */
   weekStartDate: string;
-  imageUrl: string;
 };
 
 function formatWeekLabel(weekStartDate: string) {
@@ -35,48 +35,36 @@ export const MOCK_RESCUED_CATS: MockCat[] = [
     sequenceOrder: 1,
     name: "Mochi",
     weekStartDate: "2026-06-30",
-    imageUrl:
-      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&h=600&fit=crop&q=80",
   },
   {
     id: "cat-2",
     sequenceOrder: 2,
     name: "Biscuit",
     weekStartDate: "2026-07-07",
-    imageUrl:
-      "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=600&h=600&fit=crop&q=80",
   },
   {
     id: "cat-3",
     sequenceOrder: 3,
     name: "Noodle",
     weekStartDate: "2026-07-14",
-    imageUrl:
-      "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?w=600&h=600&fit=crop&q=80",
   },
   {
     id: "cat-4",
     sequenceOrder: 4,
     name: "Pickles",
     weekStartDate: "2026-07-21",
-    imageUrl:
-      "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?w=600&h=600&fit=crop&q=80",
   },
   {
     id: "cat-5",
     sequenceOrder: 5,
     name: "Toast",
     weekStartDate: "2026-07-28",
-    imageUrl:
-      "https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=600&h=600&fit=crop&q=80",
   },
   {
     id: "cat-6",
     sequenceOrder: 6,
     name: "Bean",
     weekStartDate: "2026-08-04",
-    imageUrl:
-      "https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=600&h=600&fit=crop&q=80",
   },
 ];
 
@@ -90,11 +78,17 @@ const MOCK_STATS = {
   itemsCheckedOff: 142,
 } as const;
 
-export function CollectionScreen() {
+type Props = {
+  /** Deep-link from the Today rescue toast — scroll + highlight this cat. */
+  highlightCatId?: string | null;
+};
+
+export function CollectionScreen({ highlightCatId = null }: Props) {
   const [selected, setSelected] = useState<MockCat | null>(null);
+  const highlightRef = useRef<HTMLLIElement | null>(null);
 
   const cats = [...MOCK_RESCUED_CATS].sort(
-    (a, b) => a.sequenceOrder - b.sequenceOrder,
+    (a, b) => b.sequenceOrder - a.sequenceOrder,
   );
 
   useEffect(() => {
@@ -106,14 +100,22 @@ export function CollectionScreen() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [selected]);
 
+  useEffect(() => {
+    if (!highlightCatId) return;
+    const node = highlightRef.current;
+    if (!node) return;
+    node.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [highlightCatId]);
+
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Collection</h1>
-
-        <p className={styles.activeCount} aria-live="polite">
-          {MOCK_ACTIVE_DAYS}/{MOCK_WEEK_DAYS} days active this week
-        </p>
+        <div className={styles.titleRow}>
+          <h1 className={styles.title}>Collection</h1>
+          <p className={styles.activeBadge} aria-live="polite">
+            {MOCK_ACTIVE_DAYS}/{MOCK_WEEK_DAYS} days active this week
+          </p>
+        </div>
 
         <p className={styles.explainer}>
           Interact with Purrsist on 6+ days this week — capturing something
@@ -147,37 +149,36 @@ export function CollectionScreen() {
         </div>
       ) : (
         <ul className={styles.grid}>
-          {cats.map((cat) => (
-            <li key={cat.id}>
-              <button
-                type="button"
-                className={styles.card}
-                onClick={() => setSelected(cat)}
-                aria-label={`View ${cat.name}, week ${cat.sequenceOrder}`}
+          {cats.map((cat) => {
+            const highlighted = highlightCatId === cat.id;
+            return (
+              <li
+                key={cat.id}
+                ref={highlighted ? highlightRef : undefined}
+                className={highlighted ? styles.cardHighlightWrap : undefined}
               >
-                <span className={styles.cardMedia}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    className={styles.cardImage}
-                    src={cat.imageUrl}
-                    alt=""
-                    width={300}
-                    height={300}
-                    loading="lazy"
-                  />
-                  <span className={styles.weekBadge}>
-                    Week {cat.sequenceOrder}
+                <button
+                  type="button"
+                  className={`${styles.card} ${highlighted ? styles.cardHighlight : ""}`}
+                  onClick={() => setSelected(cat)}
+                  aria-label={`View ${cat.name}, week ${cat.sequenceOrder}`}
+                >
+                  <span className={styles.cardMedia}>
+                    <CatPortrait name={cat.name} className={styles.cardImage} />
+                    <span className={styles.weekBadge}>
+                      Week {cat.sequenceOrder}
+                    </span>
                   </span>
-                </span>
-                <span className={styles.cardMeta}>
-                  <span className={styles.cardName}>{cat.name}</span>
-                  <span className={styles.cardWeek}>
-                    {formatWeekLabel(cat.weekStartDate)}
+                  <span className={styles.cardMeta}>
+                    <span className={styles.cardName}>{cat.name}</span>
+                    <span className={styles.cardWeek}>
+                      {formatWeekLabel(cat.weekStartDate)}
+                    </span>
                   </span>
-                </span>
-              </button>
-            </li>
-          ))}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
 
@@ -202,13 +203,10 @@ export function CollectionScreen() {
             >
               Close
             </button>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <CatPortrait
+              name={selected.name}
               className={styles.detailImage}
-              src={selected.imageUrl}
-              alt={selected.name}
-              width={600}
-              height={600}
+              title={selected.name}
             />
             <div className={styles.detailHeader}>
               <h2 id="collection-cat-name" className={styles.detailName}>

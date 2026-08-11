@@ -1,7 +1,11 @@
-import type { DailyItemKind } from "@/lib/daily/extra-items";
-import type { DailyEntry, DailySlot, Significance } from "@/lib/types/database";
-import { slotTextColumn } from "@/lib/types/database";
 import { extrasForKind } from "@/lib/daily/extra-items";
+import type {
+  DailyEntry,
+  DailyItemKind,
+  DailySlot,
+  Significance,
+} from "@/lib/types/database";
+import { KIND_LABELS, slotTextColumn } from "@/lib/types/database";
 
 /** Big deal → Must-Do, Matters → Should-Do, Eventually → Quick Win */
 export function kindForSignificance(significance: Significance): DailyItemKind {
@@ -31,14 +35,7 @@ export function defaultSlotsForSignificance(
 export function categoryLabelForSignificance(
   significance: Significance,
 ): string {
-  switch (significance) {
-    case "red":
-      return "Must-Do";
-    case "yellow":
-      return "Should-Do";
-    case "green":
-      return "Quick Win";
-  }
+  return KIND_LABELS[kindForSignificance(significance)];
 }
 
 /** First empty default slot in the significance group, or null if all filled. */
@@ -68,6 +65,26 @@ export function openSlotsForSignificance(
 ): DailySlot[] {
   return defaultSlotsForSignificance(significance).filter(
     (slot) => !String(entry[slotTextColumn(slot)] ?? "").trim(),
+  );
+}
+
+export function significanceForKind(kind: DailyItemKind): Significance {
+  switch (kind) {
+    case "must_do":
+      return "red";
+    case "should_do":
+      return "yellow";
+    case "quick_win":
+      return "green";
+  }
+}
+
+/** Kinds that still have at least one empty default slot today. */
+export function openKindsForEntry(entry: DailyEntry): DailyItemKind[] {
+  const kinds: DailyItemKind[] = ["must_do", "should_do", "quick_win"];
+  return kinds.filter(
+    (kind) =>
+      openSlotsForSignificance(entry, significanceForKind(kind)).length > 0,
   );
 }
 

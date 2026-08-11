@@ -6,142 +6,92 @@
 
 .header {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
+  gap: 0.45rem;
 }
 
 .title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2rem, 5vw, 2.5rem);
-  font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
+  font-size: var(--text-page-title-size);
+  font-weight: var(--text-page-title-weight);
+  letter-spacing: var(--text-page-title-tracking);
+  line-height: var(--text-page-title-leading);
+  text-transform: none;
+  color: var(--foreground);
 }
 
-.badge {
-  position: relative;
+.dateTag {
   display: inline-flex;
   align-items: center;
-  gap: 0.28rem;
-  border-radius: 999px;
-  padding: 0.28rem 0.65rem;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: default;
-}
-
-.badgeIcon {
-  width: 0.95rem;
-  height: 0.95rem;
-  flex-shrink: 0;
-  color: #000000;
-}
-
-.badgeWin {
-  background: var(--accent);
-  color: var(--accent-foreground);
-}
-
-.badgeCelebrate {
-  animation: badgePop 700ms cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
-}
-
-.badgeTooltip {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 0.55rem);
-  z-index: 5;
-  width: max-content;
-  max-width: min(18rem, 70vw);
-  padding: 0.55rem 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 0.65rem;
-  background: var(--surface);
+  padding: 0.28rem 0.5rem;
+  border: var(--border-muted-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface-glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--foreground);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  letter-spacing: 0;
+  font-family: var(--font-ui);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   text-transform: none;
-  line-height: 1.4;
-  white-space: normal;
-  text-align: left;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: translateX(-50%) translateY(0.2rem);
-  transition:
-    opacity 160ms ease,
-    transform 160ms ease,
-    visibility 160ms ease;
-}
-
-.badgeTooltip::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  width: 0.55rem;
-  height: 0.55rem;
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  transform: translateX(-50%) translateY(-50%) rotate(45deg);
-}
-
-.badge:hover .badgeTooltip,
-.badge:focus-visible .badgeTooltip {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
-}
-
-@keyframes badgePop {
-  0% {
-    transform: scale(0.92);
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent);
-  }
-  45% {
-    transform: scale(1.08);
-    box-shadow: 0 0 0 12px transparent;
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 transparent;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .badgeCelebrate {
-    animation: none;
-  }
-
-  .badgeTooltip {
-    transition: none;
-  }
+  line-height: 1;
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
-  border-radius: var(--radius-block);
+  gap: 1.15rem;
+  border-radius: var(--radius-lg);
   padding: 1.125rem 1.25rem;
+  transform: translateZ(0);
+  transition: opacity 0.35s ease;
+}
+
+/* Quiet at-rest complete state — whole card settles to half opacity. */
+.sectionComplete {
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section {
+    transition: none;
+  }
+}
+
+/* Same timing as + / X iconPop — whole category card scales briefly */
+.sectionPulse {
+  animation: sectionPop 0.25s ease-out 1;
+}
+
+@keyframes sectionPop {
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sectionPulse {
+    animation: none;
+  }
 }
 
 .section_red {
-  background: var(--must-do-bg);
+  background: var(--must-do-bg-fill);
 }
 
 .section_yellow {
-  background: var(--should-do-bg);
+  background: var(--should-do-bg-fill);
 }
 
 .section_green {
-  background: var(--quick-win-bg);
+  background: var(--quick-win-bg-fill);
+}
+
+.section_support {
+  background: var(--support-bg-fill);
 }
 
 .section_red .sectionTitle {
@@ -156,6 +106,10 @@
   color: var(--quick-win-fg);
 }
 
+.section_support .sectionTitle {
+  color: var(--support-fg);
+}
+
 .section_red .sectionHint {
   color: color-mix(in srgb, var(--must-do-fg) 65%, transparent);
 }
@@ -168,9 +122,19 @@
   color: color-mix(in srgb, var(--quick-win-fg) 65%, transparent);
 }
 
+.section_support .sectionHint {
+  color: color-mix(in srgb, var(--support-fg) 65%, transparent);
+}
+
 .section_red .addSlotBtn {
   border-color: var(--must-do-border);
   color: var(--must-do-fg);
+}
+
+.section_red .addSlotBtn:hover:not(:disabled) {
+  border-color: var(--must-do-fg);
+  color: var(--must-do-fg);
+  background: color-mix(in srgb, var(--must-do-fg) 12%, transparent);
 }
 
 .section_yellow .addSlotBtn {
@@ -178,36 +142,72 @@
   color: var(--should-do-fg);
 }
 
+.section_yellow .addSlotBtn:hover:not(:disabled) {
+  border-color: var(--should-do-fg);
+  color: var(--should-do-fg);
+  background: color-mix(in srgb, var(--should-do-fg) 12%, transparent);
+}
+
 .section_green .addSlotBtn {
-  border-color: color-mix(in srgb, var(--quick-win-fg) 45%, var(--quick-win-bg));
+  border-color: var(--quick-win-border);
   color: var(--quick-win-fg);
+}
+
+.section_green .addSlotBtn:hover:not(:disabled) {
+  border-color: var(--quick-win-fg);
+  color: var(--quick-win-fg);
+  background: color-mix(in srgb, var(--quick-win-fg) 12%, transparent);
+}
+
+.section_support .addSlotBtn {
+  border-color: var(--support-border);
+  color: var(--support-fg);
+}
+
+.section_support .addSlotBtn:hover:not(:disabled) {
+  border-color: var(--support-fg);
+  color: var(--support-fg);
+  background: color-mix(in srgb, var(--support-fg) 12%, transparent);
 }
 
 .section_red .clearBtn {
   color: color-mix(in srgb, var(--must-do-fg) 70%, transparent);
 }
 
+.section_red .clearBtn:hover:not(:disabled):not([aria-disabled="true"]) {
+  color: var(--must-do-fg);
+  border-color: transparent;
+  background: transparent;
+}
+
 .section_yellow .clearBtn {
   color: color-mix(in srgb, var(--should-do-fg) 70%, transparent);
+}
+
+.section_yellow .clearBtn:hover:not(:disabled):not([aria-disabled="true"]) {
+  color: var(--should-do-fg);
+  border-color: transparent;
+  background: transparent;
 }
 
 .section_green .clearBtn {
   color: color-mix(in srgb, var(--quick-win-fg) 70%, transparent);
 }
 
-.section_red .badgeWin {
-  background: var(--must-do-fg);
-  color: var(--background);
+.section_green .clearBtn:hover:not(:disabled):not([aria-disabled="true"]) {
+  color: var(--quick-win-fg);
+  border-color: transparent;
+  background: transparent;
 }
 
-.section_yellow .badgeWin {
-  background: var(--should-do-fg);
-  color: var(--background);
+.section_support .clearBtn {
+  color: color-mix(in srgb, var(--support-fg) 70%, transparent);
 }
 
-.section_green .badgeWin {
-  background: var(--quick-win-fg);
-  color: var(--background);
+.section_support .clearBtn:hover:not(:disabled):not([aria-disabled="true"]) {
+  color: var(--support-fg);
+  border-color: transparent;
+  background: transparent;
 }
 
 .sectionRule {
@@ -215,13 +215,13 @@
   height: 0;
   margin: 0;
   border: none;
-  border-top: 1px solid var(--border);
+  border-top: var(--border-width) solid var(--border);
 }
 
 .sectionHead {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.35rem;
 }
 
 .sectionTitleRow {
@@ -233,51 +233,40 @@
 
 .sectionTitleCluster {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.sectionTitleMain {
+  display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: baseline;
   gap: 0.55rem 0.65rem;
   min-width: 0;
 }
 
 .sectionTitle {
   margin: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
   font-family: var(--font-display);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: var(--text-section-size);
+  font-weight: var(--text-section-weight);
+  letter-spacing: var(--text-section-tracking);
+  line-height: var(--text-section-leading);
+  text-transform: none;
   color: var(--muted);
-}
-
-.sectionDot {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 999px;
-  flex-shrink: 0;
-}
-
-.sectionDot_red {
-  background: var(--must-do-fg);
-}
-
-.sectionDot_yellow {
-  background: var(--should-do-fg);
-}
-
-.sectionDot_green {
-  background: var(--quick-win-fg);
 }
 
 .sectionHint {
   margin: 0;
-  font-size: 0.6875rem;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  line-height: 1.35;
-  color: color-mix(in srgb, var(--muted) 48%, transparent);
+  font-family: var(--font-ui);
+  font-size: var(--text-support-size);
+  font-weight: var(--text-support-weight);
+  letter-spacing: var(--text-support-tracking);
+  line-height: var(--text-support-leading);
+  color: color-mix(in srgb, var(--muted) 70%, transparent);
+  min-width: 0;
 }
 
 .slotList {
@@ -294,10 +283,10 @@
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  /* Always reserve stroke + inset so focus/empty never shift the checkbox */
+  /* Always reserve stroke so focus/empty never shift the checkbox */
   padding: 0.5rem 0.65rem;
-  border: 0.5px solid transparent;
-  border-radius: var(--radius-row);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--background) 35%, transparent);
   transition:
     opacity 160ms ease,
@@ -305,8 +294,49 @@
 }
 
 .slotEmpty {
+  /* Dashed = editable empty placeholder (special state) */
   border-style: dashed;
-  border-color: color-mix(in srgb, var(--foreground) 28%, transparent);
+  border-color: var(--border);
+}
+
+.slotDragging {
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--foreground) 18%, transparent);
+  background: var(--background);
+}
+
+.dragHandle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 44px;
+  margin: -0.5rem 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: color-mix(in srgb, var(--muted) 65%, transparent);
+  cursor: grab;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.dragHandle:focus {
+  outline: none;
+}
+
+.dragHandle:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-sm);
+}
+
+.dragHandleIcon {
+  pointer-events: none;
 }
 
 .moreCapacityRow {
@@ -316,54 +346,48 @@
 }
 
 .moreCapacityBtn {
-  appearance: none;
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.875rem;
-  letter-spacing: 0.01em;
-  padding: 0.35rem 0.55rem;
-  cursor: pointer;
-  text-align: left;
-  transition: color 160ms ease;
-}
-
-.moreCapacityBtn:hover,
-.moreCapacityBtn:focus-visible {
-  color: var(--foreground);
-  outline: none;
+  justify-content: flex-start;
+  width: auto;
 }
 
 .slotRow:focus-within {
   border-style: solid;
-  border-color: var(--foreground);
+  border-color: var(--border);
 }
 
 .section_red .slotRow:focus-within {
-  border-color: var(--must-do-fg);
+  border-color: var(--must-do-border);
 }
 
 .section_yellow .slotRow:focus-within {
-  border-color: var(--should-do-fg);
+  border-color: var(--should-do-border);
 }
 
 .section_green .slotRow:focus-within {
-  border-color: var(--quick-win-fg);
+  border-color: var(--quick-win-border);
+}
+
+.section_support .slotRow:focus-within {
+  border-color: var(--support-border);
 }
 
 .checkbox {
   flex-shrink: 0;
   width: var(--check-size);
   height: var(--check-size);
-  margin-top: 0;
-  accent-color: var(--accent);
+  margin: 0;
+  accent-color: var(--foreground);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.checkbox:focus {
   outline: none;
 }
 
-.checkbox:focus,
 .checkbox:focus-visible {
-  outline: none;
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .slotFields {
@@ -379,152 +403,183 @@
   border: none;
   background: transparent;
   color: var(--foreground);
-  font: inherit;
-  font-size: 0.95rem;
+  -webkit-text-fill-color: var(--foreground);
+  font-family: var(--font-ui);
+  font-size: var(--text-input-size);
+  font-weight: var(--text-input-weight);
+  letter-spacing: var(--text-input-tracking);
+  line-height: var(--text-input-leading);
   outline: none;
   padding: 0.25rem 0;
+  border-radius: var(--radius-sm);
 }
 
-.carryHint,
-.savingHint {
+.slotTextarea {
+  display: block;
+  resize: none;
+  overflow: hidden;
+  field-sizing: content;
+  min-height: calc(var(--text-input-leading) * 1em + 0.5rem);
+}
+
+.slotInput:disabled,
+.slotInput:read-only {
+  color: var(--foreground);
+  -webkit-text-fill-color: var(--foreground);
+  opacity: 1;
+}
+
+.carryHint {
   margin: 0;
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-family: var(--font-ui);
+  font-size: var(--text-support-size);
+  font-weight: var(--text-support-weight);
+  letter-spacing: var(--text-support-tracking);
+  line-height: var(--text-support-leading);
+  text-transform: none;
   color: var(--accent);
 }
 
-.savingHint {
-  color: var(--muted);
+/* Inline row spinner — sits beside the input instead of adding a line
+   below it, so a save in progress never changes the row's height. */
+.savingSpinner {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border: 2px solid color-mix(in srgb, var(--muted) 30%, transparent);
+  border-top-color: var(--accent);
+  border-radius: var(--radius-full);
+  animation: savingSpin 700ms linear infinite;
+}
+
+@keyframes savingSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .savingSpinner {
+    animation: none;
+    opacity: 0.6;
+  }
 }
 
 .error {
   margin: 0;
   padding: 0.75rem 0.95rem;
-  border-radius: 0.85rem;
-  border: 1px solid color-mix(in srgb, #f07178 45%, var(--border));
-  background: color-mix(in srgb, #f07178 12%, var(--surface));
-  color: #f07178;
-  font-size: 0.875rem;
+  border-radius: var(--radius-lg);
+  border: var(--border-width) solid color-mix(in srgb, var(--danger) 45%, var(--border));
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+  color: var(--danger);
+  font-family: var(--font-ui);
+  font-size: var(--text-support-size);
+  line-height: var(--text-support-leading);
 }
 
 .lockedNote {
   margin: 0;
   padding: 0.75rem 0.95rem;
-  border: 1px solid var(--border);
-  border-radius: 0.85rem;
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
   background: var(--surface);
   color: var(--muted);
-  font-size: 0.875rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-leading);
+}
+
+.lockedLink {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.lockedLink:hover {
+  color: var(--accent-hover);
 }
 
 .slotInput::placeholder {
   color: var(--muted);
+  -webkit-text-fill-color: var(--muted);
+  font-style: italic;
+}
+
+.section_red .slotInput::placeholder {
+  color: color-mix(in srgb, var(--must-do-fg) 65%, transparent);
+  -webkit-text-fill-color: color-mix(in srgb, var(--must-do-fg) 65%, transparent);
+}
+
+.section_yellow .slotInput::placeholder {
+  color: color-mix(in srgb, var(--should-do-fg) 65%, transparent);
+  -webkit-text-fill-color: color-mix(in srgb, var(--should-do-fg) 65%, transparent);
+}
+
+.section_green .slotInput::placeholder {
+  color: color-mix(in srgb, var(--quick-win-fg) 65%, transparent);
+  -webkit-text-fill-color: color-mix(in srgb, var(--quick-win-fg) 65%, transparent);
+}
+
+.section_support .slotInput::placeholder {
+  color: color-mix(in srgb, var(--support-fg) 65%, transparent);
+  -webkit-text-fill-color: color-mix(in srgb, var(--support-fg) 65%, transparent);
 }
 
 .slotDone {
-  color: var(--muted);
+  color: var(--foreground);
+  -webkit-text-fill-color: var(--foreground);
   text-decoration: line-through;
 }
 
 .manageHabitsLink {
   flex-shrink: 0;
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  text-decoration: none;
-  transition: color 160ms ease;
+  border-color: var(--support-border);
 }
 
-.manageHabitsLink:hover {
-  color: var(--accent);
+.manageHabitsLink:hover:not(:disabled):not([aria-disabled="true"]) {
+  border-color: var(--support-fg);
 }
 
 .habitLabel {
   flex: 1;
   min-width: 0;
-  font-size: 0.95rem;
-  line-height: 1.35;
+  font-family: var(--font-ui);
+  font-size: var(--text-input-size);
+  font-weight: var(--text-input-weight);
+  letter-spacing: var(--text-input-tracking);
+  line-height: var(--text-input-leading);
   padding: 0.25rem 0;
   color: var(--foreground);
+  -webkit-text-fill-color: var(--foreground);
 }
 
 .habitsEmpty {
   margin: 0;
   padding: 0.7rem 0.15rem 0.1rem;
-  font-size: 0.875rem;
-  line-height: 1.45;
+  font-family: var(--font-ui);
+  font-size: var(--text-support-size);
+  line-height: var(--text-support-leading);
   color: var(--muted);
+}
+
+.section_support .habitsEmpty {
+  color: color-mix(in srgb, var(--support-fg) 70%, transparent);
 }
 
 .clearBtn {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.65rem;
-  height: 1.65rem;
   margin-left: auto;
-  border: none;
-  border-radius: 999px;
-  background: transparent;
   color: var(--muted);
-  font-size: 1.15rem;
-  font-weight: 400;
-  line-height: 1;
-  padding: 0;
-  cursor: pointer;
-  transition:
-    color 160ms ease,
-    background-color 160ms ease;
 }
 
-.clearBtn:hover:not(:disabled) {
-  color: var(--foreground);
-  background: color-mix(in srgb, var(--foreground) 8%, transparent);
-}
-
-.clearBtn:disabled {
-  opacity: 0.28;
-  cursor: default;
-}
-
-.removeBtn {
-  flex-shrink: 0;
-  border: none;
+.clearBtn:hover:not(:disabled):not([aria-disabled="true"]) {
+  color: var(--accent);
+  border-color: transparent;
   background: transparent;
-  color: var(--muted);
-  font-size: 0.75rem;
-  cursor: pointer;
-  padding: 0.35rem 0.25rem;
-  margin-top: 0.2rem;
 }
 
-.removeBtn:hover {
-  color: var(--foreground);
-}
-
+/* Tone overrides for IconButton inside category cards */
 .addSlotBtn {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: #fff;
   color: var(--muted);
-  font-size: 1.15rem;
-  font-weight: 400;
-  line-height: 1;
-  padding: 0;
-  cursor: pointer;
-  transition:
-    color 160ms ease,
-    border-color 160ms ease,
-    background-color 160ms ease;
 }
 
 .addSlotBtn:hover:not(:disabled) {
@@ -533,86 +588,80 @@
   background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
-.addSlotBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+/* Hover.css “Icon Pop” — only the + / X glyph scales */
+.addSlotBtn svg,
+.clearBtn svg {
+  transform: translateZ(0);
+  transition-duration: 0.25s;
+  transition-property: transform;
+  transition-timing-function: ease-out;
 }
 
-.addHabit {
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.55rem 0.7rem;
-  border: 1px dashed var(--border);
-  border-radius: 0.85rem;
+.addSlotBtn:hover:not(:disabled) svg,
+.addSlotBtn:focus-visible:not(:disabled) svg,
+.addSlotBtn:active:not(:disabled) svg,
+.clearBtn:hover:not(:disabled) svg,
+.clearBtn:focus-visible:not(:disabled) svg,
+.clearBtn:active:not(:disabled) svg {
+  animation: iconPop 0.25s ease-out 1;
 }
 
-.addBtn {
-  border: none;
-  border-radius: 999px;
-  background: var(--accent);
-  color: var(--accent-foreground);
-  padding: 0.45rem 0.9rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
+@keyframes iconPop {
+  50% {
+    transform: scale(1.2);
+  }
 }
 
-.addBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+@media (prefers-reduced-motion: reduce) {
+  .addSlotBtn svg,
+  .clearBtn svg {
+    transition: none;
+  }
 
-.reminderRow {
-  align-items: flex-start;
-}
-
-.reminderRow .clearBtn {
-  margin-top: 0.35rem;
-}
-
-.reminderInput {
-  width: 100%;
-  border: none;
-  background: transparent;
-  color: var(--foreground);
-  font: inherit;
-  font-size: 0.95rem;
-  line-height: 1.45;
-  padding: 0.25rem 0;
-  resize: vertical;
-  outline: none;
-  min-height: 4.5rem;
-}
-
-.reminderInput::placeholder {
-  color: var(--muted);
+  .addSlotBtn:hover:not(:disabled) svg,
+  .addSlotBtn:focus-visible:not(:disabled) svg,
+  .addSlotBtn:active:not(:disabled) svg,
+  .clearBtn:hover:not(:disabled) svg,
+  .clearBtn:focus-visible:not(:disabled) svg,
+  .clearBtn:active:not(:disabled) svg {
+    animation: none;
+  }
 }
 
 .reminder {
   width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 0.85rem;
+  border: var(--border-default);
+  border-radius: var(--radius-md);
   background: var(--surface);
   color: var(--foreground);
-  font: inherit;
-  font-size: 0.95rem;
-  line-height: 1.45;
+  font-family: var(--font-ui);
+  font-size: var(--text-input-size);
+  font-weight: var(--text-input-weight);
+  letter-spacing: var(--text-input-tracking);
+  line-height: var(--text-input-leading);
   padding: 0.85rem 0.95rem;
   resize: vertical;
   outline: none;
 }
 
 .reminder:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  outline: none;
+}
+
+.reminder:focus-visible {
+  outline: var(--focus-ring-input);
+  outline-offset: var(--focus-ring-input-offset);
 }
 
 .reminder::placeholder {
   color: var(--muted);
+  font-style: italic;
 }
 
 .empty {
   margin: 0;
-  font-size: 0.875rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-support-size);
+  line-height: var(--text-support-leading);
   color: var(--muted);
 }

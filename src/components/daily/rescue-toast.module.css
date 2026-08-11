@@ -1,0 +1,122 @@
+.toast {
+  display: flex;
+  align-items: stretch;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0.15rem;
+  border: var(--border-width) solid
+    color-mix(in srgb, var(--accent) 32%, var(--border));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  box-shadow: 0 14px 36px color-mix(in srgb, #000 40%, transparent);
+  animation-duration: 260ms;
+  animation-timing-function: ease;
+  animation-fill-mode: both;
+}
+
+.leaving {
+  animation: toastOut 220ms ease forwards;
+  pointer-events: none;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0.55rem 0.55rem 0.55rem 0.65rem;
+  border: none;
+  border-radius: calc(var(--radius-lg) - 2px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.main:hover {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.main:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.portrait {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-md);
+  border: var(--border-muted-default);
+  background:
+    radial-gradient(
+      120% 90% at 50% 40%,
+      color-mix(in srgb, var(--accent) 14%, var(--surface)) 0%,
+      color-mix(in srgb, var(--border) 36%, var(--surface)) 100%
+    );
+  overflow: hidden;
+}
+
+.portraitSvg {
+  display: block;
+  width: 78%;
+  height: 78%;
+  color: color-mix(in srgb, var(--foreground) 86%, var(--muted));
+}
+
+.copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.text {
+  font-family: var(--font-ui);
+  font-size: var(--text-body-size);
+  font-weight: 500;
+  letter-spacing: var(--text-body-tracking);
+  line-height: var(--text-body-leading);
+  color: var(--foreground);
+}
+
+.hint {
+  font-family: var(--font-ui);
+  font-size: var(--text-support-size);
+  font-weight: var(--text-support-weight);
+  letter-spacing: var(--text-support-tracking);
+  line-height: var(--text-support-leading);
+  color: var(--accent);
+}
+
+.dismiss {
+  flex-shrink: 0;
+  align-self: center;
+  margin-right: 0.15rem;
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .leaving {
+    animation: none;
+  }
+
+  .leaving {
+    opacity: 0;
+  }
+}

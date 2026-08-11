@@ -32,7 +32,8 @@ export type BacklogItem = {
   user_id: string;
   text: string;
   normalized_text: string;
-  significance: Significance;
+  /** Null until chosen at promote-to-today (or set at color-tap capture). */
+  significance: Significance | null;
   tag: BacklogTag;
   ai_placement: DailySlot | null;
   target_date: string | null;
@@ -44,6 +45,20 @@ export type BacklogItem = {
 };
 
 export type DailyItemKind = "must_do" | "should_do" | "quick_win";
+
+/** Singular display labels — selecting a category or describing one task. */
+export const KIND_LABELS: Record<DailyItemKind, string> = {
+  must_do: "Must-Do",
+  should_do: "Should-Do",
+  quick_win: "Quick Win",
+};
+
+/** Plural display labels — section headings that contain multiple tasks. */
+export const KIND_LABELS_PLURAL: Record<DailyItemKind, string> = {
+  must_do: "Must-Dos",
+  should_do: "Should-Dos",
+  quick_win: "Quick Wins",
+};
 
 export type ExtraDailyItem = {
   id: string;
@@ -105,8 +120,31 @@ export type HabitWithCheckIn = Habit & {
   done_today: boolean;
 };
 
+/** Fixed pre-made cat in the rescue catalog (PRD §10 Cat). */
+export type Cat = {
+  id: string;
+  sequence_order: number;
+  name: string;
+  image_key: string;
+};
+
+/** Append-only weekly rescue record (PRD §10 CatRescued). */
+export type CatRescued = {
+  id: string;
+  user_id: string;
+  cat_id: string;
+  week_start_date: string;
+  /** Set the first time the Today rescue toast is shown — never shown twice. */
+  banner_shown_at: string | null;
+  created_at: string;
+};
+
+export type CatRescuedWithCat = CatRescued & {
+  cat: Cat;
+};
+
 export const DAILY_SLOTS: { slot: DailySlot; label: string; group: string }[] = [
-  { slot: "must_do", label: "Must-Do", group: "Must-Do" },
+  { slot: "must_do", label: "Must-Do", group: "Must-Dos" },
   { slot: "should_do_1", label: "Should-Do 1", group: "Should-Dos" },
   { slot: "should_do_2", label: "Should-Do 2", group: "Should-Dos" },
   { slot: "quick_win_1", label: "Quick Win 1", group: "Quick Wins" },
@@ -232,12 +270,7 @@ export function listUncheckedFilledItems(entry: DailyEntry): UncheckedItem[] {
   const fromExtras: UncheckedItem[] = extras.flatMap((item) => {
     const text = item.text.trim();
     if (!text || item.done) return [];
-    const label =
-      item.kind === "must_do"
-        ? "Must-Do"
-        : item.kind === "should_do"
-          ? "Should-Do"
-          : "Quick Win";
+    const label = KIND_LABELS[item.kind];
     return [
       {
         source: "extra" as const,

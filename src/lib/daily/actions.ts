@@ -35,7 +35,7 @@ import {
 
 function revalidateDashboard() {
   revalidatePath("/dashboard");
-  revalidatePath("/archive");
+  revalidatePath("/backlog");
 }
 
 function revalidateHabits() {
@@ -217,17 +217,13 @@ export async function updateExtraDailyItem(
   const user = await requireUser();
   const { entry } = await requireEditableEntry(entryId, user.id);
   const trimmed = text.trim();
-  let extras = readExtraItems(entry);
-
-  if (!trimmed) {
-    extras = extras.filter((item) => item.id !== itemId);
-  } else {
-    extras = extras.map((item) =>
-      item.id === itemId
-        ? { ...item, text: trimmed, done: item.done && Boolean(trimmed) }
-        : item,
-    );
-  }
+  // Keep empty drafts — plus-added rows stay until the user removes them
+  // explicitly. Clearing text on blur must not delete the row.
+  const extras = readExtraItems(entry).map((item) =>
+    item.id === itemId
+      ? { ...item, text: trimmed, done: item.done && Boolean(trimmed) }
+      : item,
+  );
 
   return saveExtraItems(entryId, user.id, extras, entry.notes);
 }
@@ -252,6 +248,70 @@ export async function removeExtraDailyItem(entryId: string, itemId: string) {
   const { entry } = await requireEditableEntry(entryId, user.id);
   const extras = readExtraItems(entry).filter((item) => item.id !== itemId);
   return saveExtraItems(entryId, user.id, extras, entry.notes);
+}
+
+export type ReorderSlotEntry = {
+  slot: DailySlot;
+  text: string;
+  done: boolean;
+  carryover_count: number;
+};
+
+export type ReorderExtraEntry = {
+  id: string;
+  text: string;
+  done: boolean;
+  carryover_count: number;
+};
+
+/**
+ * Persist a drag-reorder. Default slots and extras are fixed storage
+ * containers (columns / array positions) — reordering moves the task
+ * *content* between containers rather than moving the containers
+ * themselves, so each container keeps writing to its usual column/id.
+ */
+export async function reorderDailyItems(
+  entryId: string,
+  slots: ReorderSlotEntry[],
+  extras: ReorderExtraEntry[],
+) {
+  const user = await requireUser();
+  const { supabase, entry } = await requireEditableEntry(entryId, user.id);
+
+  if (slots.length > 0) {
+    const update: Record<string, unknown> = {};
+    for (const row of slots) {
+      update[slotTextColumn(row.slot)] = row.text.trim() || null;
+      update[slotDoneColumn(row.slot)] = row.done;
+      update[slotCarryoverColumn(row.slot)] = row.carryover_count;
+    }
+    const { error } = await supabase
+      .from("daily_entries")
+      .update(update)
+      .eq("id", entryId)
+      .eq("user_id", user.id)
+      .eq("locked", false);
+    if (error) return { ok: false as const, error: error.message };
+  }
+
+  if (extras.length > 0) {
+    const patchById = new Map(extras.map((row) => [row.id, row]));
+    const nextExtras = readExtraItems(entry).map((item) => {
+      const patch = patchById.get(item.id);
+      if (!patch) return item;
+      return {
+        ...item,
+        text: patch.text,
+        done: patch.done,
+        carryover_count: patch.carryover_count,
+      };
+    });
+    const result = await saveExtraItems(entryId, user.id, nextExtras, entry.notes);
+    if (!result.ok) return result;
+  }
+
+  revalidateDashboard();
+  return { ok: true as const };
 }
 
 export async function addHabit(name: string) {

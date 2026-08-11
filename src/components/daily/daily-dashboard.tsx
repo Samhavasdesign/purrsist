@@ -1,33 +1,64 @@
 "use client";
 
+import {
+  closestCenter,
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useEffect, useRef, useState, useTransition } from "react";
+import Link from "next/link";
 import {
   addExtraDailyItem,
   removeExtraDailyItem,
+  reorderDailyItems,
   updateExtraDailyItem,
   updateExtraDailyItemDone,
   updateSlotDone,
   updateSlotText,
+  type ReorderExtraEntry,
+  type ReorderSlotEntry,
 } from "@/lib/daily/actions";
+import { AddToBacklog } from "@/components/daily/add-to-backlog";
 import { EndOfDayNudge } from "@/components/daily/end-of-day-nudge";
 import { HabitManager } from "@/components/daily/habit-manager";
 import { ReminderManager } from "@/components/daily/reminder-manager";
-import { WinPayoff } from "@/components/daily/win-payoff";
-import { isEditableEntry } from "@/lib/daily/entry-rules";
+import { RescueToast } from "@/components/daily/rescue-toast";
+import { SectionPulseContext } from "@/components/daily/section-pulse-context";
+import { SortableTodoRow, TodoRow } from "@/components/daily/todo-row";
+import {
+  WinPayoff,
+  type WinPayoffVariant,
+} from "@/components/daily/win-payoff";
+import { PlusIcon } from "@/components/icons/icons";
+import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
+import type { RescueToastPayload } from "@/lib/collection/rescue-toast-types";
+import { isEditableEntry, formatShortDate } from "@/lib/daily/entry-rules";
 import {
   extrasForKind,
+  KIND_LABELS,
+  KIND_LABELS_PLURAL,
   newExtraItem,
   parseExtraItems,
   type DailyItemKind,
-  type ExtraDailyItem,
 } from "@/lib/daily/extra-items";
-import { isSectionComplete } from "@/lib/daily/section-complete";
+import {
+  isHabitsComplete,
+  isSectionComplete,
+  isSheetComplete,
+} from "@/lib/daily/section-complete";
 import {
   hintVisibleForKind,
   kindForSlot,
   sectionAtDefaultCapacity,
   type SectionHintFlags,
 } from "@/lib/daily/section-hints";
+import { SECTION_SUBCOPY } from "@/lib/daily/section-subcopy";
 import type {
   DailyEntry,
   DailySlot,
@@ -44,60 +75,85 @@ type Props = {
   entry: DailyEntry;
   habits: HabitWithCheckIn[];
   sectionHints: SectionHintFlags;
-  children?: React.ReactNode;
+  /** One-time stray rescue payoff — never a counter or streak. */
+  rescueToast?: RescueToastPayload | null;
 };
 
 const GROUPS: {
   title: string;
+  itemLabel: string;
   hint: string;
   kind: DailyItemKind;
   significance: "red" | "yellow" | "green";
   slots: DailySlot[];
-  placeholder: string;
   addLabel: string;
-  winLabel: string;
-  winTooltip: string;
 }[] = [
   {
-    title: "Must-Dos",
-    hint: "Starts with one — add more if you need to",
+    title: KIND_LABELS_PLURAL.must_do,
+    itemLabel: KIND_LABELS.must_do,
+    hint: SECTION_SUBCOPY.mustDo,
     kind: "must_do",
     significance: "red",
     slots: ["must_do"],
-    placeholder: "Add today’s Must-Do…",
-    addLabel: "Add another Must-Do",
-    winLabel: "Must-Do checked — today counts as a win.",
-    winTooltip: "Must-Do checked — today counts as a win. 🙌 🎉",
+    addLabel: "Add Must-Do",
   },
   {
-    title: "Should-Dos",
-    hint: "Starts with two — add more if you need to",
+    title: KIND_LABELS_PLURAL.should_do,
+    itemLabel: KIND_LABELS.should_do,
+    hint: SECTION_SUBCOPY.shouldDos,
     kind: "should_do",
     significance: "yellow",
     slots: ["should_do_1", "should_do_2"],
-    placeholder: "Add a Should-Do…",
-    addLabel: "Add another Should-Do",
-    winLabel: "All Should-Dos checked.",
-    winTooltip: "All Should-Dos checked. 🙌 🎉",
+    addLabel: "Add Should-Do",
   },
   {
-    title: "Quick Wins",
-    hint: "Starts with three — add more if you need to",
+    title: KIND_LABELS_PLURAL.quick_win,
+    itemLabel: KIND_LABELS.quick_win,
+    hint: SECTION_SUBCOPY.quickWins,
     kind: "quick_win",
     significance: "green",
     slots: ["quick_win_1", "quick_win_2", "quick_win_3"],
-    placeholder: "Add a Quick Win…",
-    addLabel: "Add another Quick Win",
-    winLabel: "All Quick Wins checked.",
-    winTooltip: "All Quick Wins checked. 🙌 🎉",
+    addLabel: "Add Quick Win",
   },
 ];
+
+/** Shared placeholder for empty / editable slot inputs. */
+function slotPlaceholder(_kind: DailyItemKind, _index: number): string {
+  return "Type here...";
+}
+
+/** A filled default slot or extra, in current display order — the unit that drag-reorder moves. */
+type OrderableItem =
+  | { key: string; kind: "slot"; slot: DailySlot; text: string; done: boolean; carry: number }
+  | { key: string; kind: "extra"; id: string; text: string; done: boolean; carry: number };
+
+/**
+ * Which slots/extras count as "filled", based on server-committed data only.
+ * Rows are grouped into the draggable list vs. the empty-placeholder list by
+ * this, not by the live typing buffer — otherwise the first keystroke into an
+ * empty field flips it into a differently-keyed row and remounts the input
+ * mid-edit, dropping focus after one character.
+ */
+function computeFilledSlots(source: DailyEntry): Set<DailySlot> {
+  const allSlots = GROUPS.flatMap((group) => group.slots);
+  return new Set(
+    allSlots.filter((slot) => String(source[slotTextColumn(slot)] ?? "").trim()),
+  );
+}
+
+function computeFilledExtraIds(source: DailyEntry): Set<string> {
+  return new Set(
+    parseExtraItems(source.extra_items)
+      .filter((item) => item.text.trim())
+      .map((item) => item.id),
+  );
+}
 
 export function DailyDashboard({
   entry,
   habits,
   sectionHints: initialSectionHints,
-  children,
+  rescueToast = null,
 }: Props) {
   const [pending, startTransition] = useTransition();
   const [localEntry, setLocalEntry] = useState(() => ({
@@ -107,20 +163,45 @@ export function DailyDashboard({
   const [sectionHints, setSectionHints] = useState(initialSectionHints);
   const [error, setError] = useState<string | null>(null);
   const [savingKey, setSavingKey] = useState<string | null>(null);
-  const [showWinPayoff, setShowWinPayoff] = useState(false);
-  const [celebratingKind, setCelebratingKind] = useState<DailyItemKind | null>(
-    null,
+  const [winPayoff, setWinPayoff] = useState<WinPayoffVariant | null>(null);
+  const [habitsComplete, setHabitsComplete] = useState(() =>
+    isHabitsComplete(habits),
   );
+  const [pulsingKind, setPulsingKind] = useState<DailyItemKind | null>(null);
+  const pulseClearTimer = useRef<number | null>(null);
   const [expandedCapacity, setExpandedCapacity] = useState(
     () => new Set<DailyItemKind>(),
   );
+  /** Empty default slots the user dismissed with X — restored by + before adding extras. */
+  const [suppressedEmptySlots, setSuppressedEmptySlots] = useState(
+    () => new Set<DailySlot>(),
+  );
+  // Slot names and extra item ids share this set — only the checkbox
+  // actually being saved shows a pending state, not every checkbox on the page.
+  const [pendingDoneKeys, setPendingDoneKeys] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [committedFilledSlots, setCommittedFilledSlots] = useState(() =>
+    computeFilledSlots(entry),
+  );
+  const [committedFilledExtraIds, setCommittedFilledExtraIds] = useState(() =>
+    computeFilledExtraIds(entry),
+  );
   const dirtySlots = useRef(new Set<DailySlot>());
+  const dirtyDoneSlots = useRef(new Set<DailySlot>());
   const dirtyExtras = useRef(new Set<string>());
   const prevComplete = useRef<Record<DailyItemKind, boolean> | null>(null);
   const slotInputRefs = useRef(new Map<DailySlot, HTMLInputElement>());
   const extraInputRefs = useRef(new Map<string, HTMLInputElement>());
   const focusEmptyKind = useRef<DailyItemKind | null>(null);
   const focusExtraId = useRef<string | null>(null);
+  const focusSlot = useRef<DailySlot | null>(null);
+  // Frozen at drag start so a concurrent update elsewhere (typing, a toggle,
+  // a server revalidation) mid-gesture can't shift what onDragEnd redistributes.
+  const dragSnapshot = useRef<OrderableItem[] | null>(null);
+  const dragSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+  );
 
   useEffect(() => {
     setLocalEntry((prev) => {
@@ -136,6 +217,13 @@ export function DailyDashboard({
       for (const slot of dirtySlots.current) {
         const col = slotTextColumn(slot);
         (next as Record<string, unknown>)[col] = prev[col];
+      }
+
+      for (const slot of dirtyDoneSlots.current) {
+        const doneCol = slotDoneColumn(slot);
+        const countCol = slotCarryoverColumn(slot);
+        (next as Record<string, unknown>)[doneCol] = prev[doneCol];
+        (next as Record<string, unknown>)[countCol] = prev[countCol];
       }
 
       if (dirtyExtras.current.size > 0) {
@@ -154,8 +242,37 @@ export function DailyDashboard({
   }, [entry]);
 
   useEffect(() => {
+    setCommittedFilledSlots(computeFilledSlots(entry));
+    setCommittedFilledExtraIds(computeFilledExtraIds(entry));
+  }, [entry]);
+
+  useEffect(() => {
     setSectionHints(initialSectionHints);
   }, [initialSectionHints]);
+
+  useEffect(() => {
+    return () => {
+      if (pulseClearTimer.current !== null) {
+        window.clearTimeout(pulseClearTimer.current);
+      }
+    };
+  }, []);
+
+  function pulseSection(kind: DailyItemKind) {
+    if (pulseClearTimer.current !== null) {
+      window.clearTimeout(pulseClearTimer.current);
+      pulseClearTimer.current = null;
+    }
+    // Drop the class first so a second capture into the same section restarts.
+    setPulsingKind(null);
+    requestAnimationFrame(() => {
+      setPulsingKind(kind);
+      pulseClearTimer.current = window.setTimeout(() => {
+        setPulsingKind(null);
+        pulseClearTimer.current = null;
+      }, 280);
+    });
+  }
 
   const sectionCompleteByKind: Record<DailyItemKind, boolean> = {
     must_do: isSectionComplete(localEntry, "must_do"),
@@ -170,18 +287,29 @@ export function DailyDashboard({
       return;
     }
 
+    let sectionJustCompleted = false;
     for (const kind of Object.keys(sectionCompleteByKind) as DailyItemKind[]) {
       if (!prevComplete.current[kind] && sectionCompleteByKind[kind]) {
-        setCelebratingKind(kind);
-        setShowWinPayoff(true);
+        sectionJustCompleted = true;
       }
     }
 
     prevComplete.current = { ...sectionCompleteByKind };
+
+    if (!sectionJustCompleted) return;
+
+    const sheetDone = isSheetComplete(localEntry, {
+      count: habits.length,
+      complete: habitsComplete,
+    });
+    setWinPayoff(sheetDone ? "sheet" : "module");
   }, [
     sectionCompleteByKind.must_do,
     sectionCompleteByKind.should_do,
     sectionCompleteByKind.quick_win,
+    localEntry,
+    habits.length,
+    habitsComplete,
   ]);
 
   // Reset payoff tracking when the calendar day / entry changes.
@@ -195,9 +323,10 @@ export function DailyDashboard({
       should_do: isSectionComplete(normalized, "should_do"),
       quick_win: isSectionComplete(normalized, "quick_win"),
     };
-    setShowWinPayoff(false);
-    setCelebratingKind(null);
+    setHabitsComplete(isHabitsComplete(habits));
+    setWinPayoff(null);
     setExpandedCapacity(new Set());
+    setSuppressedEmptySlots(new Set());
   }, [entry.id]);
 
   useEffect(() => {
@@ -208,17 +337,48 @@ export function DailyDashboard({
       return;
     }
 
+    const slot = focusSlot.current;
+    if (slot) {
+      focusSlot.current = null;
+      window.setTimeout(() => slotInputRefs.current.get(slot)?.focus(), 30);
+      return;
+    }
+
     const kind = focusEmptyKind.current;
     if (!kind) return;
     focusEmptyKind.current = null;
     const group = GROUPS.find((g) => g.kind === kind);
     if (!group) return;
     const firstEmpty = group.slots.find(
-      (slot) => !String(localEntry[slotTextColumn(slot)] ?? "").trim(),
+      (s) =>
+        !suppressedEmptySlots.has(s) &&
+        !String(localEntry[slotTextColumn(s)] ?? "").trim(),
     );
     if (!firstEmpty) return;
     window.setTimeout(() => slotInputRefs.current.get(firstEmpty)?.focus(), 30);
-  }, [expandedCapacity, localEntry]);
+  }, [expandedCapacity, localEntry, suppressedEmptySlots]);
+
+  function markDonePending(key: string) {
+    setPendingDoneKeys((prev) => {
+      const next = new Set(prev);
+      next.add(key);
+      return next;
+    });
+  }
+
+  function clearDonePending(key: string) {
+    setPendingDoneKeys((prev) => {
+      if (!prev.has(key)) return prev;
+      const next = new Set(prev);
+      next.delete(key);
+      return next;
+    });
+  }
+
+  // Scoped to the one row actually saving/toggling — never the whole page.
+  function isRowBusy(key: string) {
+    return (savingKey === key && pending) || pendingDoneKeys.has(key);
+  }
 
   function expandKind(kind: DailyItemKind) {
     setExpandedCapacity((prev) => {
@@ -233,6 +393,14 @@ export function DailyDashboard({
     dirtySlots.current.add(slot);
     const col = slotTextColumn(slot);
     setLocalEntry((prev) => ({ ...prev, [col]: text }));
+    if (text.trim()) {
+      setSuppressedEmptySlots((prev) => {
+        if (!prev.has(slot)) return prev;
+        const next = new Set(prev);
+        next.delete(slot);
+        return next;
+      });
+    }
   }
 
   function setExtraLocal(itemId: string, text: string) {
@@ -303,6 +471,8 @@ export function DailyDashboard({
     setError(null);
     const col = slotDoneColumn(slot);
     const countCol = slotCarryoverColumn(slot);
+    dirtyDoneSlots.current.add(slot);
+    markDonePending(slot);
     setLocalEntry((prev) => ({
       ...prev,
       [col]: done,
@@ -310,6 +480,8 @@ export function DailyDashboard({
     }));
     startTransition(async () => {
       const result = await updateSlotDone(localEntry.id, slot, done);
+      dirtyDoneSlots.current.delete(slot);
+      clearDonePending(slot);
       if (!result.ok) {
         setError(result.error);
         setLocalEntry((prev) => ({ ...prev, [col]: !done }));
@@ -320,6 +492,21 @@ export function DailyDashboard({
   function addExtra(kind: DailyItemKind) {
     if (!editable) return;
     setError(null);
+
+    const group = GROUPS.find((g) => g.kind === kind);
+    const restored = group?.slots.find((slot) =>
+      suppressedEmptySlots.has(slot),
+    );
+    if (restored) {
+      setSuppressedEmptySlots((prev) => {
+        const next = new Set(prev);
+        next.delete(restored);
+        return next;
+      });
+      focusSlot.current = restored;
+      return;
+    }
+
     const optimistic = newExtraItem(kind);
     expandKind(kind);
     focusExtraId.current = optimistic.id;
@@ -348,6 +535,20 @@ export function DailyDashboard({
     });
   }
 
+  function suppressEmptySlot(slot: DailySlot) {
+    if (!editable) return;
+    const text = String(localEntry[slotTextColumn(slot)] ?? "").trim();
+    if (text) {
+      clearDefaultSlot(slot);
+      return;
+    }
+    setSuppressedEmptySlots((prev) => {
+      const next = new Set(prev);
+      next.add(slot);
+      return next;
+    });
+  }
+
   function saveExtra(itemId: string, text: string) {
     if (!editable) return;
     setError(null);
@@ -369,6 +570,8 @@ export function DailyDashboard({
   function toggleExtraDone(itemId: string, done: boolean) {
     if (!editable) return;
     setError(null);
+    dirtyExtras.current.add(itemId);
+    markDonePending(itemId);
     setLocalEntry((prev) => ({
       ...prev,
       extra_items: parseExtraItems(prev.extra_items).map((item) =>
@@ -383,6 +586,8 @@ export function DailyDashboard({
         itemId,
         done,
       );
+      dirtyExtras.current.delete(itemId);
+      clearDonePending(itemId);
       if (!result.ok) {
         setError(result.error);
         setLocalEntry((prev) => ({
@@ -391,6 +596,8 @@ export function DailyDashboard({
             item.id === itemId ? { ...item, done: !done } : item,
           ),
         }));
+      } else if (result.extras) {
+        setLocalEntry((prev) => ({ ...prev, extra_items: result.extras }));
       }
     });
   }
@@ -406,6 +613,12 @@ export function DailyDashboard({
       [slotCarryoverColumn(slot)]: 0,
     }));
     saveText(slot, "");
+  }
+
+  function clearExtra(itemId: string) {
+    if (!editable) return;
+    setExtraLocal(itemId, "");
+    saveExtra(itemId, "");
   }
 
   function removeExtra(itemId: string) {
@@ -424,16 +637,120 @@ export function DailyDashboard({
     });
   }
 
+  function handleDragEnd(fallbackItems: OrderableItem[], event: DragEndEvent) {
+    if (!editable) return;
+    const items = dragSnapshot.current ?? fallbackItems;
+    dragSnapshot.current = null;
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = items.findIndex((item) => item.key === active.id);
+    const newIndex = items.findIndex((item) => item.key === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    // Containers (slot columns / extra ids) keep their position — only the
+    // task content they hold gets reshuffled into the new priority order.
+    const contents = items.map((item) => ({
+      text: item.text,
+      done: item.done,
+      carry: item.carry,
+    }));
+    const reordered = arrayMove(contents, oldIndex, newIndex);
+
+    const slotUpdates: ReorderSlotEntry[] = [];
+    const extraUpdates: ReorderExtraEntry[] = [];
+    items.forEach((container, index) => {
+      const content = reordered[index];
+      if (container.kind === "slot") {
+        slotUpdates.push({
+          slot: container.slot,
+          text: content.text,
+          done: content.done,
+          carryover_count: content.carry,
+        });
+      } else {
+        extraUpdates.push({
+          id: container.id,
+          text: content.text,
+          done: content.done,
+          carryover_count: content.carry,
+        });
+      }
+    });
+
+    setError(null);
+    const snapshot = localEntry;
+    for (const row of slotUpdates) {
+      dirtySlots.current.add(row.slot);
+      dirtyDoneSlots.current.add(row.slot);
+    }
+    for (const row of extraUpdates) {
+      dirtyExtras.current.add(row.id);
+    }
+
+    setLocalEntry((prev) => {
+      const next = { ...prev } as Record<string, unknown> as DailyEntry;
+      for (const row of slotUpdates) {
+        (next as Record<string, unknown>)[slotTextColumn(row.slot)] = row.text;
+        (next as Record<string, unknown>)[slotDoneColumn(row.slot)] = row.done;
+        (next as Record<string, unknown>)[slotCarryoverColumn(row.slot)] =
+          row.carryover_count;
+      }
+      if (extraUpdates.length > 0) {
+        const patchById = new Map(extraUpdates.map((row) => [row.id, row]));
+        next.extra_items = parseExtraItems(prev.extra_items).map((item) => {
+          const patch = patchById.get(item.id);
+          if (!patch) return item;
+          return {
+            ...item,
+            text: patch.text,
+            done: patch.done,
+            carryover_count: patch.carryover_count,
+          };
+        });
+      }
+      return next;
+    });
+
+    startTransition(async () => {
+      const result = await reorderDailyItems(
+        snapshot.id,
+        slotUpdates,
+        extraUpdates,
+      );
+      for (const row of slotUpdates) {
+        dirtySlots.current.delete(row.slot);
+        dirtyDoneSlots.current.delete(row.slot);
+      }
+      for (const row of extraUpdates) {
+        dirtyExtras.current.delete(row.id);
+      }
+      if (!result.ok) {
+        setError(result.error);
+        setLocalEntry(snapshot);
+      }
+    });
+  }
+
   return (
+    <SectionPulseContext.Provider value={{ pulseSection }}>
     <div className={styles.dashboard}>
+      {rescueToast ? <RescueToast rescue={rescueToast} /> : null}
+
       <header className={styles.header}>
-        <h1 className={styles.title}>Today</h1>
+        <span className={styles.dateTag}>{formatShortDate(localEntry.date)}</span>
+        <h1 className={styles.title}>Today&apos;s To-Dos</h1>
       </header>
+
+      {editable ? <AddToBacklog /> : null}
 
       {editable ? <EndOfDayNudge entry={localEntry} /> : null}
       {!editable ? (
         <p className={styles.lockedNote}>
-          This day is locked and view-only. Browse it in Archive.
+          This day is locked and view-only. Browse it in{" "}
+          <Link className={styles.lockedLink} href="/backlog?tab=archived">
+            Backlog → Archived
+          </Link>
+          .
         </p>
       ) : null}
 
@@ -443,31 +760,76 @@ export function DailyDashboard({
         </p>
       ) : null}
 
-      {children}
-
       <WinPayoff
-        active={showWinPayoff}
+        active={winPayoff !== null}
+        variant={winPayoff ?? "module"}
         onDone={() => {
-          setShowWinPayoff(false);
-          setCelebratingKind(null);
+          setWinPayoff(null);
         }}
       />
 
-      <hr className={styles.sectionRule} />
-
+      {/* eslint-disable-next-line react-hooks/refs -- registerInputNode callbacks
+          are passed to TodoRow/SortableTodoRow as props and attached to `ref`
+          there; the compiler rule doesn't trace ref-callbacks across a
+          component boundary, but this is the standard, correct pattern for
+          collecting DOM node refs owned by the parent (focus-after-add). */}
       {GROUPS.map((group) => {
         const extras = extrasForKind(localEntry, group.kind);
         const sectionComplete = sectionCompleteByKind[group.kind];
         const capacityExpanded = expandedCapacity.has(group.kind);
-        // Default slots (1 / 2 / 3) always show, including blanks at day start.
-        const visibleSlots = group.slots;
-        const filledExtras = extras.filter((item) => item.text.trim());
-        const emptyExtras = extras.filter((item) => !item.text.trim());
-        // Extra overflow rows: show filled ones always; empty drafts once expanded via +.
-        const visibleExtras = capacityExpanded ? extras : filledExtras;
+        const emptySlots = group.slots.filter(
+          (slot) =>
+            !committedFilledSlots.has(slot) && !suppressedEmptySlots.has(slot),
+        );
+        const filledExtras = extras.filter((item) =>
+          committedFilledExtraIds.has(item.id),
+        );
+        const emptyExtras = extras.filter(
+          (item) => !committedFilledExtraIds.has(item.id),
+        );
         const hiddenEmptyCount = capacityExpanded ? 0 : emptyExtras.length;
         const showMoreAffordance =
           editable && !capacityExpanded && hiddenEmptyCount > 0;
+
+        function placeholderForSlot(slot: DailySlot): string {
+          return slotPlaceholder(group.kind, group.slots.indexOf(slot) + 1);
+        }
+
+        function placeholderForExtra(id: string): string {
+          const extraIndex = extras.findIndex((item) => item.id === id);
+          return slotPlaceholder(
+            group.kind,
+            group.slots.length + Math.max(extraIndex, 0) + 1,
+          );
+        }
+
+        // Filled items (defaults + extras), in priority order — draggable.
+        // Empty slots/drafts render separately below, for adding new items.
+        const orderableItems: OrderableItem[] = [
+          ...group.slots
+            .filter((slot) => committedFilledSlots.has(slot))
+            .map((slot) => ({
+              key: `slot:${slot}`,
+              kind: "slot" as const,
+              slot,
+              text: String(localEntry[slotTextColumn(slot)] ?? ""),
+              done: Boolean(localEntry[slotDoneColumn(slot)]),
+              carry: Number(localEntry[slotCarryoverColumn(slot)] ?? 0),
+            })),
+          ...filledExtras.map((item) => ({
+            key: `extra:${item.id}`,
+            kind: "extra" as const,
+            id: item.id,
+            text: item.text,
+            done: item.done,
+            carry: item.carryover_count,
+          })),
+        ];
+
+        const visibleEmptyExtras = capacityExpanded ? emptyExtras : [];
+        const sectionRowCount =
+          orderableItems.length + emptySlots.length + visibleEmptyExtras.length;
+        const canClearRow = sectionRowCount > 1;
 
         function expandCapacity() {
           focusEmptyKind.current = group.kind;
@@ -477,210 +839,192 @@ export function DailyDashboard({
         return (
           <section
             key={group.title}
-            className={`${styles.section} ${styles[`section_${group.significance}`]}`}
+            className={[
+              styles.section,
+              styles[`section_${group.significance}`],
+              sectionComplete ? styles.sectionComplete : "",
+              pulsingKind === group.kind ? styles.sectionPulse : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
           >
             <div className={styles.sectionHead}>
               <div className={styles.sectionTitleRow}>
                 <div className={styles.sectionTitleCluster}>
-                  <h2 className={styles.sectionTitle}>
-                    <span
-                      className={`${styles.sectionDot} ${styles[`sectionDot_${group.significance}`]}`}
-                      aria-hidden
-                    />
-                    {group.title}
-                  </h2>
-                  {sectionComplete ? (
-                    <span
-                      className={`${styles.badge} ${styles.badgeWin} ${celebratingKind === group.kind ? styles.badgeCelebrate : ""}`}
-                      aria-label={group.winLabel}
-                      aria-live="polite"
-                    >
-                      <svg
-                        className={styles.badgeIcon}
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.75"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                      >
-                        <path d="M20 6L9 17l-5-5" />
-                      </svg>
-                      Win
-                      <span className={styles.badgeTooltip} role="tooltip">
-                        {group.winTooltip}
-                      </span>
-                    </span>
-                  ) : null}
+                  <div className={styles.sectionTitleMain}>
+                    <h2 className={styles.sectionTitle}>{group.title}</h2>
+                    {hintVisibleForKind(sectionHints, group.kind) ? (
+                      <p className={styles.sectionHint}>{group.hint}</p>
+                    ) : null}
+                  </div>
                 </div>
                 {editable ? (
-                  <button
-                    type="button"
+                  <IconButton
+                    label={group.addLabel}
+                    icon={<PlusIcon />}
+                    iconSize={20}
                     className={styles.addSlotBtn}
                     onClick={() => addExtra(group.kind)}
-                    disabled={pending}
-                    aria-label={group.addLabel}
                     title={group.addLabel}
-                  >
-                    <span aria-hidden>+</span>
-                  </button>
+                  />
                 ) : null}
               </div>
-              {hintVisibleForKind(sectionHints, group.kind) ? (
-                <p className={styles.sectionHint}>{group.hint}</p>
-              ) : null}
             </div>
             <ul className={styles.slotList}>
-              {visibleSlots.map((slot) => {
-                const text = String(localEntry[slotTextColumn(slot)] ?? "");
-                const done = Boolean(localEntry[slotDoneColumn(slot)]);
-                const carry = Number(localEntry[slotCarryoverColumn(slot)] ?? 0);
-                const isEmpty = !text.trim();
-                const isSaving = savingKey === slot && pending;
-
-                return (
-                  <li
-                    key={slot}
-                    className={`${styles.slotRow} ${isEmpty && editable ? styles.slotEmpty : ""}`}
-                  >
-                    <input
-                      type="checkbox"
-                      className={styles.checkbox}
-                      checked={done}
-                      disabled={!editable || isEmpty || pending}
-                      aria-label={`Mark ${group.title} done`}
-                      onChange={(event) =>
-                        toggleDone(slot, event.target.checked)
+              <DndContext
+                id={`dnd-${group.kind}`}
+                sensors={dragSensors}
+                collisionDetection={closestCenter}
+                modifiers={[restrictToVerticalAxis]}
+                onDragStart={() => {
+                  dragSnapshot.current = orderableItems;
+                }}
+                onDragEnd={(event) => handleDragEnd(orderableItems, event)}
+              >
+                <SortableContext
+                  items={orderableItems.map((item) => item.key)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {orderableItems.map((item) => (
+                    <SortableTodoRow
+                      key={item.key}
+                      id={item.key}
+                      dragDisabled={orderableItems.length <= 1}
+                      text={item.text}
+                      done={item.done}
+                      carry={item.carry}
+                      isEmpty={false}
+                      isSaving={
+                        item.kind === "slot"
+                          ? savingKey === item.slot && pending
+                          : savingKey === item.id && pending
                       }
-                    />
-                    <div className={styles.slotFields}>
-                      <input
-                        ref={(node) => {
-                          if (node) slotInputRefs.current.set(slot, node);
-                          else slotInputRefs.current.delete(slot);
-                        }}
-                        className={`${styles.slotInput} ${done ? styles.slotDone : ""}`}
-                        type="text"
-                        value={text}
-                        placeholder={group.placeholder}
-                        disabled={!editable}
-                        readOnly={!editable}
-                        aria-label={group.placeholder}
-                        onChange={(event) =>
-                          setTextLocal(slot, event.target.value)
-                        }
-                        onBlur={(event) => saveText(slot, event.target.value)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter") {
-                            event.currentTarget.blur();
-                          }
-                        }}
-                      />
-                      {carry > 0 ? (
-                        <p className={styles.carryHint}>
-                          Carried {carry} day{carry === 1 ? "" : "s"}
-                        </p>
-                      ) : null}
-                      {isSaving ? (
-                        <p className={styles.savingHint}>Saving…</p>
-                      ) : null}
-                    </div>
-                    {editable ? (
-                      <button
-                        type="button"
-                        className={styles.clearBtn}
-                        onClick={() => clearDefaultSlot(slot)}
-                        disabled={isEmpty || pending}
-                        aria-label={`Clear ${group.title}`}
-                        title="Clear"
-                      >
-                        <span aria-hidden>×</span>
-                      </button>
-                    ) : null}
-                  </li>
-                );
-              })}
-
-              {visibleExtras.map((item: ExtraDailyItem) => {
-                const isEmpty = !item.text.trim();
-                const isSaving = savingKey === item.id && pending;
-                return (
-                  <li
-                    key={item.id}
-                    className={`${styles.slotRow} ${isEmpty && editable ? styles.slotEmpty : ""}`}
-                  >
-                    <input
-                      type="checkbox"
-                      className={styles.checkbox}
-                      checked={item.done}
-                      disabled={!editable || isEmpty || pending}
-                      aria-label={`Mark extra ${group.title} done`}
-                      onChange={(event) =>
-                        toggleExtraDone(item.id, event.target.checked)
+                      editable={editable}
+                      checkboxDisabled={!editable}
+                      checkboxLabel={
+                        item.kind === "slot"
+                          ? `Mark ${group.itemLabel} done`
+                          : `Mark extra ${group.itemLabel} done`
                       }
-                    />
-                    <div className={styles.slotFields}>
-                      <input
-                        ref={(node) => {
+                      placeholder={
+                        item.kind === "slot"
+                          ? placeholderForSlot(item.slot)
+                          : placeholderForExtra(item.id)
+                      }
+                      inputLabel={
+                        item.kind === "slot"
+                          ? placeholderForSlot(item.slot)
+                          : placeholderForExtra(item.id)
+                      }
+                      registerInputNode={(node) => {
+                        if (item.kind === "slot") {
+                          if (node) slotInputRefs.current.set(item.slot, node);
+                          else slotInputRefs.current.delete(item.slot);
+                        } else {
                           if (node) extraInputRefs.current.set(item.id, node);
                           else extraInputRefs.current.delete(item.id);
-                        }}
-                        className={`${styles.slotInput} ${item.done ? styles.slotDone : ""}`}
-                        type="text"
-                        value={item.text}
-                        placeholder={group.placeholder}
-                        disabled={!editable}
-                        readOnly={!editable}
-                        aria-label={group.placeholder}
-                        onChange={(event) =>
-                          setExtraLocal(item.id, event.target.value)
                         }
-                        onBlur={(event) =>
-                          saveExtra(item.id, event.target.value)
+                      }}
+                      onToggle={(checked) =>
+                        item.kind === "slot"
+                          ? toggleDone(item.slot, checked)
+                          : toggleExtraDone(item.id, checked)
+                      }
+                      onTextChange={(text) =>
+                        item.kind === "slot"
+                          ? setTextLocal(item.slot, text)
+                          : setExtraLocal(item.id, text)
+                      }
+                      onTextBlur={(text) =>
+                        item.kind === "slot"
+                          ? saveText(item.slot, text)
+                          : saveExtra(item.id, text)
+                      }
+                      onRemove={() => {
+                        if (item.kind === "slot") {
+                          clearDefaultSlot(item.slot);
+                          return;
                         }
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter") {
-                            event.currentTarget.blur();
-                          }
-                        }}
-                      />
-                      {item.carryover_count > 0 ? (
-                        <p className={styles.carryHint}>
-                          Carried {item.carryover_count} day
-                          {item.carryover_count === 1 ? "" : "s"}
-                        </p>
-                      ) : null}
-                      {isSaving ? (
-                        <p className={styles.savingHint}>Saving…</p>
-                      ) : null}
-                    </div>
-                    {editable ? (
-                      <button
-                        type="button"
-                        className={styles.clearBtn}
-                        onClick={() => removeExtra(item.id)}
-                        disabled={pending}
-                        aria-label={`Remove ${group.title}`}
-                        title="Remove"
-                      >
-                        <span aria-hidden>×</span>
-                      </button>
-                    ) : null}
-                  </li>
-                );
-              })}
+                        if (canClearRow) removeExtra(item.id);
+                        else clearExtra(item.id);
+                      }}
+                      removeDisabled={isRowBusy(
+                        item.kind === "slot" ? item.slot : item.id,
+                      )}
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
+
+              {emptySlots.map((slot) => (
+                <TodoRow
+                  key={slot}
+                  text={String(localEntry[slotTextColumn(slot)] ?? "")}
+                  done={false}
+                  carry={0}
+                  isEmpty
+                  isSaving={savingKey === slot && pending}
+                  editable={editable}
+                  checkboxDisabled
+                  checkboxLabel={`Mark ${group.itemLabel} done`}
+                  placeholder={placeholderForSlot(slot)}
+                  inputLabel={placeholderForSlot(slot)}
+                  registerInputNode={(node) => {
+                    if (node) slotInputRefs.current.set(slot, node);
+                    else slotInputRefs.current.delete(slot);
+                  }}
+                  onToggle={() => {}}
+                  onTextChange={(text) => setTextLocal(slot, text)}
+                  onTextBlur={(text) => saveText(slot, text)}
+                  onRemove={() => {
+                    if (canClearRow) suppressEmptySlot(slot);
+                    else clearDefaultSlot(slot);
+                  }}
+                  removeDisabled={isRowBusy(slot)}
+                />
+              ))}
+
+              {capacityExpanded
+                ? emptyExtras.map((item) => (
+                    <TodoRow
+                      key={item.id}
+                      text={item.text}
+                      done={false}
+                      carry={0}
+                      isEmpty
+                      isSaving={savingKey === item.id && pending}
+                      editable={editable}
+                      checkboxDisabled
+                      checkboxLabel={`Mark extra ${group.itemLabel} done`}
+                      placeholder={placeholderForExtra(item.id)}
+                      inputLabel={placeholderForExtra(item.id)}
+                      registerInputNode={(node) => {
+                        if (node) extraInputRefs.current.set(item.id, node);
+                        else extraInputRefs.current.delete(item.id);
+                      }}
+                      onToggle={() => {}}
+                      onTextChange={(text) => setExtraLocal(item.id, text)}
+                      onTextBlur={(text) => saveExtra(item.id, text)}
+                      onRemove={() => {
+                        if (canClearRow) removeExtra(item.id);
+                        else clearExtra(item.id);
+                      }}
+                      removeDisabled={isRowBusy(item.id)}
+                    />
+                  ))
+                : null}
 
               {showMoreAffordance ? (
                 <li className={styles.moreCapacityRow}>
-                  <button
+                  <Button
                     type="button"
+                    variant="secondary"
                     className={styles.moreCapacityBtn}
                     onClick={expandCapacity}
-                    aria-label={`Show ${hiddenEmptyCount} more empty ${group.title} slot${hiddenEmptyCount === 1 ? "" : "s"}`}
+                    aria-label={`Show ${hiddenEmptyCount} more empty ${group.itemLabel} slot${hiddenEmptyCount === 1 ? "" : "s"}`}
                   >
                     + {hiddenEmptyCount} more
-                  </button>
+                  </Button>
                 </li>
               ) : null}
             </ul>
@@ -694,11 +1038,20 @@ export function DailyDashboard({
         date={localEntry.date}
         habits={habits}
         readOnly={!editable}
+        onHabitsCompleteChange={setHabitsComplete}
+        onSectionWin={() => {
+          const sheetDone = isSheetComplete(localEntry, {
+            count: habits.length,
+            complete: true,
+          });
+          setWinPayoff(sheetDone ? "sheet" : "module");
+        }}
       />
 
       <hr className={styles.sectionRule} />
 
       <ReminderManager entry={localEntry} readOnly={!editable} />
     </div>
+    </SectionPulseContext.Provider>
   );
 }

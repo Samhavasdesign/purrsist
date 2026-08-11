@@ -4,19 +4,18 @@ import type {
   ExtraDailyItem,
 } from "@/lib/types/database";
 import type { DailySlot } from "@/lib/types/database";
+import {
+  KIND_LABELS,
+  KIND_LABELS_PLURAL,
+} from "@/lib/types/database";
 
 export type { DailyItemKind, ExtraDailyItem };
+export { KIND_LABELS, KIND_LABELS_PLURAL };
 
 export const DEFAULT_SLOTS_BY_KIND: Record<DailyItemKind, DailySlot[]> = {
   must_do: ["must_do"],
   should_do: ["should_do_1", "should_do_2"],
   quick_win: ["quick_win_1", "quick_win_2", "quick_win_3"],
-};
-
-export const KIND_LABELS: Record<DailyItemKind, string> = {
-  must_do: "Must-Do",
-  should_do: "Should-Do",
-  quick_win: "Quick Win",
 };
 
 const NOTES_EXTRAS_KEY = "purrsist_extra_items";

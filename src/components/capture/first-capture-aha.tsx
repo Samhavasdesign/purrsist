@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import styles from "./first-capture-aha.module.css";
 
 type Props = {
@@ -37,8 +38,9 @@ export function FirstCaptureAha({ reason, onDismiss }: Props) {
       <p className={styles.sub}>
         That&apos;s the whole idea — you dump it, Purrsist files it.
       </p>
-      <button
+      <Button
         type="button"
+        variant="secondary"
         className={styles.dismiss}
         onClick={() => {
           setLeaving(true);
@@ -46,7 +48,7 @@ export function FirstCaptureAha({ reason, onDismiss }: Props) {
         }}
       >
         Got it
-      </button>
+      </Button>
     </div>
   );
 }

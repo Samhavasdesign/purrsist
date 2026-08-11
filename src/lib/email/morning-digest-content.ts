@@ -2,6 +2,7 @@ import { readReminders } from "@/lib/daily/reminders";
 import type { DailyEntry } from "@/lib/types/database";
 import {
   DAILY_SLOTS,
+  KIND_LABELS,
   slotDoneColumn,
   slotTextColumn,
 } from "@/lib/types/database";
@@ -73,7 +74,7 @@ function formatSlotLine(
 /**
  * Plain-text Morning Digest matching PRD §7:
  * (1) yesterday recap — Must-Do hit or not, Should-Dos/Quick Wins completed, habits checked off
- * (2) nudge to fill today's Must-Do, Should-Dos, Quick Wins, Daily Reminder if not set
+ * (2) nudge to fill today's Must-Dos, Should-Dos, Quick Wins, Daily Reminder if not set
  */
 export function buildMorningDigestEmail(data: MorningDigestData): {
   subject: string;
@@ -154,12 +155,7 @@ export function buildMorningDigestEmail(data: MorningDigestData): {
     for (const extra of parseExtraItems(yesterday.extra_items)) {
       const text = extra.text.trim();
       if (!text) continue;
-      const label =
-        extra.kind === "must_do"
-          ? "Must-Do"
-          : extra.kind === "should_do"
-            ? "Should-Do"
-            : "Quick Win";
+      const label = KIND_LABELS[extra.kind];
       lines.push(
         `  ${extra.done ? "[done]" : "[open]"} ${label}: ${text}`,
       );
@@ -172,13 +168,13 @@ export function buildMorningDigestEmail(data: MorningDigestData): {
 
   if (!needsTodayNudge(nudge)) {
     lines.push(
-      "Today's Dashboard looks filled in — Must-Do, Should-Dos, Quick Wins, and Daily Reminder are set. Review them when you're ready.",
+      "Today's Dashboard looks filled in — Must-Dos, Should-Dos, Quick Wins, and Daily Reminder are set. Review them when you're ready.",
     );
   } else {
     lines.push(
       "A gentle nudge to fill in / review today's Dashboard if you haven't yet:",
     );
-    if (nudge.mustDoEmpty) lines.push("  • Must-Do — not set yet");
+    if (nudge.mustDoEmpty) lines.push("  • Must-Dos — not set yet");
     if (nudge.shouldDosEmpty) lines.push("  • Should-Dos — not set yet");
     if (nudge.quickWinsEmpty) lines.push("  • Quick Wins — not set yet");
     if (nudge.reminderEmpty) lines.push("  • Daily Reminder — not set yet");

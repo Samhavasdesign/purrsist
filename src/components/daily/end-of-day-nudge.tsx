@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { updateExtraDailyItemDone, updateSlotDone } from "@/lib/daily/actions";
 import { eveningHourLocal } from "@/lib/daily/time";
 import type { DailyEntry } from "@/lib/types/database";
@@ -150,22 +151,22 @@ export function EndOfDayNudge({ entry }: Props) {
         </ul>
       </div>
       <div className={styles.actions}>
-        <button
+        <Button
           type="button"
-          className={styles.primary}
+          variant="primary"
           disabled={pending}
           onClick={checkAll}
         >
           Check all off
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
-          className={styles.secondary}
+          variant="secondary"
           disabled={pending}
           onClick={dismiss}
         >
           Not now
-        </button>
+        </Button>
       </div>
     </aside>
   );

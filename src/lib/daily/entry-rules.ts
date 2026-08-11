@@ -18,6 +18,17 @@ export function formatArchiveDate(dateKeyStr: string): string {
   });
 }
 
+/** Compact date for chrome tags — e.g. "Aug 10, 2026". */
+export function formatShortDate(dateKeyStr: string): string {
+  const [y, m, d] = dateKeyStr.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 /** Same-day-only editing (PRD §6 / §8). */
 export function isEditableEntry(entry: DailyEntry, now = new Date()): boolean {
   return entry.date === dateKeyFromDate(now) && !entry.locked;

@@ -3,7 +3,7 @@
   top: 0;
   z-index: 30;
   padding-top: env(safe-area-inset-top, 0px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: var(--border-default);
   background: color-mix(in srgb, var(--background) 88%, transparent);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -15,7 +15,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   max-width: var(--app-content-max);
   margin: 0 auto;
   padding: 0.75rem var(--app-content-pad-x);
@@ -34,27 +34,68 @@
   gap: 0.45rem;
 }
 
-.backLink {
-  display: grid;
-  place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
+.backBtn {
   margin-left: -0.65rem;
-  border-radius: 0.75rem;
-  color: var(--muted);
-  transition:
-    color 160ms ease,
-    background-color 160ms ease;
 }
 
-.backLink:hover {
+.catCounter {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-width: var(--btn-height);
+  min-height: var(--btn-height);
+  height: var(--btn-height);
+  padding: 0 0.65rem;
+  border: var(--border-default);
+  border-radius: var(--btn-radius-soft);
+  background: transparent;
+  color: var(--muted);
+  text-decoration: none;
+  transition: var(--btn-transition);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.catCounter:hover {
   color: var(--foreground);
+  border-color: var(--muted);
   background: color-mix(in srgb, var(--surface) 80%, transparent);
 }
 
-.backIcon {
-  width: 1.25rem;
-  height: 1.25rem;
+.catCounter:focus {
+  outline: none;
+}
+
+.catCounter:focus-visible {
+  outline: var(--btn-focus-ring);
+  outline-offset: var(--btn-focus-offset);
+}
+
+.catCounterActive {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.catCounterActive:hover {
+  color: var(--accent-hover);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+.catCounterIcon {
+  display: block;
+  flex-shrink: 0;
+}
+
+.catCounterValue {
+  font-family: var(--font-ui);
+  font-size: var(--text-label-size);
+  font-weight: var(--text-label-weight);
+  letter-spacing: var(--text-label-tracking);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .brand {
@@ -64,14 +105,15 @@
   margin: 0;
   padding: 0.45rem 0;
   font-family: var(--font-display);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  font-size: var(--text-section-size);
+  font-weight: var(--text-section-weight);
+  letter-spacing: var(--text-section-tracking);
+  line-height: var(--text-section-leading);
+  text-transform: none;
   color: var(--accent);
   text-decoration: none;
   cursor: pointer;
-  border-radius: 0.45rem;
+  border-radius: var(--radius-sm);
   transition: color 160ms ease;
 }
 
@@ -79,42 +121,13 @@
   color: var(--accent-hover);
 }
 
-.iconLink {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  color: var(--muted);
-  transition:
-    color 160ms ease,
-    border-color 160ms ease,
-    background-color 160ms ease;
+.brand:focus {
+  outline: none;
 }
 
-.iconLink:hover {
-  color: var(--foreground);
-  border-color: var(--muted);
-  background: color-mix(in srgb, var(--surface) 80%, transparent);
-}
-
-.iconLinkActive {
-  color: var(--accent);
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-}
-
-.iconLinkActive:hover {
-  color: var(--accent-hover);
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 16%, transparent);
-}
-
-.icon {
-  width: 1.25rem;
-  height: 1.25rem;
+.brand:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
 
 @media (min-width: 640px) {

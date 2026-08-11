@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SaveAccountForm } from "@/components/auth/save-account-form";
 import { isAnonymousUser, requireUser } from "@/lib/auth";
 import styles from "./settings.module.css";
@@ -14,6 +15,15 @@ export default async function SettingsPage() {
           Manage your account and app preferences.
         </p>
       </header>
+
+      <section className={styles.section} aria-labelledby="help-heading">
+        <h2 id="help-heading" className={styles.sectionTitle}>
+          Help
+        </h2>
+        <Link className={styles.navItem} href="/settings/how-it-works">
+          How Purrsist Works
+        </Link>
+      </section>
 
       <section className={styles.section} aria-labelledby="account-heading">
         <h2 id="account-heading" className={styles.sectionTitle}>

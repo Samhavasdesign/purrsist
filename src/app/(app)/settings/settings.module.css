@@ -48,6 +48,24 @@
   color: var(--muted);
 }
 
+.navItem {
+  align-self: flex-start;
+  font-family: var(--font-ui);
+  font-size: var(--text-body-size);
+  font-weight: var(--text-body-weight);
+  letter-spacing: var(--text-body-tracking);
+  line-height: var(--text-body-leading);
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.navItem:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
 .email {
   margin: 0;
   font-size: 0.975rem;

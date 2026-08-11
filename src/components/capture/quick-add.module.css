@@ -10,80 +10,10 @@
   gap: 0.5rem;
 }
 
-.sigBtn {
+.field {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  border: 0.5px solid transparent;
-  border-radius: 0.9rem;
-  padding: 0.7rem 0.5rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    border-color 160ms ease,
-    color 160ms ease,
-    transform 160ms ease;
-}
-
-.sig_red {
-  background: var(--must-do-bg);
-  color: var(--must-do-fg);
-}
-
-.sig_yellow {
-  background: var(--should-do-bg);
-  color: var(--should-do-fg);
-}
-
-.sig_green {
-  background: var(--quick-win-bg);
-  color: var(--quick-win-fg);
-}
-
-.sigBtn:hover {
-  filter: brightness(0.97);
-}
-
-.sigSelected {
-  transform: translateY(-1px);
-}
-
-.sig_red.sigSelected {
-  border-color: var(--must-do-fg);
-}
-
-.sig_yellow.sigSelected {
-  border-color: var(--should-do-fg);
-}
-
-.sig_green.sigSelected {
-  border-color: var(--quick-win-fg);
-}
-
-.sigDot {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 999px;
-  flex-shrink: 0;
-}
-
-.sig_red .sigDot {
-  background: var(--must-do-fg);
-}
-
-.sig_yellow .sigDot {
-  background: var(--should-do-fg);
-}
-
-.sig_green .sigDot {
-  background: var(--quick-win-fg);
-}
-
-.sigLabel {
-  white-space: nowrap;
-  line-height: 1.2;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
 .inputRow {
@@ -94,50 +24,62 @@
 .input {
   flex: 1;
   min-width: 0;
-  border: 1px solid var(--border);
-  border-radius: 0.9rem;
+  min-height: var(--btn-height);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
   background: var(--surface);
   color: var(--foreground);
-  padding: 0.85rem 1rem;
-  font-size: 0.975rem;
+  -webkit-text-fill-color: var(--foreground);
+  padding: 0 1rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-input-size);
+  font-weight: var(--text-input-weight);
+  letter-spacing: var(--text-input-tracking);
+  line-height: var(--text-input-leading);
   outline: none;
-  transition:
-    border-color 160ms ease,
-    box-shadow 160ms ease;
+  transition: border-color 160ms ease;
 }
 
 .input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  outline: none;
+}
+
+.input:focus-visible {
+  outline: var(--focus-ring-input);
+  outline-offset: var(--focus-ring-input-offset);
 }
 
 .input::placeholder {
   color: var(--muted);
 }
 
+.inputError {
+  border-color: var(--danger);
+}
+
+.inputError:focus-visible {
+  outline-color: color-mix(in srgb, var(--danger) 70%, transparent);
+}
+
 .submit {
-  align-self: center;
   flex-shrink: 0;
-  border: none;
-  border-radius: 999px;
-  background: var(--accent);
-  color: var(--accent-foreground);
-  padding: 0.55rem 1.1rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    background-color 160ms ease,
-    opacity 160ms ease;
+  align-self: center;
 }
 
-.submit:hover:not(:disabled) {
-  background: var(--accent-hover);
+/* Idle until there’s text — still clickable so validation can run */
+.submitIdle,
+.submitIdle:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--muted) 22%, var(--surface)) !important;
+  color: color-mix(in srgb, var(--muted) 72%, var(--foreground)) !important;
+  border-color: var(--border) !important;
 }
 
-.submit:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
+/* Ready look once the user has typed — even before a category is chosen */
+.submitReady,
+.submitReady:hover:not(:disabled) {
+  background: var(--foreground) !important;
+  color: var(--background) !important;
+  border-color: transparent !important;
 }
 
 .backlogToggle {
@@ -146,8 +88,11 @@
   gap: 0.55rem;
   margin: 0;
   color: var(--muted);
-  font-size: 0.8125rem;
-  line-height: 1.4;
+  font-family: var(--font-ui);
+  font-size: var(--text-support-size);
+  font-weight: var(--text-support-weight);
+  letter-spacing: var(--text-support-tracking);
+  line-height: var(--text-support-leading);
   cursor: pointer;
   user-select: none;
 }
@@ -156,23 +101,29 @@
   width: var(--check-size);
   height: var(--check-size);
   margin-top: 0.15rem;
-  accent-color: var(--accent);
+  accent-color: var(--foreground);
   flex-shrink: 0;
+  border-radius: var(--radius-sm);
+}
+
+.backlogToggle input:focus {
+  outline: none;
+}
+
+.backlogToggle input:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .error {
   margin: 0;
-  font-size: 0.8125rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-support-size);
+  line-height: var(--text-support-leading);
   color: var(--danger);
 }
 
 .aha {
   /* Reserved — first-capture uses FirstCaptureAha */
   display: none;
-}
-
-@media (max-width: 420px) {
-  .sigLabel {
-    font-size: 0.75rem;
-  }
 }

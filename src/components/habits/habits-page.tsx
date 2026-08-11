@@ -9,13 +9,22 @@ import {
   renameHabit,
   unarchiveHabit,
 } from "@/lib/daily/actions";
+import { ViewTabs } from "@/components/ui/view-tabs";
 import type { Habit } from "@/lib/types/database";
 import styles from "./habits-page.module.css";
 
 type Props = {
+  tab: HabitsTab;
   activeHabits: Habit[];
   archivedHabits: Habit[];
 };
+
+export type HabitsTab = "active" | "archived";
+
+const TAB_OPTIONS = [
+  { value: "active" as const, label: "Active" },
+  { value: "archived" as const, label: "Archived" },
+];
 
 function formatCreatedDate(iso: string) {
   const date = new Date(iso);
@@ -28,6 +37,7 @@ function formatCreatedDate(iso: string) {
 }
 
 export function HabitsPage({
+  tab,
   activeHabits: initialActive,
   archivedHabits: initialArchived,
 }: Props) {
@@ -35,7 +45,6 @@ export function HabitsPage({
   const [pending, startTransition] = useTransition();
   const [activeHabits, setActiveHabits] = useState(initialActive);
   const [archivedHabits, setArchivedHabits] = useState(initialArchived);
-  const [showArchived, setShowArchived] = useState(false);
   const [newName, setNewName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
@@ -51,6 +60,14 @@ export function HabitsPage({
 
   function refresh() {
     router.refresh();
+  }
+
+  function setTab(next: HabitsTab) {
+    if (next === "archived") {
+      router.push("/habits?tab=archived");
+      return;
+    }
+    router.push("/habits");
   }
 
   function onAdd(event: React.FormEvent) {
@@ -210,9 +227,15 @@ export function HabitsPage({
       <header className={styles.header}>
         <h1 className={styles.title}>Habits</h1>
         <p className={styles.subtitle}>
-          Add and edit the recurring checklist that shows up on Today. Archiving
-          removes a habit from future days without changing past check-ins.
+          Set up and clean up the recurring checklist that shows up on Today.
+          Checking off today&apos;s habits stays on the Today dashboard.
         </p>
+        <ViewTabs
+          value={tab}
+          options={TAB_OPTIONS}
+          ariaLabel="Habits view"
+          onChange={setTab}
+        />
       </header>
 
       {error ? (
@@ -221,169 +244,169 @@ export function HabitsPage({
         </p>
       ) : null}
 
-      <section className={styles.section} aria-labelledby="add-habit-heading">
-        <h2 id="add-habit-heading" className={styles.sectionTitle}>
-          Add habit
-        </h2>
-        <form className={styles.addForm} onSubmit={onAdd}>
-          <input
-            className={styles.input}
-            type="text"
-            value={newName}
-            placeholder="e.g. Drink water"
-            aria-label="New habit name"
-            disabled={pending}
-            onChange={(event) => setNewName(event.target.value)}
-          />
-          <button
-            type="submit"
-            className={styles.primaryBtn}
-            disabled={pending || !newName.trim()}
+      {tab === "active" ? (
+        <>
+          <section className={styles.section} aria-labelledby="add-habit-heading">
+            <h2 id="add-habit-heading" className={styles.sectionTitle}>
+              Add habit
+            </h2>
+            <form className={styles.addForm} onSubmit={onAdd}>
+              <input
+                className={styles.input}
+                type="text"
+                value={newName}
+                placeholder="e.g. Drink water"
+                aria-label="New habit name"
+                disabled={pending}
+                onChange={(event) => setNewName(event.target.value)}
+              />
+              <button
+                type="submit"
+                className={styles.primaryBtn}
+                disabled={pending || !newName.trim()}
+              >
+                Add
+              </button>
+            </form>
+          </section>
+
+          <section
+            className={styles.section}
+            aria-labelledby="active-habits-heading"
           >
-            Add
-          </button>
-        </form>
-      </section>
-
-      <section className={styles.section} aria-labelledby="active-habits-heading">
-        <h2 id="active-habits-heading" className={styles.sectionTitle}>
-          Active
-        </h2>
-        {activeHabits.length === 0 ? (
-          <p className={styles.empty}>No active habits yet.</p>
-        ) : (
-          <ul className={styles.list}>
-            {activeHabits.map((habit) => {
-              const isEditing = editingId === habit.id;
-              return (
-                <li key={habit.id} className={styles.row}>
-                  <div className={styles.rowMain}>
-                    {isEditing ? (
-                      <input
-                        className={styles.nameInput}
-                        type="text"
-                        value={editName}
-                        aria-label="Edit habit name"
-                        disabled={pending}
-                        autoFocus
-                        onChange={(event) =>
-                          onEditNameChange(event.target.value)
-                        }
-                        onBlur={() => commitEdit(habit.id)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter") {
-                            event.preventDefault();
-                            event.currentTarget.blur();
-                          }
-                          if (event.key === "Escape") {
-                            event.preventDefault();
-                            cancelEdit();
-                          }
-                        }}
-                      />
-                    ) : (
-                      <button
-                        type="button"
-                        className={styles.habitName}
-                        disabled={pending}
-                        onClick={() => startEdit(habit)}
-                      >
-                        {habit.name.trim() || "Untitled habit"}
-                      </button>
-                    )}
-                    <p className={styles.meta}>
-                      Created {formatCreatedDate(habit.created_at)}
-                    </p>
-                  </div>
-                  <div className={styles.actions}>
-                    {isEditing ? (
-                      <button
-                        type="button"
-                        className={styles.ghostBtn}
-                        disabled={pending}
-                        onMouseDown={(event) => event.preventDefault()}
-                        onClick={cancelEdit}
-                      >
-                        Cancel
-                      </button>
-                    ) : (
-                      <>
-                        <button
-                          type="button"
-                          className={styles.ghostBtn}
-                          disabled={pending}
-                          onClick={() => onArchive(habit)}
-                        >
-                          Archive
-                        </button>
-                        <button
-                          type="button"
-                          className={styles.dangerBtn}
-                          disabled={pending}
-                          onClick={() => onDelete(habit)}
-                        >
-                          Delete
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
-
-      <section className={styles.section} aria-labelledby="archived-habits-heading">
-        <div className={styles.sectionHead}>
+            <h2 id="active-habits-heading" className={styles.sectionTitle}>
+              Your habits
+            </h2>
+            {activeHabits.length === 0 ? (
+              <p className={styles.empty}>No active habits yet.</p>
+            ) : (
+              <ul className={styles.list}>
+                {activeHabits.map((habit) => {
+                  const isEditing = editingId === habit.id;
+                  return (
+                    <li key={habit.id} className={styles.row}>
+                      <div className={styles.rowMain}>
+                        {isEditing ? (
+                          <input
+                            className={styles.nameInput}
+                            type="text"
+                            value={editName}
+                            aria-label="Edit habit name"
+                            disabled={pending}
+                            autoFocus
+                            onChange={(event) =>
+                              onEditNameChange(event.target.value)
+                            }
+                            onBlur={() => commitEdit(habit.id)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter") {
+                                event.preventDefault();
+                                event.currentTarget.blur();
+                              }
+                              if (event.key === "Escape") {
+                                event.preventDefault();
+                                cancelEdit();
+                              }
+                            }}
+                          />
+                        ) : (
+                          <button
+                            type="button"
+                            className={styles.habitName}
+                            disabled={pending}
+                            onClick={() => startEdit(habit)}
+                          >
+                            {habit.name.trim() || "Untitled habit"}
+                          </button>
+                        )}
+                        <p className={styles.meta}>
+                          Created {formatCreatedDate(habit.created_at)}
+                        </p>
+                      </div>
+                      <div className={styles.actions}>
+                        {isEditing ? (
+                          <button
+                            type="button"
+                            className={styles.ghostBtn}
+                            disabled={pending}
+                            onMouseDown={(event) => event.preventDefault()}
+                            onClick={cancelEdit}
+                          >
+                            Cancel
+                          </button>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              className={styles.ghostBtn}
+                              disabled={pending}
+                              onClick={() => onArchive(habit)}
+                            >
+                              Archive
+                            </button>
+                            <button
+                              type="button"
+                              className={styles.dangerBtn}
+                              disabled={pending}
+                              onClick={() => onDelete(habit)}
+                            >
+                              Delete
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
+        </>
+      ) : archivedHabits.length === 0 ? (
+        <p className={styles.empty}>
+          No archived habits. Archive a habit to pause it without losing past
+          check-ins.
+        </p>
+      ) : (
+        <section
+          className={styles.section}
+          aria-labelledby="archived-habits-heading"
+        >
           <h2 id="archived-habits-heading" className={styles.sectionTitle}>
             Archived
           </h2>
-          <button
-            type="button"
-            className={styles.toggleBtn}
-            aria-expanded={showArchived}
-            onClick={() => setShowArchived((prev) => !prev)}
-          >
-            {showArchived ? "Hide" : "Show"}
-            {archivedHabits.length > 0 ? ` (${archivedHabits.length})` : ""}
-          </button>
-        </div>
-
-        {showArchived ? (
-          archivedHabits.length === 0 ? (
-            <p className={styles.empty}>No archived habits.</p>
-          ) : (
-            <ul className={styles.list}>
-              {archivedHabits.map((habit) => (
-                <li key={habit.id} className={`${styles.row} ${styles.rowArchived}`}>
-                  <div className={styles.rowMain}>
-                    <p className={styles.archivedName}>
-                      {habit.name.trim() || "Untitled habit"}
-                    </p>
-                    <p className={styles.meta}>
-                      Created {formatCreatedDate(habit.created_at)}
-                      {habit.archived_at
-                        ? ` · Archived ${formatCreatedDate(habit.archived_at)}`
-                        : null}
-                    </p>
-                  </div>
-                  <div className={styles.actions}>
-                    <button
-                      type="button"
-                      className={styles.ghostBtn}
-                      disabled={pending}
-                      onClick={() => onUnarchive(habit)}
-                    >
-                      Unarchive
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )
-        ) : null}
-      </section>
+          <ul className={styles.list}>
+            {archivedHabits.map((habit) => (
+              <li
+                key={habit.id}
+                className={`${styles.row} ${styles.rowArchived}`}
+              >
+                <div className={styles.rowMain}>
+                  <p className={styles.archivedName}>
+                    {habit.name.trim() || "Untitled habit"}
+                  </p>
+                  <p className={styles.meta}>
+                    Created {formatCreatedDate(habit.created_at)}
+                    {habit.archived_at
+                      ? ` · Archived ${formatCreatedDate(habit.archived_at)}`
+                      : null}
+                  </p>
+                </div>
+                <div className={styles.actions}>
+                  <button
+                    type="button"
+                    className={styles.ghostBtn}
+                    disabled={pending}
+                    onClick={() => onUnarchive(habit)}
+                  >
+                    Unarchive
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </main>
   );
 }

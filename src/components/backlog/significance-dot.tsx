@@ -7,7 +7,21 @@ const LABELS: Record<Significance, string> = {
   green: "Eventually",
 };
 
-export function SignificanceDot({ value }: { value: Significance }) {
+export function SignificanceDot({
+  value,
+}: {
+  value: Significance | null;
+}) {
+  if (!value) {
+    return (
+      <span
+        className={`${styles.sigDot} ${styles.sig_unset}`}
+        title="Unassigned"
+        aria-label="Unassigned"
+      />
+    );
+  }
+
   return (
     <span
       className={`${styles.sigDot} ${styles[`sig_${value}`]}`}

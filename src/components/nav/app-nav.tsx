@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import styles from "./app-nav.module.css";
 
 const LINKS = [
   { href: "/dashboard", label: "Today", match: "/dashboard" },
   { href: "/backlog", label: "Backlog", match: "/backlog" },
-  { href: "/archive", label: "Archive", match: "/archive" },
+  { href: "/habits", label: "Habits", match: "/habits" },
 ] as const;
 
 export function AppNav() {
@@ -18,14 +18,15 @@ export function AppNav() {
       {LINKS.map((link) => {
         const active = pathname.startsWith(link.match);
         return (
-          <Link
+          <Button
             key={link.href}
             href={link.href}
-            className={`${styles.link} ${active ? styles.active : ""}`}
+            variant="nav"
+            selected={active}
             aria-current={active ? "page" : undefined}
           >
             {link.label}
-          </Link>
+          </Button>
         );
       })}
     </nav>
