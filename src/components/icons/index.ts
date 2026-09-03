@@ -3,6 +3,7 @@ export {
   CheckIcon,
   ChevronLeftIcon,
   CloseIcon,
+  GripIcon,
   ICON_STROKE,
   InfoIcon,
   PawPrintIcon,
