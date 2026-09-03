@@ -1,6 +1,6 @@
 .banner {
   margin: 0;
-  padding: 0.7rem 0.9rem;
+  padding: var(--space-3) var(--space-4);
   border: var(--border-default);
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--accent) 8%, transparent);

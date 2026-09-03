@@ -1,13 +1,13 @@
 .section {
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
+  gap: var(--space-3);
 }
 
 .sectionHead {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: var(--space-1);
 }
 
 .sectionTitle {
@@ -22,7 +22,7 @@
 
 .sectionHint {
   margin: 0;
-  font-size: 0.6875rem;
+  font-size: var(--text-kicker-size);
   font-weight: 400;
   letter-spacing: 0.01em;
   line-height: 1.35;
@@ -35,15 +35,15 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.55rem 0.65rem;
-  padding: 0.55rem 0.7rem;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
   border: var(--border-default);
   border-radius: var(--radius-md);
   background: var(--surface);
@@ -61,7 +61,7 @@
   flex: 1 1 8rem;
   min-width: 0;
   font: inherit;
-  font-size: 0.95rem;
+  font-size: var(--text-body-size);
   font-weight: var(--text-input-weight);
   color: var(--foreground);
   -webkit-text-fill-color: var(--foreground);
@@ -71,7 +71,7 @@
   border: none;
   background: transparent;
   outline: none;
-  padding: 0.2rem 0;
+  padding: var(--space-1) 0;
   border-radius: var(--radius-sm);
 }
 
@@ -92,7 +92,7 @@
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem;
+  gap: var(--space-1);
   margin-left: auto;
 }
 
@@ -101,7 +101,7 @@
   border: none;
   background: transparent;
   font-size: 0.75rem;
-  padding: 0.25rem 0.4rem;
+  padding: var(--space-1) var(--space-2);
   cursor: pointer;
 }
 
@@ -123,8 +123,8 @@
 
 .addRow {
   display: flex;
-  gap: 0.5rem;
-  padding: 0.55rem 0.7rem;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   border: var(--border-width) dashed var(--border);
   border-radius: var(--radius-md);
 }
@@ -134,8 +134,8 @@
   border-radius: var(--radius-md);
   background: var(--accent);
   color: var(--accent-foreground);
-  padding: 0.45rem 0.9rem;
-  font-size: 0.8125rem;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-meta-size);
   font-weight: 600;
   cursor: pointer;
 }
@@ -155,6 +155,6 @@
 
 .error {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: var(--text-meta-size);
   color: var(--danger);
 }

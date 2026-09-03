@@ -1,14 +1,14 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-4);
   width: 100%;
   max-width: 22rem;
 }
 
 .blurb {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: var(--text-support-size);
   line-height: 1.55;
   color: var(--muted);
 }

@@ -1,7 +1,7 @@
 .screen {
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: var(--space-7);
   width: 100%;
   max-width: var(--app-content-max);
   margin: 0 auto;
@@ -13,7 +13,7 @@
 .header {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: var(--space-3);
 }
 
 .title {
@@ -27,7 +27,7 @@
 
 .subtitle {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: var(--text-body-size);
   line-height: 1.5;
   color: var(--muted);
 }
@@ -35,13 +35,13 @@
 .body {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-6);
 }
 
 .empty {
   margin: 0;
   font-family: var(--font-ui);
-  font-size: 0.9rem;
+  font-size: var(--text-support-size);
   line-height: 1.5;
   color: var(--muted);
 }

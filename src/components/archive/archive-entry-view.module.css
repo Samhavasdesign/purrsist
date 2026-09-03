@@ -1,18 +1,18 @@
 .view {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-6);
 }
 
 .header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .kicker {
-  margin: 0 0 0.35rem;
+  margin: 0 0 var(--space-1);
   font-family: var(--font-display);
   font-size: 0.75rem;
   font-weight: 700;
@@ -33,14 +33,14 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.28rem;
-  padding: 0.28rem 0.5rem;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
   border: var(--border-width) solid transparent;
   border-radius: var(--radius-sm);
   background: var(--foreground);
   color: var(--background);
   font-family: var(--font-ui);
-  font-size: 0.625rem;
+  font-size: var(--text-kicker-size);
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: none;
@@ -56,14 +56,14 @@
 
 .readonlyNote {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: var(--text-meta-size);
   color: var(--muted);
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: var(--space-3);
 }
 
 .sectionTitle {
@@ -82,14 +82,14 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .item {
   display: flex;
-  gap: 0.7rem;
+  gap: var(--space-3);
   align-items: flex-start;
-  padding: 0.75rem 0.85rem;
+  padding: var(--space-3) var(--space-3);
   border: var(--border-default);
   border-radius: var(--radius-md);
   background: var(--surface);
@@ -98,7 +98,7 @@
 .check {
   width: var(--check-size);
   height: var(--check-size);
-  margin-top: 0.2rem;
+  margin-top: var(--space-1);
   border-radius: var(--radius-sm);
   border: var(--border-default);
   flex-shrink: 0;
@@ -113,12 +113,12 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: var(--space-1);
 }
 
 .itemText {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: var(--text-body-size);
   line-height: 1.4;
 }
 
@@ -129,7 +129,7 @@
 
 .meta {
   margin: 0;
-  font-size: 0.6875rem;
+  font-size: var(--text-kicker-size);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--muted);
@@ -137,11 +137,11 @@
 
 .reminder {
   margin: 0;
-  padding: 0.85rem 0.95rem;
+  padding: var(--space-3) var(--space-4);
   border: var(--border-default);
   border-radius: var(--radius-md);
   background: var(--surface);
-  font-size: 0.95rem;
+  font-size: var(--text-body-size);
   line-height: 1.45;
   white-space: pre-wrap;
 }

@@ -3,11 +3,11 @@
   position: fixed;
   inset: 0;
   z-index: 80;
-  animation: layerIn 220ms ease;
+  animation: layerIn var(--duration-exit) ease;
 }
 
 .leaving {
-  animation: layerOut 420ms ease forwards;
+  animation: layerOut var(--duration-spring) ease forwards;
 }
 
 .confetti {
@@ -29,7 +29,7 @@
   background: var(--color);
   opacity: 0;
   transform: translate(-50%, -50%) rotate(0deg) scale(0.4);
-  animation: confettiBurst var(--duration) cubic-bezier(0.16, 1, 0.3, 1)
+  animation: confettiBurst var(--duration) var(--ease-overshoot)
     var(--delay) forwards;
 }
 
@@ -44,13 +44,13 @@
   width: max-content;
   max-width: calc(100vw - 1.5rem);
   min-width: 0;
-  padding: 0.85rem 1.1rem;
+  padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
   border: var(--border-default);
   background: color-mix(in srgb, var(--surface) 92%, var(--accent));
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
-  animation-duration: 420ms;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 10px 24px color-mix(in srgb, #000 28%, transparent);
+  animation-duration: var(--duration-spring);
+  animation-timing-function: var(--ease-spring);
   animation-fill-mode: both;
 }
 

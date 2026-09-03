@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.4rem;
+  gap: var(--space-2);
   margin-top: -0.35rem;
   width: 100%;
 }
@@ -11,9 +11,9 @@
   display: inline-flex;
   align-items: center;
   align-self: flex-start;
-  gap: 0.3rem;
+  gap: var(--space-1);
   margin: 0;
-  padding: 0.15rem 0;
+  padding: var(--space-1) 0;
   border: none;
   background: transparent;
   color: var(--muted);
@@ -27,8 +27,8 @@
   text-underline-offset: 0.18em;
   cursor: pointer;
   transition:
-    color 160ms ease,
-    text-decoration-color 160ms ease;
+    color var(--duration-base) ease,
+    text-decoration-color var(--duration-base) ease;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -55,14 +55,14 @@
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: var(--space-2);
   width: 100%;
 }
 
 .inputRow {
   display: flex;
   align-items: flex-end;
-  gap: 0.5rem;
+  gap: var(--space-2);
   width: 100%;
 }
 
@@ -78,14 +78,14 @@
   background: var(--surface);
   color: var(--foreground);
   -webkit-text-fill-color: var(--foreground);
-  padding: 0.7rem 1rem;
+  padding: var(--space-3) var(--space-4);
   font-family: var(--font-ui);
   font-size: var(--text-input-size);
   font-weight: var(--text-input-weight);
   letter-spacing: var(--text-input-tracking);
   line-height: var(--text-input-leading);
   outline: none;
-  transition: border-color 160ms ease;
+  transition: border-color var(--duration-base) ease;
 }
 
 .input:focus {

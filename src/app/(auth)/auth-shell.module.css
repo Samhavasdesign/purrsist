@@ -2,9 +2,9 @@
   min-height: 100dvh;
   display: grid;
   place-items: center;
-  padding: 2rem 1.25rem;
+  padding: var(--space-8) var(--space-5);
   background:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(122, 58, 32, 0.12), transparent),
+    radial-gradient(ellipse 80% 50% at 50% -20%, var(--accent-soft), transparent),
     var(--background);
 }
 
@@ -12,10 +12,10 @@
   width: min(100%, 26rem);
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 2.25rem 1.75rem;
+  gap: var(--space-8);
+  padding: 2.25rem var(--space-7);
   border: 1px solid var(--border);
-  border-radius: 1.25rem;
+  border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--surface) 88%, transparent);
   backdrop-filter: blur(12px);
 }
@@ -23,7 +23,7 @@
 .brand {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: var(--space-3);
 }
 
 .mark {
@@ -47,13 +47,13 @@
 
 .subtitle {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: var(--text-body-size);
   line-height: 1.55;
   color: var(--muted);
 }
 
 @media (min-width: 640px) {
   .panel {
-    padding: 2.5rem;
+    padding: var(--space-10);
   }
 }

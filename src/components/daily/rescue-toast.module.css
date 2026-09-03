@@ -1,21 +1,21 @@
 .toast {
   display: flex;
   align-items: stretch;
-  gap: 0.15rem;
+  gap: var(--space-1);
   margin: 0;
-  padding: 0.15rem;
+  padding: var(--space-1);
   border: var(--border-width) solid
     color-mix(in srgb, var(--accent) 32%, var(--border));
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--accent) 12%, var(--surface));
   box-shadow: 0 14px 36px color-mix(in srgb, #000 40%, transparent);
-  animation-duration: 260ms;
+  animation-duration: var(--duration-aha);
   animation-timing-function: ease;
   animation-fill-mode: both;
 }
 
 .leaving {
-  animation: toastOut 220ms ease forwards;
+  animation: toastOut var(--duration-exit) ease forwards;
   pointer-events: none;
 }
 
@@ -24,9 +24,9 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
   margin: 0;
-  padding: 0.55rem 0.55rem 0.55rem 0.65rem;
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
   border: none;
   border-radius: calc(var(--radius-lg) - 2px);
   background: transparent;
@@ -34,7 +34,7 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
-  transition: background-color 160ms ease;
+  transition: background-color var(--duration-base) ease;
 }
 
 .main:hover {
@@ -74,7 +74,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: var(--space-1);
 }
 
 .text {
@@ -98,7 +98,7 @@
 .dismiss {
   flex-shrink: 0;
   align-self: center;
-  margin-right: 0.15rem;
+  margin-right: var(--space-1);
 }
 
 @keyframes toastOut {
