@@ -1,17 +1,40 @@
-/* Inline text action styled as a link. */
+/* Inline link — see .inlineLink in globals.css. Rendered as a <button>. */
 .linkButton {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+  transition:
+    color var(--duration-base) ease,
+    text-decoration-color var(--duration-base) ease;
+  /* Context: strip the native button chrome and inherit the sentence's type. */
+  display: inline-block;
   padding: 0;
   border: none;
   background: none;
   font: inherit;
-  color: var(--accent);
-  text-decoration: underline;
-  text-underline-offset: 0.18em;
-  cursor: pointer;
 }
 
 .linkButton:hover {
   color: var(--accent-hover);
+  text-decoration-color: color-mix(in srgb, var(--accent-hover) 45%, transparent);
+}
+
+/* Hover.css “Icon Pop”, softened for whole controls — same subtle pulse as
+   the "+" / "X" habit buttons. */
+@media (prefers-reduced-motion: no-preference) {
+  .linkButton:hover,
+  .linkButton:focus-visible,
+  .linkButton:active {
+    animation: ctaPop 0.25s ease-out 1;
+  }
+}
+
+@keyframes ctaPop {
+  50% {
+    transform: scale(1.04);
+  }
 }
 
 .linkButton:focus {

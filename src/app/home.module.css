@@ -142,6 +142,25 @@
   border-color: var(--muted);
 }
 
+/* Hover.css “Icon Pop”, softened for whole controls — same subtle pulse as
+   the in-app "+" / "X" habit buttons. */
+@media (prefers-reduced-motion: no-preference) {
+  .cta:hover,
+  .cta:focus-visible,
+  .cta:active,
+  .secondary:hover,
+  .secondary:focus-visible,
+  .secondary:active {
+    animation: ctaPop 0.25s ease-out 1;
+  }
+}
+
+@keyframes ctaPop {
+  50% {
+    transform: scale(1.04);
+  }
+}
+
 /* Supporting microcopy — not an action. */
 .reassurance {
   margin: 0;

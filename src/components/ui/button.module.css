@@ -38,6 +38,23 @@
   transform: translateY(0.5px);
 }
 
+/* Hover.css “Icon Pop”, softened for whole controls — the same subtle pulse
+   as the "+" / "X" habit buttons. Category selectors already pop their glyph,
+   so they opt out here. */
+@media (prefers-reduced-motion: no-preference) {
+  .root:not(.category):hover:not(:disabled):not([aria-disabled="true"]),
+  .root:not(.category):focus-visible:not(:disabled):not([aria-disabled="true"]),
+  .root:not(.category):active:not(:disabled):not([aria-disabled="true"]) {
+    animation: ctaPop 0.25s ease-out 1;
+  }
+}
+
+@keyframes ctaPop {
+  50% {
+    transform: scale(1.04);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .root {
     transition: none;

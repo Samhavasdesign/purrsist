@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { PurrsistLogo } from "@/components/brand/purrsist-logo";
 import {
   CatHeadIcon,
@@ -26,6 +27,15 @@ export function AppTopBar({
   email,
 }: Props) {
   const pathname = usePathname();
+  // Lift a faint shadow onto the bar once the page scrolls away from the top,
+  // so it reads as floating over content without a hard edge at rest.
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 0);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   // How-it-works lives under /settings/ in the route tree, but it's reached from
   // the global top-bar info button, not from Settings — so its back button
   // should return to Today, not Settings.
@@ -48,7 +58,11 @@ export function AppTopBar({
       : `${catCount} cats rescued — view collection`;
 
   return (
-    <header className={styles.bar}>
+    <header
+      className={[styles.bar, scrolled ? styles.barScrolled : ""]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <div className={styles.inner}>
         <div className={styles.left}>
           {showBack ? (

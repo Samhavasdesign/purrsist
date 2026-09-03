@@ -20,15 +20,50 @@
   color: var(--muted);
 }
 
+/* Inline link — see .inlineLink in globals.css */
 .link {
   color: var(--accent);
   text-decoration: underline;
-  text-underline-offset: 0.15em;
+  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+  transition:
+    color var(--duration-base) ease,
+    text-decoration-color var(--duration-base) ease;
+  /* Context: keep the link on one line within the notice. */
+  display: inline-block;
   white-space: nowrap;
 }
 
 .link:hover {
   color: var(--accent-hover);
+  text-decoration-color: color-mix(in srgb, var(--accent-hover) 45%, transparent);
+}
+
+/* Hover.css “Icon Pop”, softened for whole controls — same subtle pulse as
+   the "+" / "X" habit buttons. */
+@media (prefers-reduced-motion: no-preference) {
+  .link:hover,
+  .link:focus-visible,
+  .link:active {
+    animation: ctaPop 0.25s ease-out 1;
+  }
+}
+
+@keyframes ctaPop {
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.link:focus {
+  outline: none;
+}
+
+.link:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-sm);
 }
 
 .dismiss {

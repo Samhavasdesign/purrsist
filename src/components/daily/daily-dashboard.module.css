@@ -217,23 +217,30 @@
   background: transparent;
 }
 
-/* Quiet way into the read-only archive — same treatment as the capture link. */
+/*
+ * Quiet way into the read-only archive.
+ * Inline link — see .inlineLink in globals.css
+ */
 .archiveLink {
+  /* inline-block so the hover pulse's transform takes effect */
+  display: inline-block;
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+  transition:
+    color var(--duration-base) ease,
+    text-decoration-color var(--duration-base) ease;
+  /* Context: caption-sized standalone link, left-aligned in the column. */
   align-self: flex-start;
   margin: 0;
   padding: var(--space-1) 0;
-  color: var(--accent);
   font-family: var(--font-ui);
   font-size: var(--text-caption-size);
   font-weight: var(--text-caption-weight);
   letter-spacing: var(--text-caption-tracking);
   line-height: var(--text-caption-leading);
-  text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
-  text-underline-offset: 0.18em;
-  transition:
-    color var(--duration-base) ease,
-    text-decoration-color var(--duration-base) ease;
 }
 
 .archiveLink:hover {
@@ -249,6 +256,25 @@
   outline: var(--focus-ring);
   outline-offset: var(--focus-ring-offset);
   border-radius: var(--radius-sm);
+}
+
+/* Hover.css “Icon Pop”, softened for whole controls — same subtle pulse as
+   the "+" / "X" habit buttons, shared by the archive / locked inline links. */
+@media (prefers-reduced-motion: no-preference) {
+  .archiveLink:hover,
+  .archiveLink:focus-visible,
+  .archiveLink:active,
+  .lockedLink:hover,
+  .lockedLink:focus-visible,
+  .lockedLink:active {
+    animation: ctaPop 0.25s ease-out 1;
+  }
+}
+
+@keyframes ctaPop {
+  50% {
+    transform: scale(1.04);
+  }
 }
 
 .sectionRule {
@@ -533,6 +559,8 @@
 }
 
 .lockedLink {
+  /* inline-block so the hover pulse's transform takes effect */
+  display: inline-block;
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 0.12em;

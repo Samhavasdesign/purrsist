@@ -7,6 +7,33 @@
   background: color-mix(in srgb, var(--background) 88%, transparent);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 0 0 0 transparent;
+  transition: box-shadow var(--duration-base) var(--ease-base);
+}
+
+/* Fades in only once the page has scrolled off the top. */
+.barScrolled {
+  box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--foreground) 12%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    transition: none;
+  }
+
+  .catCounterIcon,
+  .right .navControl svg {
+    transition: none;
+  }
+
+  .catCounter:hover .catCounterIcon,
+  .catCounter:focus-visible .catCounterIcon,
+  .catCounter:active .catCounterIcon,
+  .right .navControl:hover:not(:disabled):not([aria-disabled="true"]) svg,
+  .right .navControl:focus-visible:not(:disabled):not([aria-disabled="true"]) svg,
+  .right .navControl:active:not(:disabled):not([aria-disabled="true"]) svg {
+    animation: none;
+  }
 }
 
 .inner {
@@ -80,6 +107,18 @@
   background: color-mix(in srgb, var(--foreground) 8%, transparent);
 }
 
+/* Hover.css “Icon Pop” — same glyph pulse as the "+" / "X" habit controls. */
+.right .navControl svg {
+  transform: translateZ(0);
+  transition: transform 0.25s ease-out;
+}
+
+.right .navControl:hover:not(:disabled):not([aria-disabled="true"]) svg,
+.right .navControl:focus-visible:not(:disabled):not([aria-disabled="true"]) svg,
+.right .navControl:active:not(:disabled):not([aria-disabled="true"]) svg {
+  animation: iconPop 0.25s ease-out 1;
+}
+
 /* Current-page (pressed) state — identical to the collection counter's active look. */
 .right .navControl[aria-current="page"] {
   color: var(--foreground);
@@ -120,6 +159,21 @@
 .catCounterIcon {
   display: block;
   flex-shrink: 0;
+  transform: translateZ(0);
+  transition: transform 0.25s ease-out;
+}
+
+/* Hover.css “Icon Pop” — same glyph pulse as the "+" / "X" habit controls. */
+.catCounter:hover .catCounterIcon,
+.catCounter:focus-visible .catCounterIcon,
+.catCounter:active .catCounterIcon {
+  animation: iconPop 0.25s ease-out 1;
+}
+
+@keyframes iconPop {
+  50% {
+    transform: scale(1.2);
+  }
 }
 
 .catCounterValue {
@@ -181,6 +235,22 @@
 
 .saveAccountCta:hover {
   background: color-mix(in srgb, var(--foreground) 90%, black);
+}
+
+/* Hover.css “Icon Pop”, softened for whole controls — same subtle pulse as
+   the "+" / "X" habit buttons. */
+@media (prefers-reduced-motion: no-preference) {
+  .saveAccountCta:hover,
+  .saveAccountCta:focus-visible,
+  .saveAccountCta:active {
+    animation: ctaPop 0.25s ease-out 1;
+  }
+}
+
+@keyframes ctaPop {
+  50% {
+    transform: scale(1.04);
+  }
 }
 
 .saveAccountCta:focus {
