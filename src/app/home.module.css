@@ -12,25 +12,27 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 64rem;
+  gap: var(--space-4);
+  max-width: 68rem;
   width: 100%;
   margin: 0 auto;
 }
 
+/* Wordmark — the product's serif display voice, not a separate logo treatment. */
 .mark {
   margin: 0;
   font-family: var(--font-display);
-  font-size: var(--text-caption-xs);
+  font-size: 1.35rem;
   font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--accent);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--foreground);
 }
 
 .nav {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 .navLink {
@@ -38,6 +40,7 @@
   font-size: var(--text-caption-size);
   text-decoration: none;
   padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
   transition: color var(--duration-base) ease;
 }
 
@@ -45,33 +48,46 @@
   color: var(--foreground);
 }
 
+/* ---------- hero ---------- */
 .hero {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: var(--space-5);
-  max-width: 40rem;
+  gap: var(--space-6);
+  max-width: 66rem;
   width: 100%;
   margin: 0 auto;
-  padding: var(--space-16) 0;
+  /* More padding below than above nudges the optical centre up the page. */
+  padding: var(--space-8) 0 var(--space-12);
+}
+
+.heroCopy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 34rem;
 }
 
 .title {
   margin: 0;
+  max-width: 18ch;
   font-family: var(--font-display);
-  font-size: clamp(3rem, 10vw, 5rem);
+  font-size: clamp(2.25rem, 6vw, 3.25rem);
   font-weight: 600;
-  letter-spacing: -0.045em;
-  line-height: 0.95;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  text-wrap: balance;
+  color: var(--foreground);
 }
 
 .subtitle {
   margin: 0;
-  max-width: 28rem;
-  font-size: 1.1rem;
+  max-width: 32rem;
+  font-size: clamp(1.05rem, 2.2vw, 1.2rem);
   line-height: 1.6;
-  color: var(--muted);
+  /* A touch richer than --muted for body-copy contrast. */
+  color: color-mix(in srgb, var(--foreground) 80%, transparent);
 }
 
 .actions {
@@ -79,22 +95,25 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
-  margin-top: var(--space-3);
+  margin-top: var(--space-2);
 }
 
+/* Primary — filled warm pill, the dominant action in header and hero. */
 .cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none;
+  min-height: 2.75rem;
+  border: 1px solid transparent;
   border-radius: var(--radius-full);
   background: var(--accent);
   color: var(--accent-foreground);
   text-decoration: none;
-  padding: var(--space-3) var(--space-5);
+  padding: var(--space-3) var(--space-6);
   font: inherit;
   font-size: var(--text-caption-size);
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
   transition:
     transform var(--duration-base) ease,
@@ -106,25 +125,65 @@
   transform: translateY(-1px);
 }
 
+/* Secondary — quiet outline pill, clearly subordinate to the primary. */
 .secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 2.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
+  background: transparent;
   color: var(--foreground);
   text-decoration: none;
   padding: var(--space-3) var(--space-5);
   font-size: var(--text-caption-size);
-  transition: border-color var(--duration-base) ease;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    border-color var(--duration-base) ease,
+    color var(--duration-base) ease;
 }
 
 .secondary:hover {
   border-color: var(--muted);
 }
 
+/* Supporting microcopy — not an action. */
+.reassurance {
+  margin: 0;
+  font-size: var(--text-caption-size);
+  color: var(--muted);
+}
+
+.heroPreview {
+  width: 100%;
+}
+
 @media (min-width: 640px) {
   .page {
     padding: var(--space-8) var(--space-8) var(--space-16);
+  }
+}
+
+@media (min-width: 900px) {
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+    align-items: start;
+    gap: var(--space-10);
+    padding: var(--space-8) 0 var(--space-12);
+  }
+
+  .heroCopy {
+    max-width: none;
+    /* Optically level the headline with the top of the preview card. */
+    padding-top: var(--space-2);
+  }
+}
+
+@media (min-width: 1200px) {
+  .hero {
+    gap: var(--space-12);
   }
 }

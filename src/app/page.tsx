@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { TryItButton } from "@/components/auth/try-it-button";
+import { TodayPreview } from "@/components/marketing/today-preview";
 import styles from "./home.module.css";
 
 export default function HomePage() {
@@ -12,25 +13,29 @@ export default function HomePage() {
             Sign in
           </Link>
           <Link className={styles.cta} href="/signup">
-            Get started
+            Try Purrsist
           </Link>
         </nav>
       </header>
 
       <section className={styles.hero}>
-        <h1 className={styles.title}>Purrsist</h1>
-        <p className={styles.subtitle}>
-          A calm place to capture what matters, sort it with AI, and stay
-          consistent — morning to week&apos;s end.
-        </p>
-        <div className={styles.actions}>
-          <TryItButton className={styles.cta}>Try it</TryItButton>
-          <Link className={styles.secondary} href="/signup">
-            Create account
-          </Link>
-          <Link className={styles.navLink} href="/login">
-            I already have one
-          </Link>
+        <div className={styles.heroCopy}>
+          <h1 className={styles.title}>Make your to&#8288;-&#8288;do list feel doable.</h1>
+          <p className={styles.subtitle}>
+            Purrsist uses AI to turn everything on your mind into a realistic
+            plan for today — without making productivity another job.
+          </p>
+          <div className={styles.actions}>
+            <TryItButton className={styles.cta}>Try Purrsist</TryItButton>
+            <Link className={styles.secondary} href="/signup">
+              Create an account
+            </Link>
+          </div>
+          <p className={styles.reassurance}>No account required to try it.</p>
+        </div>
+
+        <div className={styles.heroPreview}>
+          <TodayPreview />
         </div>
       </section>
     </main>

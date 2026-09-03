@@ -1,0 +1,37 @@
+.figure {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 48px -30px color-mix(in srgb, var(--foreground) 34%, transparent);
+}
+
+.clip {
+  border-radius: inherit;
+  overflow: hidden;
+  max-height: clamp(20rem, 60vh, 34rem);
+}
+
+/*
+ * Mirrors the real .dashboard column (flex, vertical rhythm). A little side
+ * padding keeps section borders off the rounded corners; extra bottom padding
+ * gives the fade something to dissolve into.
+ */
+.mock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-2) var(--space-1) var(--space-10);
+}
+
+/* Soft crop at the base — the view continues past what we show. */
+.fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 5.5rem;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background: linear-gradient(to bottom, transparent, var(--background));
+  pointer-events: none;
+}
