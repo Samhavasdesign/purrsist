@@ -22,13 +22,6 @@
   letter-spacing: var(--text-display-tracking);
 }
 
-.subtitle {
-  margin: 0;
-  font-size: var(--text-body-size);
-  line-height: 1.55;
-  color: var(--muted);
-}
-
 .section {
   display: flex;
   flex-direction: column;
@@ -43,24 +36,6 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
-}
-
-.navItem {
-  align-self: flex-start;
-  font-family: var(--font-ui);
-  font-size: var(--text-body-size);
-  font-weight: var(--text-body-weight);
-  letter-spacing: var(--text-body-tracking);
-  line-height: var(--text-body-leading);
-  color: var(--accent);
-  text-decoration: none;
-  transition: color var(--duration-base) ease;
-}
-
-.navItem:hover {
-  color: var(--accent-hover);
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
 }
 
 .email {
@@ -86,12 +61,4 @@
 .signOut:hover {
   color: var(--foreground);
   border-color: var(--muted);
-}
-
-.signOutHint {
-  margin: 0;
-  max-width: 22rem;
-  font-size: var(--text-caption-sm);
-  line-height: 1.45;
-  color: var(--muted);
 }

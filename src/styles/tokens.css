@@ -10,41 +10,35 @@
  */
 
 :root {
-  /* Purrsist — grounded light theme (current default) */
-  --background: #f7f1e7;
-  --foreground: #4a2e18;
-  --surface: #fffdf8;
-  --border: #e6dcc8;
-  --muted: #8a7d5f;
-  --accent: #7a3a20;
-  --accent-hover: #5c2c17;
-  --accent-foreground: #f7f1e7;
-  --accent-soft: rgba(122, 58, 32, 0.12);
-  --danger: #e07a6a;
-  --success: #8fbf8a;
-  /* Page wash — keep --background as the solid mix base for overlays */
+  /* Purrsist — ARTIFACT THEME PREVIEW (cool editorial / periwinkle) */
+  --background: #faf9f6;
+  --foreground: #2a2530;
+  --surface: #ffffff;
+  --border: #e5e0d7;
+  --muted: #696370;
+  --accent: #5b63a6;
+  --accent-hover: #464d86;
+  --accent-foreground: #ffffff;
+  --accent-soft: #ecebf6;
+  --danger: #bc5a4c;
+  --success: #6a9a69;
+  /* Page wash — clean off-white paper with the faintest indigo top light */
   --background-fill:
     radial-gradient(
-      ellipse 120% 75% at 50% -30%,
-      color-mix(in srgb, var(--accent) 18%, transparent),
-      transparent 58%
+      ellipse 120% 70% at 50% -20%,
+      color-mix(in srgb, var(--accent) 5%, transparent),
+      transparent 60%
     ),
-    linear-gradient(
-      165deg,
-      #fcf8f2 0%,
-      var(--background) 32%,
-      #eadfcb 70%,
-      #ddd0b5 100%
-    );
+    var(--background);
 
-  /* Category tokens — full-bleed Must-Do / Should-Do / Quick Win block backgrounds */
-  --must-do-bg: #debba0;
-  --must-do-fg: #7a3a20;
-  --must-do-border: #a86e48;
+  /* Category tokens — derived from signal colours (artifact preview) */
+  --must-do-bg: color-mix(in srgb, var(--danger) 13%, var(--surface));
+  --must-do-fg: color-mix(in srgb, var(--danger) 58%, var(--foreground));
+  --must-do-border: color-mix(in srgb, var(--danger) 40%, var(--border));
   --must-do-bg-fill: linear-gradient(
     165deg,
-    color-mix(in srgb, var(--must-do-bg) 94%, var(--must-do-border)) 0%,
-    color-mix(in srgb, var(--must-do-bg) 72%, var(--must-do-border)) 100%
+    color-mix(in srgb, var(--must-do-bg) 96%, var(--must-do-border)) 0%,
+    color-mix(in srgb, var(--must-do-bg) 84%, var(--must-do-border)) 100%
   );
   --must-do-bg-fill-selected: linear-gradient(
     165deg,
@@ -52,13 +46,13 @@
     color-mix(in srgb, var(--must-do-bg) 64%, var(--must-do-fg)) 100%
   );
 
-  --should-do-bg: #e2ce92;
-  --should-do-fg: #6b4f0e;
-  --should-do-border: #b5943c;
+  --should-do-bg: color-mix(in srgb, #bd8933 13%, var(--surface));
+  --should-do-fg: color-mix(in srgb, #bd8933 58%, var(--foreground));
+  --should-do-border: color-mix(in srgb, #bd8933 42%, var(--border));
   --should-do-bg-fill: linear-gradient(
     165deg,
-    color-mix(in srgb, var(--should-do-bg) 94%, var(--should-do-border)) 0%,
-    color-mix(in srgb, var(--should-do-bg) 72%, var(--should-do-border)) 100%
+    color-mix(in srgb, var(--should-do-bg) 96%, var(--should-do-border)) 0%,
+    color-mix(in srgb, var(--should-do-bg) 84%, var(--should-do-border)) 100%
   );
   --should-do-bg-fill-selected: linear-gradient(
     165deg,
@@ -66,25 +60,25 @@
     color-mix(in srgb, var(--should-do-bg) 64%, var(--should-do-fg)) 100%
   );
 
-  --quick-win-bg: #c5d5b8;
-  --quick-win-fg: #3d5230;
-  --quick-win-border: #6f8a5e;
+  --quick-win-bg: color-mix(in srgb, var(--success) 13%, var(--surface));
+  --quick-win-fg: color-mix(in srgb, var(--success) 58%, var(--foreground));
+  --quick-win-border: color-mix(in srgb, var(--success) 40%, var(--border));
   --quick-win-bg-fill: linear-gradient(
     165deg,
-    color-mix(in srgb, var(--quick-win-bg) 94%, var(--quick-win-border)) 0%,
-    color-mix(in srgb, var(--quick-win-bg) 72%, var(--quick-win-border)) 100%
+    color-mix(in srgb, var(--quick-win-bg) 96%, var(--quick-win-border)) 0%,
+    color-mix(in srgb, var(--quick-win-bg) 84%, var(--quick-win-border)) 100%
   );
   --quick-win-bg-fill-selected: linear-gradient(
     165deg,
     color-mix(in srgb, var(--quick-win-bg) 88%, var(--quick-win-fg)) 0%,
     color-mix(in srgb, var(--quick-win-bg) 64%, var(--quick-win-fg)) 100%
   );
-  --quick-win-done-fg: #5c6b50;
+  --quick-win-done-fg: color-mix(in srgb, var(--success) 55%, var(--muted));
 
-  /* Support sections — Habits / Daily Reminder (soft wash of page-title brown) */
-  --support-bg: color-mix(in srgb, var(--foreground) 14%, #f5efe6);
+  /* Support sections — Habits / Daily Reminder (soft neutral wash) */
+  --support-bg: color-mix(in srgb, var(--foreground) 6%, var(--surface));
   --support-fg: var(--foreground);
-  --support-border: color-mix(in srgb, var(--foreground) 28%, var(--border));
+  --support-border: color-mix(in srgb, var(--foreground) 18%, var(--border));
   --support-bg-fill: linear-gradient(
     165deg,
     color-mix(in srgb, var(--support-bg) 94%, var(--support-border)) 0%,
@@ -96,8 +90,9 @@
    * next/font imports in layout.tsx) and every role below follows; sizes,
    * weights and rhythm stay put.
    */
-  --font-display: var(--font-source-serif), serif;
-  --font-ui: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-ui: var(--font-hanken), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-eyebrow: var(--font-plex-mono), ui-monospace, "SF Mono", monospace;
 
   /*
    * Type roles — one definition per role. Each exposes:
@@ -174,11 +169,11 @@
     var(--text-input-weight) var(--text-input-size) / var(--text-input-leading)
     var(--text-input-family);
 
-  /* eyebrow — uppercase kickers, dot captions (consumer sets text-transform) */
-  --text-eyebrow-family: var(--font-ui);
-  --text-eyebrow-size: 0.6875rem; /* 11px */
-  --text-eyebrow-weight: 600;
-  --text-eyebrow-tracking: 0.1em;
+  /* eyebrow — mono uppercase kickers, dot captions (consumer sets text-transform) */
+  --text-eyebrow-family: var(--font-eyebrow);
+  --text-eyebrow-size: 0.72rem;
+  --text-eyebrow-weight: 500;
+  --text-eyebrow-tracking: 0.16em;
   --text-eyebrow-leading: 1.3;
   --text-eyebrow:
     var(--text-eyebrow-weight) var(--text-eyebrow-size) / var(--text-eyebrow-leading)
@@ -291,33 +286,28 @@
  * Nothing sets data-theme="dark" yet; wire up a toggle later to use it.
  */
 :root[data-theme="dark"] {
-  --background: #0c0b09;
-  --foreground: #f4efe6;
-  --surface: #161410;
-  --border: #2a261f;
-  --muted: #9a9183;
-  --accent: #d4a853;
-  --accent-hover: #e0b965;
-  --accent-foreground: #1a150c;
-  --accent-soft: rgba(212, 168, 83, 0.18);
-  --danger: #e07a6a;
-  --success: #8fbf8a;
+  --background: #1a1820;
+  --foreground: #ece8f0;
+  --surface: #232029;
+  --border: #332f3b;
+  --muted: #9c95a9;
+  --accent: #9aa0e0;
+  --accent-hover: #adb2e8;
+  --accent-foreground: #1a1820;
+  --accent-soft: #262740;
+  --danger: #d9796b;
+  --success: #8fb98b;
   --background-fill:
     radial-gradient(
       ellipse 110% 70% at 50% -25%,
-      color-mix(in srgb, var(--accent) 14%, transparent),
+      color-mix(in srgb, var(--accent) 12%, transparent),
       transparent 62%
     ),
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--background) 78%, var(--surface)) 0%,
-      var(--background) 40%,
-      color-mix(in srgb, var(--background) 70%, black) 100%
-    );
+    var(--background);
 
-  --must-do-bg: color-mix(in srgb, #e07a6a 22%, var(--surface));
-  --must-do-fg: #e07a6a;
-  --must-do-border: color-mix(in srgb, #e07a6a 45%, var(--border));
+  --must-do-bg: color-mix(in srgb, var(--danger) 20%, var(--surface));
+  --must-do-fg: color-mix(in srgb, var(--danger) 82%, var(--foreground));
+  --must-do-border: color-mix(in srgb, var(--danger) 45%, var(--border));
   --must-do-bg-fill: linear-gradient(
     165deg,
     color-mix(in srgb, var(--must-do-bg) 82%, var(--must-do-border)) 0%,
@@ -329,9 +319,9 @@
     color-mix(in srgb, var(--must-do-bg) 48%, var(--must-do-fg)) 100%
   );
 
-  --should-do-bg: color-mix(in srgb, #d4a853 22%, var(--surface));
-  --should-do-fg: #d4a853;
-  --should-do-border: color-mix(in srgb, #d4a853 45%, var(--border));
+  --should-do-bg: color-mix(in srgb, #ddaa57 20%, var(--surface));
+  --should-do-fg: color-mix(in srgb, #ddaa57 85%, var(--foreground));
+  --should-do-border: color-mix(in srgb, #ddaa57 45%, var(--border));
   --should-do-bg-fill: linear-gradient(
     165deg,
     color-mix(in srgb, var(--should-do-bg) 82%, var(--should-do-border)) 0%,
@@ -343,9 +333,9 @@
     color-mix(in srgb, var(--should-do-bg) 48%, var(--should-do-fg)) 100%
   );
 
-  --quick-win-bg: color-mix(in srgb, #8fbf8a 22%, var(--surface));
-  --quick-win-fg: #8fbf8a;
-  --quick-win-border: color-mix(in srgb, #8fbf8a 45%, var(--border));
+  --quick-win-bg: color-mix(in srgb, var(--success) 20%, var(--surface));
+  --quick-win-fg: color-mix(in srgb, var(--success) 82%, var(--foreground));
+  --quick-win-border: color-mix(in srgb, var(--success) 45%, var(--border));
   --quick-win-bg-fill: linear-gradient(
     165deg,
     color-mix(in srgb, var(--quick-win-bg) 82%, var(--quick-win-border)) 0%,
@@ -356,11 +346,8 @@
     color-mix(in srgb, var(--quick-win-bg) 78%, var(--quick-win-fg)) 0%,
     color-mix(in srgb, var(--quick-win-bg) 48%, var(--quick-win-fg)) 100%
   );
-  --quick-win-done-fg: color-mix(in srgb, #8fbf8a 70%, var(--muted));
-
-  /* Dark theme keeps its original all-Geist look, no serif headings */
-  --font-display: var(--font-geist-sans);
-  --font-ui: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --quick-win-done-fg: color-mix(in srgb, var(--success) 60%, var(--muted));
+  /* dark keeps the same Fraunces / Hanken / Plex Mono roles as light */
 }
 
 @media (min-width: 640px) {

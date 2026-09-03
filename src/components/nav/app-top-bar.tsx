@@ -25,7 +25,12 @@ export function AppTopBar({
   email,
 }: Props) {
   const pathname = usePathname();
-  const nestedSettings = pathname.startsWith("/settings/");
+  // How-it-works lives under /settings/ in the route tree, but it's reached from
+  // the global top-bar info button, not from Settings — so its back button
+  // should return to Today, not Settings.
+  const nestedSettings =
+    pathname.startsWith("/settings/") &&
+    !pathname.startsWith("/settings/how-it-works");
   const showBack =
     pathname.startsWith("/backlog") ||
     pathname.startsWith("/habits") ||

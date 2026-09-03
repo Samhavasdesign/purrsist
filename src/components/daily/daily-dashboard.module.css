@@ -41,6 +41,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
+  box-sizing: border-box;
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--space-4) var(--space-5);
   transform: translateZ(0);
@@ -75,20 +77,28 @@
   }
 }
 
+/* --row-tint: each module's own background swatch, nudged a bit darker so
+   input rows read as a recessed panel on the category fill. Darkened toward
+   the category's *own* foreground (not the neutral --foreground) so the row
+   deepens the hue instead of greying it out. */
 .section_red {
   background: var(--must-do-bg-fill);
+  --row-tint: color-mix(in srgb, var(--must-do-bg) 88%, var(--must-do-fg));
 }
 
 .section_yellow {
   background: var(--should-do-bg-fill);
+  --row-tint: color-mix(in srgb, var(--should-do-bg) 88%, var(--should-do-fg));
 }
 
 .section_green {
   background: var(--quick-win-bg-fill);
+  --row-tint: color-mix(in srgb, var(--quick-win-bg) 88%, var(--quick-win-fg));
 }
 
 .section_support {
   background: var(--support-bg-fill);
+  --row-tint: color-mix(in srgb, var(--support-bg) 88%, var(--support-fg));
 }
 
 .section_red .sectionTitle {
@@ -318,7 +328,9 @@
   padding: var(--space-2) var(--space-3);
   border: var(--border-width) solid transparent;
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--background) 35%, transparent);
+  /* The module's own background swatch, a bit darker (see --row-tint on
+     each .section_* variant); neutral wash as a fallback. */
+  background: var(--row-tint, color-mix(in srgb, var(--foreground) 4%, transparent));
   transition:
     opacity var(--duration-base) ease,
     border-color var(--duration-base) ease;

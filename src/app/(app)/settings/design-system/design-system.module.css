@@ -1,0 +1,481 @@
+.page {
+  --ds-shadow:
+    0 1px 2px color-mix(in srgb, var(--foreground) 6%, transparent),
+    0 12px 28px -18px color-mix(in srgb, var(--foreground) 30%, transparent);
+  --ds-surface-2: color-mix(in srgb, var(--surface) 88%, var(--foreground));
+
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+  width: 100%;
+  max-width: var(--app-content-max);
+  margin: 0 auto;
+  padding: var(--app-content-pad-top) var(--app-content-pad-x)
+    var(--app-content-pad-bottom);
+}
+
+/* ---------- header ---------- */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.eyebrow {
+  margin: 0;
+  font: var(--text-eyebrow);
+  letter-spacing: var(--text-eyebrow-tracking);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.title {
+  margin: 0;
+  font: var(--text-display);
+  letter-spacing: var(--text-display-tracking);
+  color: var(--foreground);
+  text-wrap: balance;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 58ch;
+  font: var(--text-body);
+  letter-spacing: var(--text-body-tracking);
+  color: var(--muted);
+}
+
+/* ---------- sections ---------- */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sectionTitle {
+  margin: 0;
+  font: var(--text-title);
+  letter-spacing: var(--text-title-tracking);
+  color: var(--foreground);
+}
+
+.sectionNote {
+  margin: calc(var(--space-2) * -1) 0 0;
+  max-width: 62ch;
+  font: var(--text-caption);
+  color: var(--muted);
+}
+
+.subhead {
+  margin: var(--space-2) 0 0;
+  font: var(--text-label);
+  letter-spacing: var(--text-label-tracking);
+  color: var(--foreground);
+}
+
+.card {
+  background: var(--surface);
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--ds-shadow);
+  padding: clamp(var(--space-4), 3vw, var(--space-6));
+}
+
+/* shared code chips */
+.swatchName,
+.swatchValue,
+.scaleName,
+.scaleValue {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: var(--text-caption-xs);
+}
+
+.swatchName {
+  color: var(--foreground);
+}
+
+.swatchValue,
+.scaleValue,
+.gradientValue {
+  color: var(--muted);
+}
+
+/* ---------- color swatches ---------- */
+.swatchGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-3);
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border: var(--border-muted-default);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.swatchChip {
+  height: 3rem;
+  border-radius: var(--radius-sm);
+  border: var(--border-muted-default);
+  background-clip: padding-box;
+}
+
+.swatchValue {
+  overflow-wrap: anywhere;
+}
+
+/* ---------- gradients ---------- */
+.gradientGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-3);
+}
+
+.gradientCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.gradientPreview {
+  height: 4.5rem;
+  border-radius: var(--radius-md);
+  border: var(--border-muted-default);
+}
+
+.gradientValue {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- category tokens ---------- */
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-3);
+}
+
+.categoryCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1.5px solid;
+  border-radius: var(--radius-lg);
+}
+
+.categoryLabel {
+  font: var(--text-label);
+  letter-spacing: var(--text-label-tracking);
+}
+
+.categoryChips {
+  display: inline-flex;
+  gap: var(--space-1);
+}
+.categoryChips span {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+}
+
+.categoryTokenList {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  opacity: 0.85;
+  overflow-wrap: anywhere;
+}
+
+.categorySelectedStrip {
+  margin-top: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-caption-xs);
+  font-weight: 600;
+  border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+}
+
+/* ---------- typography ---------- */
+.typeList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.typeRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-bottom: var(--space-5);
+  border-bottom: var(--border-muted-default);
+}
+.typeRow:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.typeHead {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.typeNote {
+  font: var(--text-caption);
+  color: var(--muted);
+}
+
+.typeSample {
+  margin: 0;
+  color: var(--foreground);
+  overflow-wrap: anywhere;
+}
+
+.typeSpec {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+}
+.typeSpec > div {
+  display: flex;
+  gap: var(--space-1);
+}
+.typeSpec dt {
+  font: var(--text-caption-xs) / 1.4 var(--font-geist-mono, monospace);
+  color: var(--muted);
+}
+.typeSpec dt::after {
+  content: ":";
+}
+.typeSpec dd {
+  margin: 0;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: var(--text-caption-xs);
+  color: var(--foreground);
+}
+
+/* ---------- space scale ---------- */
+.scaleList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.scaleRow {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr 4rem;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.scaleBarTrack {
+  height: 1.25rem;
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.scaleBar {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: var(--radius-sm);
+}
+
+.scaleValue {
+  text-align: right;
+}
+
+/* ---------- radius scale ---------- */
+.radiusGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-4);
+}
+
+.radiusCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.radiusBox {
+  width: 100%;
+  height: 4.5rem;
+  background: var(--accent-soft);
+  border: 1.5px solid var(--accent);
+}
+
+/* ---------- motion ---------- */
+.motionWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.motionToggle {
+  align-self: flex-start;
+  min-height: var(--btn-height);
+  padding: 0 var(--btn-pad-x);
+  border: var(--border-default);
+  border-radius: var(--btn-radius-soft);
+  background: var(--foreground);
+  color: var(--background);
+  font: var(--text-label);
+  cursor: pointer;
+}
+
+.motionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.motionGroupTitle {
+  margin: 0 0 var(--space-1);
+  font: var(--text-label);
+  letter-spacing: var(--text-label-tracking);
+  color: var(--foreground);
+}
+
+.motionRow {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr 6rem;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.motionTrack {
+  position: relative;
+  height: 1.5rem;
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  border-radius: var(--radius-full);
+}
+
+.motionDot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--accent);
+  transition-property: transform;
+}
+
+.motionRow .scaleValue,
+.motionRow .scaleName {
+  overflow-wrap: anywhere;
+}
+
+/* ---------- generic token table ---------- */
+.tokenTable {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  border: var(--border-muted-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.tokenTableRow {
+  display: grid;
+  grid-template-columns: minmax(10rem, 18rem) 1fr;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+}
+.tokenTableRow:nth-child(odd) {
+  background: color-mix(in srgb, var(--foreground) 3%, transparent);
+}
+.tokenTableRow dt,
+.tokenTableRow dd {
+  margin: 0;
+}
+.tokenTableRow code {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: var(--text-caption-xs);
+  overflow-wrap: anywhere;
+}
+.tokenTableRow dt code {
+  color: var(--foreground);
+}
+.tokenTableRow dd code {
+  color: var(--muted);
+}
+
+/* ---------- live components ---------- */
+.componentStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.componentRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.focusWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.focusButton {
+  min-height: var(--btn-height);
+  padding: 0 var(--btn-pad-x);
+  border: var(--border-default);
+  border-radius: var(--btn-radius-soft);
+  background: var(--surface);
+  color: var(--foreground);
+  font: var(--text-label);
+  cursor: pointer;
+}
+.focusButton:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+.focusButton code {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+.focusInput {
+  min-height: var(--btn-height);
+  min-width: min(20rem, 100%);
+  padding: 0 var(--space-3);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--foreground);
+  font: var(--text-input);
+}
+.focusInput:focus-visible {
+  outline: var(--focus-ring-input);
+  outline-offset: var(--focus-ring-input-offset);
+  box-shadow: var(--shadow-focus);
+}
+
+@media (max-width: 560px) {
+  .scaleRow {
+    grid-template-columns: 4.5rem 1fr 3.5rem;
+  }
+  .motionRow {
+    grid-template-columns: 7rem 1fr;
+  }
+  .motionRow .scaleValue {
+    display: none;
+  }
+}

@@ -1,4 +1,6 @@
+import { cookies } from "next/headers";
 import { TrialBanner } from "@/components/auth/trial-banner";
+import { TRIAL_BANNER_DISMISSED_COOKIE } from "@/components/auth/trial-banner.constants";
 import { DailyDashboard } from "@/components/daily/daily-dashboard";
 import { listDueReminders } from "@/lib/backlog/due-reminders";
 import { isAnonymousUser, requireUser } from "@/lib/auth";
@@ -32,9 +34,12 @@ export default async function DashboardPage() {
 
   const sectionHints = parseSectionHintFlags(profile);
 
+  const trialBannerDismissed =
+    (await cookies()).get(TRIAL_BANNER_DISMISSED_COOKIE)?.value === "1";
+
   return (
     <main className={styles.page}>
-      {anonymous ? <TrialBanner /> : null}
+      {anonymous && !trialBannerDismissed ? <TrialBanner /> : null}
       <DailyDashboard
         entry={entry}
         habits={habits}
