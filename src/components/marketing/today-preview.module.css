@@ -3,7 +3,6 @@
   margin: 0;
   width: 100%;
   border-radius: var(--radius-lg);
-  box-shadow: 0 24px 48px -30px color-mix(in srgb, var(--foreground) 34%, transparent);
 }
 
 .clip {

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { PurrsistLogo } from "@/components/brand/purrsist-logo";
 import {
   CatHeadIcon,
   ChevronLeftIcon,
@@ -65,7 +66,7 @@ export function AppTopBar({
             className={styles.brand}
             aria-label="Home — Today"
           >
-            Purrsist
+            <PurrsistLogo decorative className={styles.brandLogo} />
           </Link>
         </div>
 

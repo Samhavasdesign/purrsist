@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { TryItButton } from "@/components/auth/try-it-button";
+import { PurrsistLogo } from "@/components/brand/purrsist-logo";
 import { TodayPreview } from "@/components/marketing/today-preview";
 import styles from "./home.module.css";
 
@@ -7,7 +8,7 @@ export default function HomePage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <p className={styles.mark}>Purrsist</p>
+        <PurrsistLogo className={styles.logo} />
         <nav className={styles.nav}>
           <Link className={styles.navLink} href="/login">
             Sign in

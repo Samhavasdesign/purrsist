@@ -30,7 +30,7 @@ export function TrialBanner() {
         <Link className={styles.link} href="/settings">
           Save an account
         </Link>{" "}
-        to keep your to-dos.{" "}
+        to keep your to-dos. Already have one?{" "}
         <LogInInsteadButton className={styles.link} />
       </p>
       <IconButton

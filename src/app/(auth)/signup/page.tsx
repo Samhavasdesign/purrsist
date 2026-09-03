@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { AuthForm } from "@/components/auth/auth-form";
+import { PurrsistLogo } from "@/components/brand/purrsist-logo";
 import styles from "../auth-shell.module.css";
 
 export default function SignupPage() {
@@ -6,7 +8,9 @@ export default function SignupPage() {
     <main className={styles.shell}>
       <section className={styles.panel}>
         <div className={styles.brand}>
-          <p className={styles.mark}>Purrsist</p>
+          <Link href="/" className={styles.logoLink} aria-label="Purrsist home">
+            <PurrsistLogo decorative className={styles.logo} />
+          </Link>
           <h1 className={styles.title}>Create your account</h1>
           <p className={styles.subtitle}>
             Email and password — that&apos;s the only setup step.
