@@ -18,10 +18,10 @@
   background: transparent;
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: var(--text-support-size);
-  font-weight: var(--text-support-weight);
-  letter-spacing: var(--text-support-tracking);
-  line-height: var(--text-support-leading);
+  font-size: var(--text-caption-size);
+  font-weight: var(--text-caption-weight);
+  letter-spacing: var(--text-caption-tracking);
+  line-height: var(--text-caption-leading);
   text-decoration: underline;
   text-decoration-color: color-mix(in srgb, var(--muted) 35%, transparent);
   text-underline-offset: 0.18em;
@@ -123,7 +123,7 @@
 .error {
   margin: 0;
   font-family: var(--font-ui);
-  font-size: var(--text-support-size);
-  line-height: var(--text-support-leading);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-leading);
   color: var(--danger);
 }

@@ -27,11 +27,8 @@
 .title {
   margin: 0;
   min-width: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 5vw, 2.5rem);
-  font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
+  font: var(--text-display);
+  letter-spacing: var(--text-display-tracking);
 }
 
 .weekBadge,
@@ -43,7 +40,7 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: var(--foreground);
-  font-size: var(--text-kicker-size);
+  font-size: var(--text-eyebrow-size);
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -99,7 +96,7 @@
 }
 
 .statLabel {
-  font-size: var(--text-kicker-size);
+  font-size: var(--text-eyebrow-size);
   font-weight: 500;
   letter-spacing: 0.02em;
   line-height: 1.25;
@@ -125,7 +122,7 @@
 
 .emptyBody {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--text-caption-size);
   line-height: 1.5;
   color: var(--muted);
 }
@@ -223,7 +220,7 @@
 
 .cardName {
   min-width: 0;
-  font-size: var(--text-support-size);
+  font-size: var(--text-caption-size);
   font-weight: 500;
   letter-spacing: -0.01em;
   overflow: hidden;
@@ -233,7 +230,7 @@
 
 .cardWeek {
   flex-shrink: 0;
-  font-size: var(--text-kicker-size);
+  font-size: var(--text-eyebrow-size);
   font-weight: 500;
   letter-spacing: 0.01em;
   color: var(--muted);
@@ -273,7 +270,7 @@
   background: transparent;
   color: var(--muted);
   font: inherit;
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
   font-weight: 500;
   padding: var(--space-1) var(--space-3);
   cursor: pointer;
@@ -323,7 +320,7 @@
 .detailWeek {
   margin: 0;
   flex-shrink: 0;
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
   font-weight: 500;
   color: var(--muted);
 }
@@ -331,7 +328,7 @@
 .detailMeta {
   margin: 0;
   padding: 0 var(--space-1) var(--space-1);
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
   color: var(--muted);
 }
 

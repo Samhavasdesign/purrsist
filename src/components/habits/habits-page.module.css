@@ -32,11 +32,8 @@
 
 .title {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 5vw, 2.5rem);
-  font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
+  font: var(--text-display);
+  letter-spacing: var(--text-display-tracking);
 }
 
 .subtitle {
@@ -48,7 +45,7 @@
 
 .error {
   margin: 0;
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
   color: var(--danger);
 }
 
@@ -82,10 +79,10 @@
 .groupTitle {
   margin: 0;
   font-family: var(--font-display);
-  font-size: var(--text-section-size);
-  font-weight: var(--text-section-weight);
-  letter-spacing: var(--text-section-tracking);
-  line-height: var(--text-section-leading);
+  font-size: var(--text-title-size);
+  font-weight: var(--text-title-weight);
+  letter-spacing: var(--text-title-tracking);
+  line-height: var(--text-title-leading);
   text-transform: none;
   color: var(--support-fg);
 }
@@ -94,10 +91,10 @@
   margin: 0;
   min-width: 0;
   font-family: var(--font-ui);
-  font-size: var(--text-support-size);
-  font-weight: var(--text-support-weight);
-  letter-spacing: var(--text-support-tracking);
-  line-height: var(--text-support-leading);
+  font-size: var(--text-caption-size);
+  font-weight: var(--text-caption-weight);
+  letter-spacing: var(--text-caption-tracking);
+  line-height: var(--text-caption-leading);
   color: color-mix(in srgb, var(--support-fg) 65%, transparent);
 }
 
@@ -117,7 +114,7 @@
   margin: 0;
   color: color-mix(in srgb, var(--support-fg) 75%, transparent);
   line-height: 1.55;
-  font-size: 0.875rem;
+  font-size: var(--text-caption-size);
 }
 
 .cardBody {
@@ -278,7 +275,7 @@
   align-items: center;
   gap: var(--space-1) var(--space-2);
   font-family: var(--font-ui);
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
   line-height: 1.35;
   color: color-mix(in srgb, var(--support-fg) 60%, transparent);
 }
@@ -293,7 +290,7 @@
   background: transparent;
   color: var(--foreground);
   font-family: var(--font-ui);
-  font-size: var(--text-kicker-size);
+  font-size: var(--text-eyebrow-size);
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: none;
@@ -302,7 +299,7 @@
 
 .itemError {
   margin: var(--space-2) 0 0;
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
   color: var(--danger);
 }
 
@@ -322,7 +319,7 @@
   background: transparent;
   color: color-mix(in srgb, var(--support-fg) 78%, transparent);
   padding: var(--space-1) var(--space-3);
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
   white-space: nowrap;
   transition:
     color var(--duration-base) ease,

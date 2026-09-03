@@ -13,7 +13,7 @@
 .sectionTitle {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -22,7 +22,7 @@
 
 .sectionHint {
   margin: 0;
-  font-size: var(--text-kicker-size);
+  font-size: var(--text-eyebrow-size);
   font-weight: 400;
   letter-spacing: 0.01em;
   line-height: 1.35;
@@ -100,7 +100,7 @@
 .dangerBtn {
   border: none;
   background: transparent;
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
   padding: var(--space-1) var(--space-2);
   cursor: pointer;
 }
@@ -135,7 +135,7 @@
   background: var(--accent);
   color: var(--accent-foreground);
   padding: var(--space-2) var(--space-4);
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
   font-weight: 600;
   cursor: pointer;
 }
@@ -149,12 +149,12 @@
 
 .empty {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--text-caption-size);
   color: var(--muted);
 }
 
 .error {
   margin: 0;
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
   color: var(--danger);
 }

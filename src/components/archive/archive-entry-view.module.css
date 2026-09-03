@@ -14,7 +14,7 @@
 .kicker {
   margin: 0 0 var(--space-1);
   font-family: var(--font-display);
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -40,7 +40,7 @@
   background: var(--foreground);
   color: var(--background);
   font-family: var(--font-ui);
-  font-size: var(--text-kicker-size);
+  font-size: var(--text-eyebrow-size);
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: none;
@@ -56,7 +56,7 @@
 
 .readonlyNote {
   margin: 0;
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
   color: var(--muted);
 }
 
@@ -69,7 +69,7 @@
 .sectionTitle {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: none;
@@ -129,7 +129,7 @@
 
 .meta {
   margin: 0;
-  font-size: var(--text-kicker-size);
+  font-size: var(--text-eyebrow-size);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--muted);
@@ -148,6 +148,6 @@
 
 .empty {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--text-caption-size);
   color: var(--muted);
 }

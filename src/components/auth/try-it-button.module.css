@@ -12,7 +12,7 @@
 }
 
 .error {
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
   line-height: 1.35;
   color: var(--danger);
   max-width: 16rem;

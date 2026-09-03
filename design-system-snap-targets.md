@@ -89,6 +89,42 @@ component passes.
 daily-dashboard, backlog, habits, app-top-bar). Left as literals — `calc(-1 * var(--space-n))`
 adds noise for a deliberate visual tweak.
 
+---
+
+## Type roles (centralized)
+
+`tokens.css` now defines each text role once, with a `font` shorthand plus
+sub-tokens:
+
+```css
+--text-<role>-family / -size / -weight / -tracking / -leading
+--text-<role>          /* font shorthand: weight size/leading family */
+```
+
+Roles: `display` (page title), `title` (section heading), `body`, `caption`
+(+ `-sm` 13px, `-xs` 12px size-only variants), `label`, `input`, `eyebrow`
+(uppercase kickers). Consume as two lines:
+
+```css
+font: var(--text-title);
+letter-spacing: var(--text-title-tracking);
+```
+
+**Font swap** = edit `--font-display` / `--font-ui` (or the `next/font` imports
+in `layout.tsx`). Every role's `-family` points at those; sizes/weights/rhythm
+stay put. Verified by flipping `--font-display` to mono — every heading and the
+wordmark switched, body text didn't, nothing reflowed.
+
+**Restyle a role app-wide** = edit that role block in `tokens.css`. All page
+titles, section headings, captions etc. now reference the role tokens rather
+than raw literals.
+
+Still raw on purpose: the marketing hero (`clamp(3rem, 10vw, 5rem)`), the
+top-bar wordmark, and a few one-off display sizes (`statValue`, `detailName`,
+`reviewText`, auth-shell title, archive `date`) — each a single distinct use.
+The old-style serif uppercase section kicker (`0.75rem / 700 / 0.1em`, ~4 sites)
+is a candidate for its own role if it stays.
+
 ### Layout tokens in tokens.css
 `--app-content-pad-x/top` (1.25rem/1.5rem → 2rem), `--app-content-pad-bottom` (5.5rem),
 `--btn-pad-x` (1.1rem). Centralized already, not "drift". Could be expressed via

@@ -6,7 +6,7 @@
 
 .label {
   font-family: var(--font-display);
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -58,7 +58,7 @@
   color: var(--foreground);
   padding: var(--space-3) var(--space-4);
   font: inherit;
-  font-size: 0.875rem;
+  font-size: var(--text-caption-size);
   text-align: left;
   cursor: pointer;
   transition: border-color var(--duration-base) ease;
@@ -74,7 +74,7 @@
 }
 
 .winMark {
-  font-size: var(--text-kicker-size);
+  font-size: var(--text-eyebrow-size);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent);

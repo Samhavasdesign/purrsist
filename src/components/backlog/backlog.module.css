@@ -68,7 +68,7 @@
 
 .archivedHint {
   margin: 0;
-  font-size: var(--text-support-size);
+  font-size: var(--text-caption-size);
   line-height: 1.5;
   color: var(--muted);
 }
@@ -79,11 +79,8 @@
 
 .title {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 5vw, 2.5rem);
-  font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
+  font: var(--text-display);
+  letter-spacing: var(--text-display-tracking);
 }
 
 .reviewLaunch {
@@ -93,7 +90,7 @@
   background: transparent;
   color: var(--foreground);
   padding: var(--space-2) var(--space-4);
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
   font-weight: 500;
   cursor: pointer;
   transition:
@@ -120,7 +117,7 @@
 /* Card padding already supplies the breathing room. */
 .section .empty {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--text-caption-size);
 }
 
 /* Row gap, so a draft row trails the list at the same rhythm as its rows. */
@@ -163,10 +160,10 @@
 .groupTitle {
   margin: 0;
   font-family: var(--font-display);
-  font-size: var(--text-section-size);
-  font-weight: var(--text-section-weight);
-  letter-spacing: var(--text-section-tracking);
-  line-height: var(--text-section-leading);
+  font-size: var(--text-title-size);
+  font-weight: var(--text-title-weight);
+  letter-spacing: var(--text-title-tracking);
+  line-height: var(--text-title-leading);
   text-transform: none;
   color: var(--support-fg);
 }
@@ -175,10 +172,10 @@
   margin: 0;
   min-width: 0;
   font-family: var(--font-ui);
-  font-size: var(--text-support-size);
-  font-weight: var(--text-support-weight);
-  letter-spacing: var(--text-support-tracking);
-  line-height: var(--text-support-leading);
+  font-size: var(--text-caption-size);
+  font-weight: var(--text-caption-weight);
+  letter-spacing: var(--text-caption-tracking);
+  line-height: var(--text-caption-leading);
   color: color-mix(in srgb, var(--support-fg) 65%, transparent);
 }
 
@@ -203,17 +200,17 @@
 .cardTitle {
   margin: 0;
   font-family: var(--font-display);
-  font-size: var(--text-section-size);
-  font-weight: var(--text-section-weight);
-  letter-spacing: var(--text-section-tracking);
-  line-height: var(--text-section-leading);
+  font-size: var(--text-title-size);
+  font-weight: var(--text-title-weight);
+  letter-spacing: var(--text-title-tracking);
+  line-height: var(--text-title-leading);
   color: var(--support-fg);
 }
 
 .sectionTitle {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -385,7 +382,7 @@
   align-items: center;
   gap: var(--space-1) var(--space-2);
   font-family: var(--font-ui);
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
   line-height: 1.35;
   color: color-mix(in srgb, var(--support-fg) 60%, transparent);
 }
@@ -408,7 +405,7 @@
   background: transparent;
   color: var(--foreground);
   font-family: var(--font-ui);
-  font-size: var(--text-kicker-size);
+  font-size: var(--text-eyebrow-size);
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: none;
@@ -421,7 +418,7 @@
 
 .itemError {
   margin: var(--space-2) 0 0;
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
   color: var(--danger);
 }
 
@@ -450,7 +447,7 @@
   background: transparent;
   color: color-mix(in srgb, var(--support-fg) 78%, transparent);
   padding: var(--space-1) var(--space-3);
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
   white-space: nowrap;
   transition:
     color var(--duration-base) ease,
@@ -476,7 +473,7 @@
   background: transparent;
   color: color-mix(in srgb, var(--support-fg) 78%, transparent);
   padding: var(--space-1) var(--space-3);
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
   white-space: nowrap;
   transition:
     color var(--duration-base) ease,
@@ -507,7 +504,7 @@
   background: var(--foreground);
   color: var(--background);
   padding: var(--space-2) var(--space-3);
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
   font-weight: 600;
   transition: background-color var(--duration-base) ease;
 }
@@ -557,7 +554,7 @@
 .promoteLabel {
   margin: 0;
   font-family: var(--font-ui);
-  font-size: var(--text-kicker-size);
+  font-size: var(--text-eyebrow-size);
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -573,7 +570,7 @@
 .promoteCategory {
   min-height: 2.75rem;
   padding: 0 var(--space-3);
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
 }
 
 .promoteRow {
@@ -585,8 +582,8 @@
 .promoteEmpty {
   margin: 0;
   font-family: var(--font-ui);
-  font-size: var(--text-support-size);
-  line-height: var(--text-support-leading);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-leading);
   color: var(--muted);
 }
 
@@ -604,7 +601,7 @@
   background: color-mix(in srgb, var(--background) 70%, transparent);
   color: var(--foreground);
   padding: var(--space-2) var(--space-3);
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
 }
 
 .promoteOption:hover:not(:disabled) {
@@ -681,7 +678,7 @@
 
 .reviewProgress {
   margin: 0;
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
   color: var(--muted);
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -691,7 +688,7 @@
   border: none;
   background: transparent;
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: var(--text-caption-size);
   padding: var(--space-1) var(--space-1);
 }
 
@@ -729,7 +726,7 @@
 
 .swipeHint {
   margin: var(--space-4) 0 0;
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
   color: var(--muted);
 }
 
@@ -756,7 +753,7 @@
 
 .reviewLabel {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
@@ -774,7 +771,7 @@
   background: transparent;
   color: var(--muted);
   padding: var(--space-2) var(--space-3);
-  font-size: 0.75rem;
+  font-size: var(--text-caption-xs);
 }
 
 .chip:hover:not(:disabled) {
@@ -800,7 +797,7 @@
 .secondaryBtn {
   border-radius: var(--radius-full);
   padding: var(--space-3) var(--space-4);
-  font-size: 0.875rem;
+  font-size: var(--text-caption-size);
   font-weight: 600;
 }
 

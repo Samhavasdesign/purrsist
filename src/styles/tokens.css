@@ -91,52 +91,98 @@
     color-mix(in srgb, var(--support-bg) 72%, var(--support-border)) 100%
   );
 
-  /* Headings use the display serif; body/UI stays Geist Sans */
+  /*
+   * Font families — the ONLY place a typeface is named. Swap these (or the
+   * next/font imports in layout.tsx) and every role below follows; sizes,
+   * weights and rhythm stay put.
+   */
   --font-display: var(--font-source-serif), serif;
   --font-ui: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 
   /*
-   * Type hierarchy tokens — size / weight / tracking / leading.
-   * Preserve hierarchy through these, not uppercase or heavy letter-spacing.
-   * Primary body content stays ≥ 16px (1rem).
+   * Type roles — one definition per role. Each exposes:
+   *   --text-<role>-family / -size / -weight / -tracking / -leading
+   *   --text-<role>          `font` shorthand (family + weight + size / leading)
+   *
+   * Consume as two lines:
+   *   font: var(--text-title);
+   *   letter-spacing: var(--text-title-tracking);   (tracking can't ride in `font`)
+   *
+   * To restyle a role app-wide, edit it here — nowhere else.
    */
-  --text-page-title-size: clamp(2rem, 5vw, 2.5rem);
-  --text-page-title-weight: 600;
-  --text-page-title-tracking: -0.035em;
-  --text-page-title-leading: 1.1;
 
-  --text-section-size: clamp(1.125rem, 2.2vw, 1.25rem);
-  --text-section-weight: 600;
-  --text-section-tracking: -0.02em;
-  --text-section-leading: 1.25;
+  /* display — page titles (Today, Backlog, Habits, …) */
+  --text-display-family: var(--font-display);
+  --text-display-size: clamp(2rem, 5vw, 2.5rem);
+  --text-display-weight: 600;
+  --text-display-tracking: -0.035em;
+  --text-display-leading: 1.1;
+  --text-display:
+    var(--text-display-weight) var(--text-display-size) / var(--text-display-leading)
+    var(--text-display-family);
 
+  /* title — section / card headings */
+  --text-title-family: var(--font-display);
+  --text-title-size: clamp(1.125rem, 2.2vw, 1.25rem);
+  --text-title-weight: 600;
+  --text-title-tracking: -0.02em;
+  --text-title-leading: 1.25;
+  --text-title:
+    var(--text-title-weight) var(--text-title-size) / var(--text-title-leading)
+    var(--text-title-family);
+
+  /* body — primary copy, ≥ 16px */
+  --text-body-family: var(--font-ui);
   --text-body-size: 1rem;
   --text-body-weight: 400;
   --text-body-tracking: 0;
   --text-body-leading: 1.55;
+  --text-body:
+    var(--text-body-weight) var(--text-body-size) / var(--text-body-leading)
+    var(--text-body-family);
 
-  --text-support-size: 0.875rem;
-  --text-support-weight: 400;
-  --text-support-tracking: 0;
-  --text-support-leading: 1.45;
+  /* caption — supporting / metadata / hint text */
+  --text-caption-family: var(--font-ui);
+  --text-caption-size: 0.875rem;
+  --text-caption-weight: 400;
+  --text-caption-tracking: 0;
+  --text-caption-leading: 1.45;
+  --text-caption:
+    var(--text-caption-weight) var(--text-caption-size) / var(--text-caption-leading)
+    var(--text-caption-family);
+  /* dense variants — size only (chip labels, compact buttons, tight meta) */
+  --text-caption-sm: 0.8125rem; /* 13px */
+  --text-caption-xs: 0.75rem; /* 12px */
 
+  /* label — buttons, nav, form labels */
+  --text-label-family: var(--font-ui);
   --text-label-size: 0.875rem;
   --text-label-weight: 600;
   --text-label-tracking: 0;
   --text-label-leading: 1.3;
+  --text-label:
+    var(--text-label-weight) var(--text-label-size) / var(--text-label-leading)
+    var(--text-label-family);
 
+  /* input — form field text */
+  --text-input-family: var(--font-ui);
   --text-input-size: 1rem;
   --text-input-weight: 500;
   --text-input-tracking: 0;
   --text-input-leading: 1.45;
+  --text-input:
+    var(--text-input-weight) var(--text-input-size) / var(--text-input-leading)
+    var(--text-input-family);
 
-  /*
-   * Small-text sizes — size only; consumers set their own weight / tracking.
-   * meta:   dense secondary text (timestamps, counts, chip labels)
-   * kicker: uppercase eyebrow labels and dot captions
-   */
-  --text-meta-size: 0.8125rem; /* 13px */
-  --text-kicker-size: 0.6875rem; /* 11px */
+  /* eyebrow — uppercase kickers, dot captions (consumer sets text-transform) */
+  --text-eyebrow-family: var(--font-ui);
+  --text-eyebrow-size: 0.6875rem; /* 11px */
+  --text-eyebrow-weight: 600;
+  --text-eyebrow-tracking: 0.1em;
+  --text-eyebrow-leading: 1.3;
+  --text-eyebrow:
+    var(--text-eyebrow-weight) var(--text-eyebrow-size) / var(--text-eyebrow-leading)
+    var(--text-eyebrow-family);
 
   /*
    * Spacing scale — 4px base unit. Prefer these steps for gap / padding /

@@ -82,7 +82,7 @@
 .email {
   margin: 0.1rem 0 0;
   font-family: var(--font-ui);
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
   color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;

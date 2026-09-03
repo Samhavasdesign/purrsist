@@ -13,11 +13,8 @@
 
 .title {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: var(--text-page-title-size);
-  font-weight: var(--text-page-title-weight);
-  letter-spacing: var(--text-page-title-tracking);
-  line-height: var(--text-page-title-leading);
+  font: var(--text-display);
+  letter-spacing: var(--text-display-tracking);
   text-transform: none;
   color: var(--foreground);
 }
@@ -33,7 +30,7 @@
   -webkit-backdrop-filter: blur(8px);
   color: var(--foreground);
   font-family: var(--font-ui);
-  font-size: var(--text-kicker-size);
+  font-size: var(--text-eyebrow-size);
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: none;
@@ -217,10 +214,10 @@
   padding: var(--space-1) 0;
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: var(--text-support-size);
-  font-weight: var(--text-support-weight);
-  letter-spacing: var(--text-support-tracking);
-  line-height: var(--text-support-leading);
+  font-size: var(--text-caption-size);
+  font-weight: var(--text-caption-weight);
+  letter-spacing: var(--text-caption-tracking);
+  line-height: var(--text-caption-leading);
   text-decoration: underline;
   text-decoration-color: color-mix(in srgb, var(--muted) 35%, transparent);
   text-underline-offset: 0.18em;
@@ -284,10 +281,10 @@
 .sectionTitle {
   margin: 0;
   font-family: var(--font-display);
-  font-size: var(--text-section-size);
-  font-weight: var(--text-section-weight);
-  letter-spacing: var(--text-section-tracking);
-  line-height: var(--text-section-leading);
+  font-size: var(--text-title-size);
+  font-weight: var(--text-title-weight);
+  letter-spacing: var(--text-title-tracking);
+  line-height: var(--text-title-leading);
   text-transform: none;
   color: var(--muted);
 }
@@ -295,10 +292,10 @@
 .sectionHint {
   margin: 0;
   font-family: var(--font-ui);
-  font-size: var(--text-support-size);
-  font-weight: var(--text-support-weight);
-  letter-spacing: var(--text-support-tracking);
-  line-height: var(--text-support-leading);
+  font-size: var(--text-caption-size);
+  font-weight: var(--text-caption-weight);
+  letter-spacing: var(--text-caption-tracking);
+  line-height: var(--text-caption-leading);
   color: color-mix(in srgb, var(--muted) 70%, transparent);
   min-width: 0;
 }
@@ -466,10 +463,10 @@
 .carryHint {
   margin: 0;
   font-family: var(--font-ui);
-  font-size: var(--text-support-size);
-  font-weight: var(--text-support-weight);
-  letter-spacing: var(--text-support-tracking);
-  line-height: var(--text-support-leading);
+  font-size: var(--text-caption-size);
+  font-weight: var(--text-caption-weight);
+  letter-spacing: var(--text-caption-tracking);
+  line-height: var(--text-caption-leading);
   text-transform: none;
   color: var(--accent);
 }
@@ -507,8 +504,8 @@
   background: color-mix(in srgb, var(--danger) 12%, var(--surface));
   color: var(--danger);
   font-family: var(--font-ui);
-  font-size: var(--text-support-size);
-  line-height: var(--text-support-leading);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-leading);
 }
 
 .lockedNote {
@@ -593,8 +590,8 @@
   margin: 0;
   padding: var(--space-3) var(--space-1) 0.1rem;
   font-family: var(--font-ui);
-  font-size: var(--text-support-size);
-  line-height: var(--text-support-leading);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-leading);
   color: var(--muted);
 }
 
@@ -702,8 +699,8 @@
 .empty {
   margin: 0;
   font-family: var(--font-ui);
-  font-size: var(--text-support-size);
-  line-height: var(--text-support-leading);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-leading);
   color: var(--muted);
 }
 

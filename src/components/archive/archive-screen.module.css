@@ -18,11 +18,8 @@
 
 .title {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 5vw, 2.5rem);
-  font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
+  font: var(--text-display);
+  letter-spacing: var(--text-display-tracking);
 }
 
 .subtitle {
@@ -41,7 +38,7 @@
 .empty {
   margin: 0;
   font-family: var(--font-ui);
-  font-size: var(--text-support-size);
+  font-size: var(--text-caption-size);
   line-height: 1.5;
   color: var(--muted);
 }

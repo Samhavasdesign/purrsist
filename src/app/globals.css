@@ -2,82 +2,60 @@
 @import "../styles/tokens.css";
 
 /*
- * Shared type roles — prefer these tokens/classes over one-off sizes.
- * Component .module.css files should reference the --text-* / --font-* tokens
- * (cross-file `composes` is avoided under Turbopack); keep this block as the
- * canonical spec and update components to match.
+ * Shared type roles — canonical reference for the role tokens in tokens.css.
+ * Component .module.css files can't `composes` these under Turbopack, so they
+ * inline the same two lines:  font: var(--text-<role>);  letter-spacing: …
  */
 
-/* Page title — serif display (Today, Backlog, Habits, …) */
+/* Page title — display role (Today, Backlog, Habits, …) */
 .pageTitle {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: var(--text-page-title-size);
-  font-weight: var(--text-page-title-weight);
-  letter-spacing: var(--text-page-title-tracking);
-  line-height: var(--text-page-title-leading);
+  font: var(--text-display);
+  letter-spacing: var(--text-display-tracking);
   text-transform: none;
 }
 
-/* Section / card heading — serif display, title case (Must-Dos, Habits, …) */
+/* Section / card heading — title role (Must-Dos, Habits, …) */
 .sectionHeading {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: var(--text-section-size);
-  font-weight: var(--text-section-weight);
-  letter-spacing: var(--text-section-tracking);
-  line-height: var(--text-section-leading);
+  font: var(--text-title);
+  letter-spacing: var(--text-title-tracking);
   text-transform: none;
 }
 
-/* Primary body copy and instructions — sans, ≥ 16px */
+/* Primary body copy and instructions — ≥ 16px */
 .bodyText {
   margin: 0;
-  font-family: var(--font-ui);
-  font-size: var(--text-body-size);
-  font-weight: var(--text-body-weight);
+  font: var(--text-body);
   letter-spacing: var(--text-body-tracking);
-  line-height: var(--text-body-leading);
 }
 
-/* Supporting / metadata / hints — sans */
+/* Supporting / metadata / hints */
 .supportText {
   margin: 0;
-  font-family: var(--font-ui);
-  font-size: var(--text-support-size);
-  font-weight: var(--text-support-weight);
-  letter-spacing: var(--text-support-tracking);
-  line-height: var(--text-support-leading);
+  font: var(--text-caption);
+  letter-spacing: var(--text-caption-tracking);
   color: var(--muted);
 }
 
-/* Buttons, chips, nav labels — sans */
+/* Buttons, chips, nav labels */
 .labelText {
-  font-family: var(--font-ui);
-  font-size: var(--text-label-size);
-  font-weight: var(--text-label-weight);
+  font: var(--text-label);
   letter-spacing: var(--text-label-tracking);
-  line-height: var(--text-label-leading);
   text-transform: none;
 }
 
-/* Inputs and placeholders — sans */
+/* Inputs and placeholders */
 .inputText {
-  font-family: var(--font-ui);
-  font-size: var(--text-input-size);
-  font-weight: var(--text-input-weight);
+  font: var(--text-input);
   letter-spacing: var(--text-input-tracking);
-  line-height: var(--text-input-leading);
 }
 
-/* Descriptive paragraph under a page title (alias of body) */
+/* Descriptive paragraph under a page title (body + muted) */
 .pageSubtitle {
   margin: 0;
-  font-family: var(--font-ui);
-  font-size: var(--text-body-size);
-  font-weight: var(--text-body-weight);
+  font: var(--text-body);
   letter-spacing: var(--text-body-tracking);
-  line-height: var(--text-body-leading);
   color: var(--muted);
 }
 

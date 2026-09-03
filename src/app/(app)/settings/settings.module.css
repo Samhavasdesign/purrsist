@@ -18,11 +18,8 @@
 
 .title {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 5vw, 2.5rem);
-  font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
+  font: var(--text-display);
+  letter-spacing: var(--text-display-tracking);
 }
 
 .subtitle {
@@ -41,7 +38,7 @@
 
 .sectionTitle {
   margin: 0;
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -79,7 +76,7 @@
   background: transparent;
   color: var(--muted);
   padding: var(--space-2) var(--space-4);
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
   cursor: pointer;
   transition:
     color var(--duration-base) ease,
@@ -94,7 +91,7 @@
 .signOutHint {
   margin: 0;
   max-width: 22rem;
-  font-size: var(--text-meta-size);
+  font-size: var(--text-caption-sm);
   line-height: 1.45;
   color: var(--muted);
 }
