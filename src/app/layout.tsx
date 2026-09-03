@@ -47,8 +47,12 @@ const plexMono = IBM_Plex_Mono({
 const APP_NAME = "Purrsist";
 const APP_DESCRIPTION =
   "Keep your day sorted and your habits on track.";
+const APP_URL = "https://www.purrsist.co";
 
 export const metadata: Metadata = {
+  // Resolves relative URLs (OG image, canonical) to absolute ones — required
+  // for link unfurls in iMessage, Slack, WhatsApp, Discord, X, etc.
+  metadataBase: new URL(APP_URL),
   applicationName: APP_NAME,
   title: {
     default: APP_NAME,
@@ -56,6 +60,24 @@ export const metadata: Metadata = {
   },
   description: APP_DESCRIPTION,
   manifest: "/manifest.json",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    siteName: APP_NAME,
+    title: APP_NAME,
+    description: APP_DESCRIPTION,
+    url: "/",
+    locale: "en_US",
+    // og:image is added automatically from src/app/opengraph-image.tsx
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: APP_NAME,
+    description: APP_DESCRIPTION,
+    // twitter:image is added automatically from src/app/twitter-image.tsx
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
