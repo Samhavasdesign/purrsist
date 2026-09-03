@@ -1,6 +1,5 @@
 import { ImageResponse } from "next/og";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { purrsistWordmarkSvg } from "@/components/brand/purrsist-wordmark";
 
 // Social/link-preview card (iMessage, Slack, WhatsApp, Discord, X, Facebook).
 // These clients read og:image / twitter:image — never the favicon — so the
@@ -10,10 +9,12 @@ export const alt = "Purrsist — keep your day sorted and your habits on track";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// Assets are request-independent: read once at module scope, project-root
-// relative (see Next.js "opengraph-image" Node.js runtime docs).
-const wordmark = await readFile(join(process.cwd(), "public/logo.svg"), "base64");
-const wordmarkSrc = `data:image/svg+xml;base64,${wordmark}`;
+// Build the wordmark from shared geometry (not the filesystem). Reading
+// public/logo.svg via fs at module scope crashed every route on Vercel, where
+// the serverless bundle has no public/ directory.
+const wordmarkSrc = `data:image/svg+xml;base64,${Buffer.from(
+  purrsistWordmarkSvg(),
+).toString("base64")}`;
 
 export default function Image() {
   return new ImageResponse(

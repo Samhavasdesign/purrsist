@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { ensurePastDaysLocked } from "@/lib/daily/archive";
 import { applyCarryoverFromYesterday, dateKey } from "@/lib/daily/carryover";
@@ -10,15 +11,25 @@ function dbError(error: { message?: string } | null, fallback: string): Error {
   return new Error(error?.message ?? fallback);
 }
 
-/** Auto-create/load today's Daily Entry and apply yesterday's carryover (PRD §7). */
-export async function getOrCreateTodayEntry(
+/**
+ * Auto-create/load today's Daily Entry and apply yesterday's carryover (PRD §7).
+ *
+ * Wrapped in React `cache()` so the app layout and the dashboard page share one
+ * execution per request rather than running this whole sequence twice.
+ */
+export const getOrCreateTodayEntry = cache(async function getOrCreateTodayEntry(
   userId: string,
 ): Promise<DailyEntry> {
   const supabase = await createClient();
   const date = dateKey(new Date());
 
   // Same-day-only editing: anything before today becomes locked (PRD §8).
-  await ensurePastDaysLocked(userId);
+  // Best-effort — a failure here must not take down the whole page.
+  try {
+    await ensurePastDaysLocked(userId);
+  } catch (error) {
+    console.error("ensurePastDaysLocked:", error);
+  }
 
   const { data: existing, error: selectError } = await supabase
     .from("daily_entries")
@@ -61,8 +72,15 @@ export async function getOrCreateTodayEntry(
     }
   }
 
-  return applyCarryoverFromYesterday(userId, today);
-}
+  // Carryover is a convenience, not load-bearing — if it fails, still hand back
+  // today's entry so the page renders.
+  try {
+    return await applyCarryoverFromYesterday(userId, today);
+  } catch (error) {
+    console.error("applyCarryoverFromYesterday:", error);
+    return normalizeDailyEntry(today);
+  }
+});
 
 export function findOpenSlot(
   entry: DailyEntry,

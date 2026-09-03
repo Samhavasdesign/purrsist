@@ -24,9 +24,13 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const user = await requireUser();
-  // Ensure today's Daily Entry exists on any authenticated app open.
-  await getOrCreateTodayEntry(user.id);
-  const catCount = await countRescuedCats(user.id);
+  // Ensure today's Daily Entry exists on any authenticated app open. These two
+  // are independent — run them together, not back to back. getOrCreateTodayEntry
+  // is memoised, so the dashboard page reuses this result instead of repeating it.
+  const [, catCount] = await Promise.all([
+    getOrCreateTodayEntry(user.id),
+    countRescuedCats(user.id),
+  ]);
 
   const guest = isAnonymousUser(user);
   const email = user.email ?? null;
