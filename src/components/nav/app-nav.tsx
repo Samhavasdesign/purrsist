@@ -7,7 +7,6 @@ import styles from "./app-nav.module.css";
 const LINKS = [
   { href: "/dashboard", label: "Today", match: "/dashboard" },
   { href: "/backlog", label: "Backlog", match: "/backlog" },
-  { href: "/habits", label: "Habits", match: "/habits" },
 ] as const;
 
 export function AppNav() {

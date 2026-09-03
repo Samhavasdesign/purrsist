@@ -12,3 +12,10 @@
   line-height: 1.55;
   color: var(--muted);
 }
+
+.takenNote {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--foreground);
+}

@@ -24,6 +24,29 @@
   gap: 0.75rem 1rem;
 }
 
+/* Header row that owns the add button — mirrors the Today module head so the
+ * plus never sits on top of the first item / empty-state copy. */
+.cardActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Same tone treatment as the support add tile in the Today modules. */
+.addBtn {
+  flex-shrink: 0;
+  color: var(--support-fg);
+  border-color: var(--support-border);
+}
+
+/* Out-specify the base IconButton hover so the dark wash wins (not the light
+ * --surface one), matching the darkening hover on the header controls. */
+.section .addBtn:hover:not(:disabled):not([aria-disabled="true"]) {
+  color: var(--support-fg);
+  border-color: var(--support-fg);
+  background: color-mix(in srgb, var(--foreground) 8%, transparent);
+}
+
 .subtitle {
   margin: 0;
   font-size: 0.95rem;
@@ -89,21 +112,102 @@
 
 .empty {
   margin: 2rem 0 0;
-  color: var(--muted);
+  color: color-mix(in srgb, var(--support-fg) 75%, transparent);
   line-height: 1.55;
   font-size: 0.975rem;
 }
 
-.sections {
-  display: flex;
-  flex-direction: column;
-  gap: 1.75rem;
+/* Card padding already supplies the breathing room. */
+.section .empty {
+  margin: 0;
+  font-size: 0.875rem;
 }
 
-.section {
+/* Row gap, so a draft row trails the list at the same rhythm as its rows. */
+.cardBody {
   display: flex;
   flex-direction: column;
+  gap: 0.65rem;
+}
+
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+/* Title + hint on one baseline, add button centered against them — mirrors
+ * the Today module headers. */
+.groupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 0.75rem;
+  min-width: 0;
+}
+
+.groupHeadText {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.55rem 0.65rem;
+  min-width: 0;
+}
+
+.groupTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-section-size);
+  font-weight: var(--text-section-weight);
+  letter-spacing: var(--text-section-tracking);
+  line-height: var(--text-section-leading);
+  text-transform: none;
+  color: var(--support-fg);
+}
+
+.groupHint {
+  margin: 0;
+  min-width: 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-support-size);
+  font-weight: var(--text-support-weight);
+  letter-spacing: var(--text-support-tracking);
+  line-height: var(--text-support-leading);
+  color: color-mix(in srgb, var(--support-fg) 65%, transparent);
+}
+
+/* Mirrors the Today habits module: one support-fill card, always present. */
+.section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  padding: 1.125rem 1.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--support-bg-fill);
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-section-size);
+  font-weight: var(--text-section-weight);
+  letter-spacing: var(--text-section-tracking);
+  line-height: var(--text-section-leading);
+  color: var(--support-fg);
 }
 
 .sectionTitle {
@@ -128,16 +232,48 @@
 .item {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 0.95rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  background: var(--surface);
+  gap: 0.65rem;
+  padding: 0.55rem 0.7rem;
+  /* Always reserve stroke so focus never shifts the row */
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--background) 35%, transparent);
   overflow: hidden;
   transform-origin: center top;
   transition:
     border-color 160ms ease,
     background-color 160ms ease;
+}
+
+.item:focus-within {
+  border-style: solid;
+  border-color: var(--support-border);
+}
+
+/* Dashed = unsaved placeholder row, as in the Today modules. */
+.itemDraft {
+  border-style: dashed;
+  border-color: var(--support-border);
+}
+
+.itemTextInput::placeholder {
+  color: color-mix(in srgb, var(--support-fg) 55%, transparent);
+  -webkit-text-fill-color: color-mix(
+    in srgb,
+    var(--support-fg) 55%,
+    transparent
+  );
+  font-style: italic;
+}
+
+.draftClearBtn {
+  color: color-mix(in srgb, var(--support-fg) 70%, transparent);
+}
+
+.draftClearBtn:hover:not(:disabled):not([aria-disabled="true"]) {
+  color: var(--support-fg);
+  border-color: transparent;
+  background: transparent;
 }
 
 .itemPromoteOpen {
@@ -155,8 +291,8 @@
     transform: translateY(0) scale(1);
     max-height: 28rem;
     margin-bottom: 0;
-    padding-top: 0.95rem;
-    padding-bottom: 0.95rem;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
   }
 
   to {
@@ -186,55 +322,21 @@
   }
 }
 
-.item_red {
-  background: var(--must-do-bg);
-  border-color: var(--must-do-border);
-}
-
-.item_yellow {
-  background: var(--should-do-bg);
-  border-color: var(--should-do-border);
-}
-
-.item_green {
-  background: var(--quick-win-bg);
-  border-color: color-mix(in srgb, var(--quick-win-fg) 45%, var(--quick-win-bg));
-}
-
-.item_red .itemMeta,
-.item_red .metaDate {
-  color: var(--must-do-fg);
-}
-
-.item_yellow .itemMeta,
-.item_yellow .metaDate {
-  color: var(--should-do-fg);
-}
-
-.item_green .itemMeta,
-.item_green .metaDate {
-  color: var(--quick-win-fg);
-}
-
-.item_red .actionBtn {
-  border-color: var(--must-do-border);
-  color: var(--must-do-fg);
-}
-
-.item_yellow .actionBtn {
-  border-color: var(--should-do-border);
-  color: var(--should-do-fg);
-}
-
-.item_green .actionBtn {
-  border-color: color-mix(in srgb, var(--quick-win-fg) 45%, var(--quick-win-bg));
-  color: var(--quick-win-fg);
+/* Significance now reads from the dot alone, so rows stay uniform in the card. */
+/* Actions centre against the whole text block (title + date), not its first line. */
+.itemTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
 }
 
 .itemMain {
+  flex: 1;
+  min-width: 12rem;
   display: flex;
-  gap: 0.75rem;
-  align-items: flex-start;
+  gap: 0.65rem;
+  align-items: center;
 }
 
 .itemBody {
@@ -248,14 +350,14 @@
   line-height: 1.4;
 }
 
+/* Borderless like the Today slot inputs — the row's :focus-within outline is
+ * the only focus affordance, so there's no nested box on focus. */
 .itemTextInput {
   display: block;
   width: 100%;
   margin: 0;
-  padding: 0.15rem 0.35rem;
-  margin-left: -0.35rem;
-  border: 1px solid transparent;
-  border-radius: 0.45rem;
+  padding: 0.25rem 0;
+  border: none;
   background: transparent;
   color: var(--foreground);
   -webkit-text-fill-color: var(--foreground);
@@ -269,31 +371,27 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   field-sizing: content;
-  transition:
-    border-color 160ms ease,
-    background-color 160ms ease;
-}
-
-.itemTextInput:hover:not(:disabled) {
-  border-color: var(--border);
-}
-
-.itemTextInput:focus {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--background) 55%, transparent);
 }
 
 .itemTextInput:disabled {
   opacity: 0.7;
 }
 
+/* Eyebrow above the task text, mirroring the dated eyebrow over the Today title. */
 .itemMeta {
-  margin: 0.35rem 0 0;
+  margin: 0 0 0.4rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 0.75rem;
+  align-items: center;
+  gap: 0.35rem 0.6rem;
+  font-family: var(--font-ui);
   font-size: 0.75rem;
-  color: var(--muted);
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--support-fg) 60%, transparent);
+}
+
+.metaAdded {
+  white-space: nowrap;
 }
 
 .tag {
@@ -304,11 +402,10 @@
   display: inline-flex;
   align-items: center;
   padding: 0.28rem 0.5rem;
-  border: var(--border-muted-default);
+  border: var(--border-width) var(--border-style)
+    color-mix(in srgb, var(--support-border) 50%, transparent);
   border-radius: var(--radius-sm);
-  background: var(--surface-glass);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: transparent;
   color: var(--foreground);
   font-family: var(--font-ui);
   font-size: 0.625rem;
@@ -329,13 +426,15 @@
 }
 
 .itemActions {
+  flex-shrink: 0;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .actionBtn,
 .actionBtnPrimary,
+.dangerBtn,
 .promoteOption,
 .textBtn,
 .chip,
@@ -346,20 +445,60 @@
 }
 
 .actionBtn {
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--support-border);
   border-radius: 999px;
   background: transparent;
-  color: var(--muted);
-  padding: 0.4rem 0.85rem;
+  color: color-mix(in srgb, var(--support-fg) 78%, transparent);
+  padding: 0.35rem 0.75rem;
   font-size: 0.75rem;
+  white-space: nowrap;
   transition:
     color 160ms ease,
-    border-color 160ms ease;
+    border-color 160ms ease,
+    background-color 160ms ease;
 }
 
 .actionBtn:hover:not(:disabled) {
-  color: var(--foreground);
-  border-color: var(--muted);
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 55%, var(--support-border));
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+}
+
+.actionBtn:active:not(:disabled) {
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 70%, var(--support-border));
+  background: color-mix(in srgb, var(--success) 20%, transparent);
+}
+
+.dangerBtn {
+  border: var(--border-width) solid var(--support-border);
+  border-radius: 999px;
+  background: transparent;
+  color: color-mix(in srgb, var(--support-fg) 78%, transparent);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.dangerBtn:hover:not(:disabled) {
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 55%, var(--support-border));
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+
+.dangerBtn:active:not(:disabled) {
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 70%, var(--support-border));
+  background: color-mix(in srgb, var(--danger) 20%, transparent);
+}
+
+.dangerBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .actionBtnPrimary {
@@ -493,11 +632,6 @@
   border-color: var(--quick-win-fg);
   background: color-mix(in srgb, var(--quick-win-fg) 12%, var(--surface));
   color: var(--quick-win-fg);
-}
-
-.itemNeutral {
-  background: var(--surface);
-  border-color: var(--border);
 }
 
 .sig_unset {
@@ -696,4 +830,3 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
-

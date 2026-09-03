@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  checkOffInPlace,
+  archiveBacklogItem,
   promoteToToday,
   updateBacklogItemText,
 } from "@/lib/backlog/actions";
@@ -19,10 +19,8 @@ import type {
   DailyEntry,
   DailyItemKind,
   DailySlot,
-  Significance,
 } from "@/lib/types/database";
 import { BACKLOG_TAGS, KIND_LABELS } from "@/lib/types/database";
-import { SignificanceDot } from "./significance-dot";
 import styles from "./backlog.module.css";
 
 type Props = {
@@ -42,15 +40,6 @@ type Props = {
   onExitComplete: () => void;
 };
 
-const SIGNIFICANCE_OPTIONS: {
-  value: Significance;
-  label: string;
-}[] = [
-  { value: "red", label: "Red" },
-  { value: "yellow", label: "Yellow" },
-  { value: "green", label: "Green" },
-];
-
 const SLOT_OPTIONS: DailyItemKind[] = ["must_do", "should_do", "quick_win"];
 
 export function BacklogItemRow({
@@ -66,35 +55,17 @@ export function BacklogItemRow({
 }: Props) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [significance, setSignificance] = useState<Significance | null>(
-    item.significance,
-  );
   const [kind, setKind] = useState<DailyItemKind | null>(null);
   const [text, setText] = useState(item.text);
   const textRef = useRef<HTMLTextAreaElement>(null);
 
   const openKinds = openKindsForEntry(todayEntry);
   const openKindSet = new Set(openKinds);
-  const canConfirm = Boolean(significance && kind && openKindSet.has(kind));
+  const canConfirm = Boolean(kind && openKindSet.has(kind));
 
   useEffect(() => {
     setText(item.text);
   }, [item.text]);
-
-  useEffect(() => {
-    setSignificance(item.significance);
-  }, [item.significance]);
-
-  useEffect(() => {
-    if (!promoteOpen) {
-      setSignificance(item.significance);
-      setKind(null);
-      return;
-    }
-    setError(null);
-    setSignificance(item.significance);
-    setKind(null);
-  }, [promoteOpen, item.significance]);
 
   useEffect(() => {
     const el = textRef.current;
@@ -139,13 +110,13 @@ export function BacklogItemRow({
   }
 
   function confirmPromote() {
-    if (!significance || !kind || !openKindSet.has(kind) || pending) return;
+    if (!kind || !openKindSet.has(kind) || pending) return;
 
     setError(null);
     startTransition(async () => {
       try {
         const result = await promoteToToday(item.id, {
-          significance,
+          significance: significanceForKind(kind),
           kind,
         });
         if (!result.ok) {
@@ -192,13 +163,9 @@ export function BacklogItemRow({
     });
   }
 
-  const itemToneClass = item.significance
-    ? styles[`item_${item.significance}`]
-    : styles.itemNeutral;
-
   return (
     <li
-      className={`${styles.item} ${itemToneClass} ${
+      className={`${styles.item} ${
         promoteOpen ? styles.itemPromoteOpen : ""
       } ${exiting ? styles.itemExiting : ""}`}
       onAnimationEnd={(event) => {
@@ -207,104 +174,80 @@ export function BacklogItemRow({
         onExitComplete();
       }}
     >
-      <div className={styles.itemMain}>
-        <SignificanceDot value={item.significance} />
-        <div className={styles.itemBody}>
-          <textarea
-            ref={textRef}
-            className={styles.itemTextInput}
-            rows={1}
-            value={text}
-            aria-label="Edit backlog item"
-            disabled={pending || exiting}
-            onChange={(event) => setText(event.target.value)}
-            onBlur={(event) => saveText(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                event.currentTarget.blur();
-              }
-              if (event.key === "Escape") {
-                setText(item.text);
-                setError(null);
-                event.currentTarget.blur();
-              }
-            }}
-          />
-          <p className={styles.itemMeta}>
-            {showTag ? (
-              <span className={styles.tag}>
-                {BACKLOG_TAGS.find((row) => row.tag === item.tag)?.label ??
-                  item.tag}
+      <div className={styles.itemTop}>
+        <div className={styles.itemMain}>
+          <div className={styles.itemBody}>
+            <p className={styles.itemMeta}>
+              {showTag ? (
+                <span className={styles.tag}>
+                  {BACKLOG_TAGS.find((row) => row.tag === item.tag)?.label ??
+                    item.tag}
+                </span>
+              ) : null}
+              <span className={`${styles.metaAdded} ${styles.dateTag}`}>
+                Added {formatShortDate(toDateKey(item.created_at))}
               </span>
-            ) : null}
-            <span className={styles.dateTag}>
-              {formatShortDate(toDateKey(item.created_at))}
-            </span>
-            {item.target_date ? (
-              <span className={styles.metaDate}>
-                {formatTargetDate(item.target_date)}
-              </span>
-            ) : null}
-          </p>
-          {error ? <p className={styles.itemError}>{error}</p> : null}
+              {item.target_date ? (
+                <span className={styles.metaDate}>
+                  {formatTargetDate(item.target_date)}
+                </span>
+              ) : null}
+            </p>
+            <textarea
+              ref={textRef}
+              className={styles.itemTextInput}
+              rows={1}
+              value={text}
+              aria-label="Edit backlog item"
+              disabled={pending || exiting}
+              onChange={(event) => setText(event.target.value)}
+              onBlur={(event) => saveText(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  event.currentTarget.blur();
+                }
+                if (event.key === "Escape") {
+                  setText(item.text);
+                  setError(null);
+                  event.currentTarget.blur();
+                }
+              }}
+            />
+            {error ? <p className={styles.itemError}>{error}</p> : null}
+          </div>
         </div>
+
+        {!promoteOpen ? (
+          <div className={styles.itemActions}>
+            <button
+              type="button"
+              className={styles.actionBtn}
+              disabled={pending || exiting}
+              onClick={() => {
+                setKind(null);
+                setError(null);
+                onPromoteOpen();
+              }}
+            >
+              Promote to today
+            </button>
+            <button
+              type="button"
+              className={styles.dangerBtn}
+              disabled={pending || exiting}
+              onClick={() => run(() => archiveBacklogItem(item.id))}
+            >
+              Archive
+            </button>
+          </div>
+        ) : null}
       </div>
 
-      {!promoteOpen ? (
-        <div className={styles.itemActions}>
-          <button
-            type="button"
-            className={styles.actionBtnPrimary}
-            disabled={pending || exiting}
-            onClick={() => {
-              setError(null);
-              onPromoteOpen();
-            }}
-          >
-            Promote to today
-          </button>
-          <button
-            type="button"
-            className={styles.actionBtn}
-            disabled={pending || exiting}
-            onClick={() => run(() => checkOffInPlace(item.id))}
-          >
-            Delete
-          </button>
-        </div>
-      ) : (
+      {promoteOpen ? (
         <div className={styles.promoteMenu} aria-label="Promote to today">
           <div className={styles.promoteBlock}>
-            <p className={styles.promoteLabel}>Significance</p>
-            <div
-              className={styles.promoteSigRow}
-              role="group"
-              aria-label="Significance"
-            >
-              {SIGNIFICANCE_OPTIONS.map((option) => (
-                <Button
-                  key={option.value}
-                  type="button"
-                  variant="category"
-                  category={option.value}
-                  selected={significance === option.value}
-                  aria-pressed={significance === option.value}
-                  className={styles.promoteCategory}
-                  disabled={pending}
-                  onClick={() => {
-                    setSignificance(option.value);
-                    setError(null);
-                  }}
-                >
-                  {option.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.promoteBlock}>
-            <p className={styles.promoteLabel}>Slot</p>
+            <p className={styles.promoteLabel}>Priority</p>
             {openKinds.length === 0 ? (
               <p className={styles.promoteEmpty}>
                 Today&apos;s list is full — free a slot first.
@@ -313,7 +256,7 @@ export function BacklogItemRow({
               <div
                 className={styles.promoteSigRow}
                 role="group"
-                aria-label="Slot"
+                aria-label="Priority"
               >
                 {SLOT_OPTIONS.map((slotKind) => {
                   const available =
@@ -356,13 +299,11 @@ export function BacklogItemRow({
               disabled={pending || !canConfirm}
               onClick={confirmPromote}
               title={
-                !significance
-                  ? "Pick a significance"
-                  : !kind
-                    ? "Pick a slot"
-                    : kind && !openKindSet.has(kind)
-                      ? `${KIND_LABELS[kind]} is full`
-                      : "Confirm promote"
+                !kind
+                  ? "Pick a slot"
+                  : !openKindSet.has(kind)
+                    ? `${KIND_LABELS[kind]} is full`
+                    : "Confirm promote"
               }
             >
               Confirm
@@ -377,7 +318,7 @@ export function BacklogItemRow({
             </Button>
           </div>
         </div>
-      )}
+      ) : null}
     </li>
   );
 }

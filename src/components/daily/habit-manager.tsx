@@ -124,7 +124,11 @@ export function HabitManager({
       </div>
 
       {habits.length === 0 ? (
-        <p className={styles.habitsEmpty}>
+        <p
+          className={`${styles.habitsEmpty} ${
+            readOnly ? "" : styles.habitsEmptyIdle
+          }`}
+        >
           {readOnly
             ? "No habits were active."
             : "No active habits yet. Manage habits to add one."}

@@ -13,12 +13,19 @@ export type DigestHabitLine = {
   done: boolean;
 };
 
+export type DigestDueReminder = {
+  text: string;
+  target_date: string;
+};
+
 export type MorningDigestData = {
   todayKey: string;
   yesterdayKey: string;
   yesterday: DailyEntry | null;
   today: DailyEntry;
   habitsYesterday: DigestHabitLine[];
+  /** Date-triggered backlog items whose target date has arrived. */
+  dueReminders: DigestDueReminder[];
 };
 
 export type TodayNudge = {
@@ -165,6 +172,18 @@ export function buildMorningDigestEmail(data: MorningDigestData): {
   lines.push("");
   lines.push("—— Today ——");
   lines.push("");
+
+  if (data.dueReminders.length > 0) {
+    lines.push("Reminders you scheduled for today:");
+    for (const reminder of data.dueReminders) {
+      const past =
+        reminder.target_date < data.todayKey
+          ? ` (was due ${reminder.target_date})`
+          : "";
+      lines.push(`  • ${reminder.text}${past}`);
+    }
+    lines.push("");
+  }
 
   if (!needsTodayNudge(nudge)) {
     lines.push(

@@ -29,6 +29,10 @@
   min-width: 0;
 }
 
+.left {
+  gap: 0.35rem;
+}
+
 .right {
   justify-content: flex-end;
   gap: 0.45rem;
@@ -51,7 +55,7 @@
   border: var(--border-default);
   border-radius: var(--btn-radius-soft);
   background: transparent;
-  color: var(--muted);
+  color: var(--foreground);
   text-decoration: none;
   transition: var(--btn-transition);
   -webkit-tap-highlight-color: transparent;
@@ -60,7 +64,36 @@
 .catCounter:hover {
   color: var(--foreground);
   border-color: var(--muted);
-  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  background: color-mix(in srgb, var(--foreground) 8%, transparent);
+}
+
+/* Header controls share the page-title brown, not the lighter muted tone,
+   and darken on hover with the same wash as the ghost back button. */
+.right .navControl {
+  color: var(--foreground);
+}
+
+/* Match the base IconButton hover specificity so the dark wash wins. */
+.right .navControl:hover:not(:disabled):not([aria-disabled="true"]) {
+  color: var(--foreground);
+  border-color: var(--muted);
+  background: color-mix(in srgb, var(--foreground) 8%, transparent);
+}
+
+/* Current-page (pressed) state — identical to the collection counter's active look. */
+.right .navControl[aria-current="page"] {
+  color: var(--foreground);
+  border-color: color-mix(in srgb, var(--foreground) 32%, var(--border));
+  background: color-mix(in srgb, var(--foreground) 8%, transparent);
+}
+
+.right
+  .navControl[aria-current="page"]:hover:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+  color: var(--foreground);
+  border-color: color-mix(in srgb, var(--foreground) 45%, var(--border));
+  background: color-mix(in srgb, var(--foreground) 12%, transparent);
 }
 
 .catCounter:focus {
@@ -73,15 +106,15 @@
 }
 
 .catCounterActive {
-  color: var(--accent);
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--foreground);
+  border-color: color-mix(in srgb, var(--foreground) 32%, var(--border));
+  background: color-mix(in srgb, var(--foreground) 8%, transparent);
 }
 
 .catCounterActive:hover {
-  color: var(--accent-hover);
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--foreground);
+  border-color: color-mix(in srgb, var(--foreground) 45%, var(--border));
+  background: color-mix(in srgb, var(--foreground) 12%, transparent);
 }
 
 .catCounterIcon {
@@ -99,18 +132,15 @@
 }
 
 .brand {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   margin: 0;
   padding: 0.45rem 0;
   font-family: var(--font-display);
-  font-size: var(--text-section-size);
+  font-size: clamp(1.375rem, 3.2vw, 1.625rem);
   font-weight: var(--text-section-weight);
   letter-spacing: var(--text-section-tracking);
   line-height: var(--text-section-leading);
   text-transform: none;
-  color: var(--accent);
+  color: var(--foreground);
   text-decoration: none;
   cursor: pointer;
   border-radius: var(--radius-sm);
@@ -118,7 +148,7 @@
 }
 
 .brand:hover {
-  color: var(--accent-hover);
+  color: var(--foreground);
 }
 
 .brand:focus {
@@ -128,6 +158,43 @@
 .brand:focus-visible {
   outline: var(--focus-ring);
   outline-offset: var(--focus-ring-offset);
+}
+
+/* Guest CTA — replaces the account avatar when there is no authenticated user. */
+.saveAccountCta {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--btn-height);
+  height: var(--btn-height);
+  padding: 0 0.9rem;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--btn-radius-soft);
+  background: var(--foreground);
+  color: var(--background);
+  font-family: var(--font-ui);
+  font-size: var(--text-label-size);
+  font-weight: var(--text-label-weight);
+  letter-spacing: var(--text-label-tracking);
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: var(--btn-transition);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.saveAccountCta:hover {
+  background: color-mix(in srgb, var(--foreground) 90%, black);
+}
+
+.saveAccountCta:focus {
+  outline: none;
+}
+
+.saveAccountCta:focus-visible {
+  outline: var(--btn-focus-ring);
+  outline-offset: var(--btn-focus-offset);
 }
 
 @media (min-width: 640px) {

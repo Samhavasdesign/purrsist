@@ -4,6 +4,7 @@ export {
   ChevronLeftIcon,
   CloseIcon,
   ICON_STROKE,
+  InfoIcon,
   PawPrintIcon,
   PlusIcon,
   SettingsIcon,

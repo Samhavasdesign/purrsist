@@ -8,6 +8,7 @@ import {
   shiftDateKey,
   zonedDateKey,
 } from "@/lib/email/dates";
+import { listDueReminders } from "@/lib/backlog/due-reminders";
 import { getEmailFrom, getResendClient } from "@/lib/email/resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { DailyEntry } from "@/lib/types/database";
@@ -98,6 +99,7 @@ export async function sendMorningDigestForUser(input: {
     if (yesterdayError) throw yesterdayError;
 
     const habitsYesterday = await loadYesterdayHabits(userId, yesterdayKey);
+    const dueReminders = await listDueReminders(admin, userId, todayKey);
 
     const payload: MorningDigestData = {
       todayKey,
@@ -105,6 +107,10 @@ export async function sendMorningDigestForUser(input: {
       yesterday: (yesterday as DailyEntry | null) ?? null,
       today,
       habitsYesterday,
+      dueReminders: dueReminders.map((reminder) => ({
+        text: reminder.text,
+        target_date: reminder.target_date,
+      })),
     };
 
     const { subject, text } = buildMorningDigestEmail(payload);

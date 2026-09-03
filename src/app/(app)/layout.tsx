@@ -1,8 +1,22 @@
 import { AppNav } from "@/components/nav/app-nav";
 import { AppTopBar } from "@/components/nav/app-top-bar";
-import { requireUser } from "@/lib/auth";
+import { isAnonymousUser, requireUser } from "@/lib/auth";
 import { countRescuedCats } from "@/lib/collection/rescue-toast";
 import { getOrCreateTodayEntry } from "@/lib/daily/entry";
+
+function resolveDisplayName(
+  metadata: Record<string, unknown> | undefined,
+  email: string | null,
+  anonymous: boolean,
+): string {
+  const fromMetadata = metadata?.full_name ?? metadata?.name;
+  if (typeof fromMetadata === "string" && fromMetadata.trim()) {
+    return fromMetadata.trim();
+  }
+  const local = email?.split("@")[0];
+  if (local) return local;
+  return anonymous ? "Guest" : "Account";
+}
 
 export default async function AppLayout({
   children,
@@ -14,9 +28,18 @@ export default async function AppLayout({
   await getOrCreateTodayEntry(user.id);
   const catCount = await countRescuedCats(user.id);
 
+  const guest = isAnonymousUser(user);
+  const email = user.email ?? null;
+  const displayName = resolveDisplayName(user.user_metadata, email, guest);
+
   return (
     <>
-      <AppTopBar catCount={catCount} />
+      <AppTopBar
+        catCount={catCount}
+        isGuest={guest}
+        displayName={displayName}
+        email={email}
+      />
       {children}
       <AppNav />
     </>

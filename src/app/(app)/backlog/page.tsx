@@ -1,23 +1,12 @@
 import { BacklogScreen } from "@/components/backlog/backlog-screen";
+import { sweepAgedBacklogItems } from "@/lib/backlog/archive";
 import { requireUser } from "@/lib/auth";
-import {
-  getDailyEntryByDate,
-  listArchiveDates,
-  listHabitChecksForDate,
-  ensurePastDaysLocked,
-} from "@/lib/daily/archive";
-import { dateKey } from "@/lib/daily/carryover";
 import { getOrCreateTodayEntry } from "@/lib/daily/entry";
 import { createClient } from "@/lib/supabase/server";
-import type { BacklogItem, DailyEntry } from "@/lib/types/database";
-import type {
-  ArchiveDateOption,
-  ArchiveHabitCheck,
-} from "@/lib/daily/archive";
+import type { BacklogItem } from "@/lib/types/database";
 
 type SearchParams = Promise<{
   tab?: string | string[];
-  date?: string | string[];
 }>;
 
 function firstParam(value: string | string[] | undefined) {
@@ -31,6 +20,7 @@ export default async function BacklogPage({
 }) {
   const user = await requireUser();
   const supabase = await createClient();
+  await sweepAgedBacklogItems(user.id);
   const today = await getOrCreateTodayEntry(user.id);
 
   const params = await searchParams;
@@ -60,48 +50,20 @@ export default async function BacklogPage({
   );
 
   let archivedItems: BacklogItem[] = [];
-  let archiveDates: ArchiveDateOption[] = [];
-  let selectedArchiveDate: string | null = null;
-  let archiveEntry: DailyEntry | null = null;
-  let archiveHabits: ArchiveHabitCheck[] = [];
 
   if (tab === "archived") {
-    await ensurePastDaysLocked(user.id);
-
-    const [{ data: archivedData, error: archivedError }, dates] =
-      await Promise.all([
-        supabase
-          .from("backlog_items")
-          .select("*")
-          .eq("user_id", user.id)
-          .eq("status", "archived")
-          .order("last_touched_at", { ascending: false }),
-        listArchiveDates(user.id),
-      ]);
+    const { data: archivedData, error: archivedError } = await supabase
+      .from("backlog_items")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("status", "archived")
+      .order("last_touched_at", { ascending: false });
 
     if (archivedError) {
       throw new Error(archivedError.message);
     }
 
     archivedItems = (archivedData ?? []) as BacklogItem[];
-    archiveDates = dates;
-
-    const requested = firstParam(params.date);
-    const todayKey = dateKey(new Date());
-    selectedArchiveDate =
-      requested &&
-      /^\d{4}-\d{2}-\d{2}$/.test(requested) &&
-      requested < todayKey &&
-      dates.some((d) => d.date === requested)
-        ? requested
-        : (dates[0]?.date ?? null);
-
-    if (selectedArchiveDate != null) {
-      [archiveEntry, archiveHabits] = await Promise.all([
-        getDailyEntryByDate(user.id, selectedArchiveDate),
-        listHabitChecksForDate(user.id, selectedArchiveDate),
-      ]);
-    }
   }
 
   return (
@@ -110,10 +72,6 @@ export default async function BacklogPage({
       listItems={listItems}
       reviewItems={reviewItems}
       archivedItems={archivedItems}
-      archiveDates={archiveDates}
-      selectedArchiveDate={selectedArchiveDate}
-      archiveEntry={archiveEntry}
-      archiveHabits={archiveHabits}
       todayEntry={today}
     />
   );

@@ -4,19 +4,34 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import authStyles from "./auth-form.module.css";
+import { LogInInsteadButton } from "./log-in-instead-button";
 import styles from "./save-account-form.module.css";
+
+function isEmailAlreadyRegistered(error: {
+  code?: string;
+  message?: string;
+}): boolean {
+  if (error.code === "email_exists" || error.code === "user_already_exists") {
+    return true;
+  }
+  return /already (been )?(registered|in use)|already exists/i.test(
+    error.message ?? "",
+  );
+}
 
 export function SaveAccountForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [emailTaken, setEmailTaken] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+    setEmailTaken(false);
     setMessage(null);
     setLoading(true);
 
@@ -32,7 +47,11 @@ export function SaveAccountForm() {
     );
 
     if (updateError) {
-      setError(updateError.message);
+      if (isEmailAlreadyRegistered(updateError)) {
+        setEmailTaken(true);
+      } else {
+        setError(updateError.message);
+      }
       setLoading(false);
       return;
     }
@@ -88,11 +107,21 @@ export function SaveAccountForm() {
       </div>
 
       {error ? <p className={authStyles.error}>{error}</p> : null}
+      {emailTaken ? (
+        <p className={styles.takenNote}>
+          That email already has an account.{" "}
+          <LogInInsteadButton>Log in instead</LogInInsteadButton>.
+        </p>
+      ) : null}
       {message ? <p className={authStyles.message}>{message}</p> : null}
 
       <button className={authStyles.submit} type="submit" disabled={loading}>
         {loading ? "Saving…" : "Save my account"}
       </button>
+
+      <p className={authStyles.switch}>
+        Already have an account? <LogInInsteadButton />
+      </p>
     </form>
   );
 }

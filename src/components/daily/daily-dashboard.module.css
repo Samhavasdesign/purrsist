@@ -210,6 +210,40 @@
   background: transparent;
 }
 
+/* Quiet way into the read-only archive — same treatment as the capture link. */
+.archiveLink {
+  align-self: flex-start;
+  margin: 0;
+  padding: 0.15rem 0;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-support-size);
+  font-weight: var(--text-support-weight);
+  letter-spacing: var(--text-support-tracking);
+  line-height: var(--text-support-leading);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--muted) 35%, transparent);
+  text-underline-offset: 0.18em;
+  transition:
+    color 160ms ease,
+    text-decoration-color 160ms ease;
+}
+
+.archiveLink:hover {
+  color: var(--foreground);
+  text-decoration-color: color-mix(in srgb, var(--foreground) 45%, transparent);
+}
+
+.archiveLink:focus {
+  outline: none;
+}
+
+.archiveLink:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-sm);
+}
+
 .sectionRule {
   width: 100%;
   height: 0;
@@ -534,9 +568,11 @@
 .manageHabitsLink {
   flex-shrink: 0;
   border-color: var(--support-border);
+  color: var(--support-fg);
 }
 
 .manageHabitsLink:hover:not(:disabled):not([aria-disabled="true"]) {
+  color: var(--support-fg);
   border-color: var(--support-fg);
 }
 
@@ -564,6 +600,11 @@
 
 .section_support .habitsEmpty {
   color: color-mix(in srgb, var(--support-fg) 70%, transparent);
+}
+
+.habitsEmptyIdle {
+  font-style: italic;
+  opacity: 0.5;
 }
 
 .clearBtn {
@@ -664,4 +705,68 @@
   font-size: var(--text-support-size);
   line-height: var(--text-support-leading);
   color: var(--muted);
+}
+
+/* Date-triggered reminders — dotted "special state" box above Must-Dos. */
+.dueBox {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.125rem 1.25rem;
+  border: 2px dashed var(--support-border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--support-bg) 55%, transparent);
+}
+
+.dueBox .sectionTitle {
+  color: var(--support-fg);
+}
+
+.dueBox .sectionHint {
+  color: color-mix(in srgb, var(--support-fg) 65%, transparent);
+}
+
+.dueList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.dueRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.85rem;
+}
+
+.dueText {
+  margin: 0;
+  flex: 1 1 16rem;
+  min-width: 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-leading);
+  color: var(--support-fg);
+}
+
+.dueKicker {
+  font-weight: 600;
+}
+
+.dueActions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.dueAddBtn {
+  height: auto;
+  min-height: 2.25rem;
+  padding-block: 0.4rem;
+  white-space: nowrap;
 }

@@ -19,6 +19,20 @@ import type {
   Significance,
 } from "@/lib/types/database";
 
+/**
+ * Databases that predate migration 20260811010000 still enforce NOT NULL on
+ * significance, which rejects quiet captures outright.
+ */
+function isSignificanceNotNullViolation(
+  error: { code?: string; message?: string } | null,
+): boolean {
+  if (!error) return false;
+  return error.code === "23502" && /significance/i.test(error.message ?? "");
+}
+
+/** Least-urgent bucket, used only when the column cannot hold NULL. */
+const FALLBACK_SIGNIFICANCE: Significance = "green";
+
 /** Quiet backlog capture — no significance, no today placement. */
 export async function addToBacklog(text: string) {
   const user = await requireUser();
@@ -31,18 +45,26 @@ export async function addToBacklog(text: string) {
   const supabase = await createClient();
   const now = new Date().toISOString();
 
-  const { error } = await supabase.from("backlog_items").insert({
+  const row = {
     user_id: user.id,
     text: trimmed,
     normalized_text: trimmed.toLowerCase(),
-    significance: null,
-    tag: "task",
+    significance: null as Significance | null,
+    tag: "task" as const,
     target_date: null,
     ai_placement: null,
     promoted_to_entry_id: null,
     promoted_to_slot: null,
     last_touched_at: now,
-  });
+  };
+
+  let { error } = await supabase.from("backlog_items").insert(row);
+
+  if (isSignificanceNotNullViolation(error)) {
+    ({ error } = await supabase
+      .from("backlog_items")
+      .insert({ ...row, significance: FALLBACK_SIGNIFICANCE }));
+  }
 
   if (error) {
     return { ok: false as const, error: error.message };
@@ -131,6 +153,60 @@ export async function checkOffInPlace(itemId: string) {
     .eq("id", itemId)
     .eq("user_id", user.id)
     .eq("status", "active");
+
+  if (error) throw error;
+  revalidatePath("/backlog");
+  revalidatePath("/dashboard");
+}
+
+/** Manual per-row archive — move an active backlog item into the Archive tab. */
+export async function archiveBacklogItem(itemId: string) {
+  const user = await requireUser();
+  const supabase = await createClient();
+
+  const { data: item } = await supabase
+    .from("backlog_items")
+    .select("promoted_to_entry_id, promoted_to_slot")
+    .eq("id", itemId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (item?.promoted_to_entry_id && item.promoted_to_slot) {
+    await clearSlot(item.promoted_to_entry_id, item.promoted_to_slot);
+  }
+
+  const { error } = await supabase
+    .from("backlog_items")
+    .update({
+      status: "archived",
+      last_touched_at: new Date().toISOString(),
+      promoted_to_entry_id: null,
+      promoted_to_slot: null,
+      ai_placement: null,
+    })
+    .eq("id", itemId)
+    .eq("user_id", user.id)
+    .eq("status", "active");
+
+  if (error) throw error;
+  revalidatePath("/backlog");
+  revalidatePath("/dashboard");
+}
+
+/** Reverse of archiveBacklogItem — move an archived item back to the Active tab. */
+export async function unarchiveBacklogItem(itemId: string) {
+  const user = await requireUser();
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("backlog_items")
+    .update({
+      status: "active",
+      last_touched_at: new Date().toISOString(),
+    })
+    .eq("id", itemId)
+    .eq("user_id", user.id)
+    .eq("status", "archived");
 
   if (error) throw error;
   revalidatePath("/backlog");
@@ -269,4 +345,49 @@ export async function sendBackToBacklog(itemId: string) {
   if (error) throw error;
   revalidatePath("/backlog");
   revalidatePath("/dashboard");
+}
+
+/**
+ * A date-triggered reminder came due — drop it into today's first open slot,
+ * trying Must-Do, then Should-Do, then Quick Win. Clears the target_date via
+ * promoteToToday (which nulls ai_placement and re-homes the row onto the day).
+ */
+export async function landReminderOnToday(itemId: string) {
+  const kinds: DailyItemKind[] = ["must_do", "should_do", "quick_win"];
+  for (const kind of kinds) {
+    const result = await promoteToToday(itemId, {
+      significance: significanceForKind(kind),
+      kind,
+    });
+    if (result.ok) return result;
+  }
+  return {
+    ok: false as const,
+    error: "Today's list is full — free up a slot, then add this.",
+  };
+}
+
+/**
+ * Dismiss a due reminder from the dashboard box: drop its target_date so it
+ * rejoins the normal backlog under its tag instead of nagging every morning.
+ */
+export async function dismissDueReminder(itemId: string) {
+  const user = await requireUser();
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("backlog_items")
+    .update({
+      target_date: null,
+      last_touched_at: new Date().toISOString(),
+    })
+    .eq("id", itemId)
+    .eq("user_id", user.id)
+    .eq("status", "active");
+
+  if (error) return { ok: false as const, error: error.message };
+
+  revalidatePath("/backlog");
+  revalidatePath("/dashboard");
+  return { ok: true as const };
 }

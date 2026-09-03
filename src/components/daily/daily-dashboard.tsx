@@ -24,6 +24,7 @@ import {
   type ReorderSlotEntry,
 } from "@/lib/daily/actions";
 import { AddToBacklog } from "@/components/daily/add-to-backlog";
+import { DueReminders } from "@/components/daily/due-reminders";
 import { EndOfDayNudge } from "@/components/daily/end-of-day-nudge";
 import { HabitManager } from "@/components/daily/habit-manager";
 import { ReminderManager } from "@/components/daily/reminder-manager";
@@ -37,6 +38,7 @@ import {
 import { PlusIcon } from "@/components/icons/icons";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
+import type { DueReminder } from "@/lib/backlog/due-reminders";
 import type { RescueToastPayload } from "@/lib/collection/rescue-toast-types";
 import { isEditableEntry, formatShortDate } from "@/lib/daily/entry-rules";
 import {
@@ -75,6 +77,8 @@ type Props = {
   entry: DailyEntry;
   habits: HabitWithCheckIn[];
   sectionHints: SectionHintFlags;
+  /** Date-triggered backlog items whose target date has arrived. */
+  dueReminders?: DueReminder[];
   /** One-time stray rescue payoff — never a counter or streak. */
   rescueToast?: RescueToastPayload | null;
 };
@@ -153,6 +157,7 @@ export function DailyDashboard({
   entry,
   habits,
   sectionHints: initialSectionHints,
+  dueReminders = [],
   rescueToast = null,
 }: Props) {
   const [pending, startTransition] = useTransition();
@@ -768,6 +773,8 @@ export function DailyDashboard({
         }}
       />
 
+      <DueReminders reminders={dueReminders} readOnly={!editable} />
+
       {/* eslint-disable-next-line react-hooks/refs -- registerInputNode callbacks
           are passed to TodoRow/SortableTodoRow as props and attached to `ref`
           there; the compiler rule doesn't trace ref-callbacks across a
@@ -1051,6 +1058,10 @@ export function DailyDashboard({
       <hr className={styles.sectionRule} />
 
       <ReminderManager entry={localEntry} readOnly={!editable} />
+
+      <Link href="/archive" className={styles.archiveLink}>
+        View past days
+      </Link>
     </div>
     </SectionPulseContext.Provider>
   );

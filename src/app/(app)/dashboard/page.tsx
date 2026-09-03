@@ -1,5 +1,6 @@
 import { TrialBanner } from "@/components/auth/trial-banner";
 import { DailyDashboard } from "@/components/daily/daily-dashboard";
+import { listDueReminders } from "@/lib/backlog/due-reminders";
 import { isAnonymousUser, requireUser } from "@/lib/auth";
 import { prepareRescueToast } from "@/lib/collection/rescue-toast";
 import { getOrCreateTodayEntry } from "@/lib/daily/entry";
@@ -18,13 +19,16 @@ export default async function DashboardPage() {
   ]);
 
   const supabase = await createClient();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select(
-      "has_filled_must_do_once, has_filled_should_dos_once, has_filled_quick_wins_once",
-    )
-    .eq("id", user.id)
-    .maybeSingle();
+  const [{ data: profile }, dueReminders] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select(
+        "has_filled_must_do_once, has_filled_should_dos_once, has_filled_quick_wins_once",
+      )
+      .eq("id", user.id)
+      .maybeSingle(),
+    listDueReminders(supabase, user.id),
+  ]);
 
   const sectionHints = parseSectionHintFlags(profile);
 
@@ -35,6 +39,7 @@ export default async function DashboardPage() {
         entry={entry}
         habits={habits}
         sectionHints={sectionHints}
+        dueReminders={dueReminders}
         rescueToast={rescueToast}
       />
     </main>

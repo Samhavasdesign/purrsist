@@ -78,15 +78,15 @@
 .stat {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   gap: 0.3rem;
   min-width: 0;
-  padding: 0.7rem 0.65rem;
+  padding: 0.7rem 0.75rem;
   border: var(--border-width) solid color-mix(in srgb, var(--accent) 28%, var(--border));
   border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--accent) 8%, transparent);
-  text-align: center;
+  background: transparent;
+  text-align: left;
 }
 
 .statValue {

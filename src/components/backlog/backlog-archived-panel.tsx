@@ -1,105 +1,92 @@
 "use client";
 
-import { ArchiveDatePicker } from "@/components/archive/archive-date-picker";
-import { ArchiveEntryView } from "@/components/archive/archive-entry-view";
-import type {
-  ArchiveDateOption,
-  ArchiveHabitCheck,
-} from "@/lib/daily/archive";
-import { formatTargetDate, toDateKey } from "@/lib/backlog/group";
-import { formatShortDate } from "@/lib/daily/entry-rules";
-import type { BacklogItem, DailyEntry } from "@/lib/types/database";
-import { BACKLOG_TAGS } from "@/lib/types/database";
-import { SignificanceDot } from "./significance-dot";
+import { useEffect, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { unarchiveBacklogItem } from "@/lib/backlog/actions";
+import type { BacklogItem } from "@/lib/types/database";
 import styles from "./backlog.module.css";
 
 type Props = {
-  dates: ArchiveDateOption[];
-  selectedDate: string | null;
-  entry: DailyEntry | null;
-  habits: ArchiveHabitCheck[];
   archivedItems: BacklogItem[];
 };
 
-export function BacklogArchivedPanel({
-  dates,
-  selectedDate,
-  entry,
-  habits,
-  archivedItems,
-}: Props) {
+export function BacklogArchivedPanel({ archivedItems }: Props) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [items, setItems] = useState(archivedItems);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setItems(archivedItems);
+  }, [archivedItems]);
+
+  function onUnarchive(item: BacklogItem) {
+    setError(null);
+    setItems((prev) => prev.filter((row) => row.id !== item.id));
+    startTransition(async () => {
+      try {
+        await unarchiveBacklogItem(item.id);
+        router.refresh();
+      } catch (err) {
+        setItems(archivedItems);
+        setError(
+          err instanceof Error ? err.message : "Couldn't unarchive that item.",
+        );
+      }
+    });
+  }
+
   return (
     <div className={styles.archivedPanel}>
-      <section className={styles.archivedBlock} aria-labelledby="past-days-heading">
-        <h2 id="past-days-heading" className={styles.sectionTitle}>
-          Past days
-        </h2>
-        <p className={styles.archivedHint}>
-          Once a day has passed, it&apos;s locked and view-only.
-        </p>
-        <ArchiveDatePicker dates={dates} selectedDate={selectedDate} />
-        {entry ? (
-          <ArchiveEntryView entry={entry} habits={habits} />
-        ) : dates.length > 0 ? (
-          <p className={styles.empty}>
-            Pick a past date to see what was logged that day.
-          </p>
-        ) : null}
-      </section>
-
       <section
-        className={styles.archivedBlock}
+        className={styles.section}
         aria-labelledby="archived-items-heading"
       >
-        <h2 id="archived-items-heading" className={styles.sectionTitle}>
-          Archived items
-        </h2>
-        {archivedItems.length === 0 ? (
+        <div className={styles.sectionHead}>
+          <h2 id="archived-items-heading" className={styles.cardTitle}>
+            Archived items
+          </h2>
+        </div>
+        {error ? (
+          <p className={styles.itemError} role="alert">
+            {error}
+          </p>
+        ) : null}
+        {items.length === 0 ? (
           <p className={styles.empty}>
-            No archived backlog items. Bulk archive moves aging items here
-            without counting them as done.
+            No archived backlog items. Archiving an item from the Active tab
+            moves it here without counting it as done, and items left untouched
+            for 30 days land here on their own.
           </p>
         ) : (
           <ul className={styles.list}>
-            {archivedItems.map((item) => (
-              <ArchivedBacklogItemRow key={item.id} item={item} />
+            {items.map((item) => (
+              <li
+                key={item.id}
+                className={`${styles.item} ${styles.itemArchived}`}
+              >
+                <div className={styles.itemTop}>
+                  <div className={styles.itemMain}>
+                    <div className={styles.itemBody}>
+                      <p className={styles.itemText}>{item.text}</p>
+                    </div>
+                  </div>
+                  <div className={styles.itemActions}>
+                    <button
+                      type="button"
+                      className={styles.actionBtn}
+                      disabled={pending}
+                      onClick={() => onUnarchive(item)}
+                    >
+                      Unarchive
+                    </button>
+                  </div>
+                </div>
+              </li>
             ))}
           </ul>
         )}
       </section>
     </div>
-  );
-}
-
-function ArchivedBacklogItemRow({ item }: { item: BacklogItem }) {
-  const tagLabel =
-    BACKLOG_TAGS.find((row) => row.tag === item.tag)?.label ?? item.tag;
-
-  return (
-    <li
-      className={`${styles.item} ${styles.itemArchived} ${
-        item.significance
-          ? styles[`item_${item.significance}`]
-          : styles.itemNeutral
-      }`}
-    >
-      <div className={styles.itemMain}>
-        <SignificanceDot value={item.significance} />
-        <div className={styles.itemBody}>
-          <p className={styles.itemText}>{item.text}</p>
-          <p className={styles.itemMeta}>
-            <span className={styles.tag}>{tagLabel}</span>
-            <span className={styles.dateTag}>
-              {formatShortDate(toDateKey(item.created_at))}
-            </span>
-            {item.target_date ? (
-              <span className={styles.metaDate}>
-                {formatTargetDate(item.target_date)}
-              </span>
-            ) : null}
-          </p>
-        </div>
-      </div>
-    </li>
   );
 }

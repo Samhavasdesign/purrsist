@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogInInsteadButton } from "./log-in-instead-button";
 import styles from "./trial-banner.module.css";
 
 export function TrialBanner() {
@@ -9,7 +10,8 @@ export function TrialBanner() {
         <Link className={styles.link} href="/settings">
           save an account
         </Link>{" "}
-        anytime to keep your data.
+        anytime to keep your data, or{" "}
+        <LogInInsteadButton className={styles.link} />.
       </p>
     </aside>
   );

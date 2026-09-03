@@ -2,26 +2,31 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { PlusIcon } from "@/components/icons/icons";
+import { IconButton } from "@/components/ui/icon-button";
 import { ViewTabs } from "@/components/ui/view-tabs";
-import type {
-  ArchiveDateOption,
-  ArchiveHabitCheck,
-} from "@/lib/daily/archive";
 import { groupBacklogItems } from "@/lib/backlog/group";
-import { SECTION_SUBCOPY } from "@/lib/daily/section-subcopy";
-import type {
-  BacklogItem,
-  DailyEntry,
-  DailySlot,
-} from "@/lib/types/database";
+import {
+  BACKLOG_GROUP_COPY,
+  SECTION_SUBCOPY,
+} from "@/lib/daily/section-subcopy";
+import type { BacklogItem, DailyEntry, DailySlot } from "@/lib/types/database";
 import { slotTextColumn } from "@/lib/types/database";
 import { BacklogArchivedPanel } from "./backlog-archived-panel";
+import { BacklogDraftRow } from "./backlog-draft-row";
 import { BacklogItemRow } from "./backlog-item-row";
 import { ReviewPass } from "./review-pass";
 import styles from "./backlog.module.css";
 
 /** Review pass UI is temporarily hidden; keep wiring for a later return. */
 const SHOW_REVIEW = false;
+
+/** Local-only key for an unsaved row — never reaches the server. */
+function newDraftId(): string {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `draft-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
 
 export type BacklogTab = "active" | "archived";
 
@@ -30,10 +35,6 @@ type Props = {
   listItems: BacklogItem[];
   reviewItems: BacklogItem[];
   archivedItems: BacklogItem[];
-  archiveDates: ArchiveDateOption[];
-  selectedArchiveDate: string | null;
-  archiveEntry: DailyEntry | null;
-  archiveHabits: ArchiveHabitCheck[];
   todayEntry: DailyEntry;
 };
 
@@ -47,14 +48,12 @@ export function BacklogScreen({
   listItems,
   reviewItems,
   archivedItems,
-  archiveDates,
-  selectedArchiveDate,
-  archiveEntry,
-  archiveHabits,
   todayEntry,
 }: Props) {
   const router = useRouter();
   const [reviewing, setReviewing] = useState(false);
+  /** Ids of the empty rows the plus has added, in the order they appear. */
+  const [draftIds, setDraftIds] = useState<string[]>([]);
   const [promotingId, setPromotingId] = useState<string | null>(null);
   const [exitingIds, setExitingIds] = useState<Set<string>>(() => new Set());
   const [removedIds, setRemovedIds] = useState<Set<string>>(() => new Set());
@@ -77,14 +76,18 @@ export function BacklogScreen({
 
   function setTab(next: BacklogTab) {
     if (next === "archived") {
-      const params = new URLSearchParams({ tab: "archived" });
-      if (selectedArchiveDate) {
-        params.set("date", selectedArchiveDate);
-      }
-      router.push(`/backlog?${params.toString()}`);
+      router.push("/backlog?tab=archived");
       return;
     }
     router.push("/backlog");
+  }
+
+  function addDraft() {
+    setDraftIds((prev) => [...prev, newDraftId()]);
+  }
+
+  function removeDraft(draftId: string) {
+    setDraftIds((prev) => prev.filter((id) => id !== draftId));
   }
 
   function handlePromoted(payload: {
@@ -133,7 +136,7 @@ export function BacklogScreen({
         </div>
         <p className={styles.subtitle}>
           {tab === "archived"
-            ? "Past locked days and archived items — view only."
+            ? "Items you archived without doing them. Unarchive one to move it back to Active."
             : SECTION_SUBCOPY.backlog}
         </p>
         {SHOW_REVIEW && tab === "active" ? (
@@ -149,53 +152,99 @@ export function BacklogScreen({
       </header>
 
       {tab === "archived" ? (
-        <BacklogArchivedPanel
-          dates={archiveDates}
-          selectedDate={selectedArchiveDate}
-          entry={archiveEntry}
-          habits={archiveHabits}
-          archivedItems={archivedItems}
-        />
-      ) : !hasAny ? (
-        <p className={styles.empty}>
-          Nothing in the backlog yet. Captures that aren&apos;t placed on today
-          land here, grouped by category as they&apos;re sorted.
-        </p>
+        <BacklogArchivedPanel archivedItems={archivedItems} />
       ) : (
-        <div className={styles.sections}>
-          {sections.map((section) => (
-            <section key={section.key} className={styles.section}>
-              <h2 className={styles.sectionTitle}>{section.title}</h2>
-              <ul className={styles.list}>
-                {section.items.map((item) => (
-                  <BacklogItemRow
-                    key={item.id}
-                    item={item}
-                    todayEntry={entrySnapshot}
-                    showTag={section.tag === null}
-                    promoteOpen={promotingId === item.id}
-                    exiting={exitingIds.has(item.id)}
-                    onPromoteOpen={() => setPromotingId(item.id)}
-                    onPromoteClose={() =>
-                      setPromotingId((current) =>
-                        current === item.id ? null : current,
-                      )
-                    }
-                    onPromoted={handlePromoted}
-                    onExitComplete={() => handleExitComplete(item.id)}
-                  />
-                ))}
-              </ul>
-            </section>
-          ))}
-        </div>
+        <section className={styles.section} aria-label="Backlog items">
+          {!hasAny ? (
+            <div className={styles.cardActions}>
+              <IconButton
+                label="Add backlog item"
+                icon={<PlusIcon />}
+                iconSize={20}
+                className={styles.addBtn}
+                title="Add backlog item"
+                onClick={addDraft}
+              />
+            </div>
+          ) : null}
+
+          {!hasAny && draftIds.length === 0 ? (
+            <p className={styles.empty}>
+              Nothing in the backlog yet. Captures that aren&apos;t placed on
+              today land here, grouped by category as they&apos;re sorted.
+            </p>
+          ) : (
+            <div className={styles.cardBody}>
+              {hasAny ? (
+                <div className={styles.groups}>
+                  {sections.map((section, index) => {
+                    const copy = BACKLOG_GROUP_COPY[section.key];
+                    return (
+                      <div key={section.key} className={styles.group}>
+                        <div className={styles.groupHead}>
+                          <div className={styles.groupHeadText}>
+                            <h2 className={styles.groupTitle}>
+                              {copy?.title ?? section.title}
+                            </h2>
+                            {copy ? (
+                              <p className={styles.groupHint}>{copy.hint}</p>
+                            ) : null}
+                          </div>
+                          {index === 0 ? (
+                            <IconButton
+                              label="Add backlog item"
+                              icon={<PlusIcon />}
+                              iconSize={20}
+                              className={styles.addBtn}
+                              title="Add backlog item"
+                              onClick={addDraft}
+                            />
+                          ) : null}
+                        </div>
+                        <ul className={styles.list}>
+                          {section.items.map((item) => (
+                            <BacklogItemRow
+                              key={item.id}
+                              item={item}
+                              todayEntry={entrySnapshot}
+                              showTag={section.tag === null}
+                              promoteOpen={promotingId === item.id}
+                              exiting={exitingIds.has(item.id)}
+                              onPromoteOpen={() => setPromotingId(item.id)}
+                              onPromoteClose={() =>
+                                setPromotingId((current) =>
+                                  current === item.id ? null : current,
+                                )
+                              }
+                              onPromoted={handlePromoted}
+                              onExitComplete={() => handleExitComplete(item.id)}
+                            />
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
+
+              {draftIds.length > 0 ? (
+                <ul className={`${styles.list} ${styles.draftList}`}>
+                  {draftIds.map((id) => (
+                    <BacklogDraftRow
+                      key={id}
+                      onSaved={() => removeDraft(id)}
+                      onDiscard={() => removeDraft(id)}
+                    />
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          )}
+        </section>
       )}
 
       {SHOW_REVIEW && reviewing ? (
-        <ReviewPass
-          items={reviewItems}
-          onClose={() => setReviewing(false)}
-        />
+        <ReviewPass items={reviewItems} onClose={() => setReviewing(false)} />
       ) : null}
     </div>
   );

@@ -33,10 +33,10 @@ export function ArchiveDatePicker({ dates, selectedDate }: Props) {
         onChange={(event) => {
           const value = event.target.value;
           if (!value) {
-            router.push("/backlog?tab=archived");
+            router.push("/archive");
             return;
           }
-          router.push(`/backlog?tab=archived&date=${value}`);
+          router.push(`/archive?date=${value}`);
         }}
       >
         <option value="">Select a date…</option>
@@ -56,9 +56,7 @@ export function ArchiveDatePicker({ dates, selectedDate }: Props) {
               <button
                 type="button"
                 className={`${styles.chip} ${active ? styles.chipActive : ""}`}
-                onClick={() =>
-                  router.push(`/backlog?tab=archived&date=${option.date}`)
-                }
+                onClick={() => router.push(`/archive?date=${option.date}`)}
               >
                 <span>{formatArchiveDate(option.date)}</span>
                 {option.must_do_done ? (

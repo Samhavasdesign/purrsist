@@ -5,25 +5,35 @@ import { usePathname } from "next/navigation";
 import {
   CatHeadIcon,
   ChevronLeftIcon,
-  SettingsIcon,
+  InfoIcon,
 } from "@/components/icons/icons";
 import { IconButton } from "@/components/ui/icon-button";
+import { AccountMenu } from "./account-menu";
 import styles from "./app-top-bar.module.css";
 
 type Props = {
   catCount?: number;
+  isGuest: boolean;
+  displayName: string;
+  email: string | null;
 };
 
-export function AppTopBar({ catCount = 0 }: Props) {
+export function AppTopBar({
+  catCount = 0,
+  isGuest,
+  displayName,
+  email,
+}: Props) {
   const pathname = usePathname();
   const nestedSettings = pathname.startsWith("/settings/");
   const showBack =
     pathname.startsWith("/backlog") ||
     pathname.startsWith("/habits") ||
     pathname.startsWith("/settings") ||
-    pathname.startsWith("/collection");
+    pathname.startsWith("/collection") ||
+    pathname.startsWith("/archive");
   const collectionActive = pathname.startsWith("/collection");
-  const settingsActive = pathname.startsWith("/settings");
+  const infoActive = pathname.startsWith("/settings/how-it-works");
   const backHref = nestedSettings ? "/settings" : "/dashboard";
   const backLabel = nestedSettings ? "Back to Settings" : "Back to Today";
   const catLabel =
@@ -45,15 +55,14 @@ export function AppTopBar({ catCount = 0 }: Props) {
               className={styles.backBtn}
             />
           ) : null}
+          <Link
+            href="/dashboard"
+            className={styles.brand}
+            aria-label="Home — Today"
+          >
+            Purrsist
+          </Link>
         </div>
-
-        <Link
-          href="/dashboard"
-          className={styles.brand}
-          aria-label="Home — Today"
-        >
-          Purrsist
-        </Link>
 
         <div className={styles.right}>
           <Link
@@ -74,13 +83,21 @@ export function AppTopBar({ catCount = 0 }: Props) {
             </span>
           </Link>
           <IconButton
-            href="/settings"
-            label="Open settings"
-            icon={<SettingsIcon />}
+            href="/settings/how-it-works"
+            label="About Purrsist"
+            icon={<InfoIcon />}
             iconSize={20}
-            active={settingsActive}
-            aria-current={settingsActive ? "page" : undefined}
+            active={infoActive}
+            aria-current={infoActive ? "page" : undefined}
+            className={styles.navControl}
           />
+          {isGuest ? (
+            <Link href="/settings" className={styles.saveAccountCta}>
+              Save account
+            </Link>
+          ) : (
+            <AccountMenu displayName={displayName} email={email} />
+          )}
         </div>
       </div>
     </header>

@@ -1,0 +1,133 @@
+.root {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Avatar — filled brown circle, reads as "person" next to the square nav tiles. */
+.avatar {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--btn-height);
+  height: var(--btn-height);
+  min-width: var(--btn-height);
+  min-height: var(--btn-height);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--foreground);
+  color: var(--background);
+  font-family: var(--font-ui);
+  font-size: var(--text-label-size);
+  font-weight: var(--text-label-weight);
+  letter-spacing: var(--text-label-tracking);
+  line-height: 1;
+  cursor: pointer;
+  transition: var(--btn-transition);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.avatar:hover {
+  background: color-mix(in srgb, var(--foreground) 90%, black);
+}
+
+.avatar:focus {
+  outline: none;
+}
+
+/* Subtle open / active state — no outer geometry, just a darker fill + inset. */
+.avatarOpen,
+.avatarOpen:hover {
+  background: color-mix(in srgb, var(--foreground) 82%, black);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.28);
+}
+
+/* Reserved exclusively for keyboard focus. */
+.avatar:focus-visible {
+  outline: var(--btn-focus-ring);
+  outline-offset: var(--btn-focus-offset);
+}
+
+/* Dropdown — right-aligned beneath the avatar. */
+.menu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 40;
+  min-width: 12rem;
+  max-width: 15rem;
+  background: var(--surface);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 6px 20px -8px color-mix(in srgb, var(--foreground) 30%, transparent);
+}
+
+.identity {
+  padding: 0.6rem 0.85rem;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-label-size);
+  font-weight: var(--text-label-weight);
+  color: var(--foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.email {
+  margin: 0.1rem 0 0;
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.divider {
+  height: 1px;
+  margin: 0;
+  background: var(--border);
+}
+
+.signOutForm {
+  margin: 0;
+  display: block;
+}
+
+.item {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.6rem 0.85rem;
+  border: none;
+  background: transparent;
+  font-family: var(--font-ui);
+  font-size: var(--text-label-size);
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: var(--btn-transition);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.item:hover {
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
+}
+
+.item:focus {
+  outline: none;
+}
+
+.item:focus-visible {
+  outline: var(--btn-focus-ring);
+  outline-offset: calc(-1 * var(--focus-ring-offset, 2px));
+}
