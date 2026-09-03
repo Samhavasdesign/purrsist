@@ -102,7 +102,7 @@ export function HabitManager({
         .join(" ")}
     >
       <div className={styles.sectionHead}>
-        <div className={styles.sectionTitleRow}>
+        <div className={`${styles.sectionTitleRow} ${styles.habitsTitleRow}`}>
           <div className={styles.sectionTitleCluster}>
             <div className={styles.sectionTitleMain}>
               <h2 className={styles.sectionTitle}>Habits</h2>

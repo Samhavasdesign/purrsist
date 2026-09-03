@@ -9,14 +9,6 @@ export default function HomePage() {
     <main className={styles.page}>
       <header className={styles.header}>
         <PurrsistLogo className={styles.logo} />
-        <nav className={styles.nav}>
-          <Link className={styles.navLink} href="/login">
-            Sign in
-          </Link>
-          <Link className={styles.cta} href="/signup">
-            Try Purrsist
-          </Link>
-        </nav>
       </header>
 
       <section className={styles.hero}>
@@ -32,7 +24,13 @@ export default function HomePage() {
               Create an account
             </Link>
           </div>
-          <p className={styles.reassurance}>No account required to try it.</p>
+          <p className={styles.reassurance}>
+            No account needed to try it. Already have one?{" "}
+            <Link className={styles.reassuranceLink} href="/login">
+              Log in
+            </Link>
+            .
+          </p>
         </div>
 
         <div className={styles.heroPreview}>

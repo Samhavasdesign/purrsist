@@ -602,9 +602,20 @@
   text-decoration: line-through;
 }
 
+/* Keep "Manage habits" pinned to the top of the module: when the subcopy wraps
+   (narrow screens) the row must not vertically centre the button against the
+   whole title + hint stack. Top-align the row so the button's top edge sits on
+   the same line as the "Habits" heading — equal padding above both. */
+.habitsTitleRow {
+  align-items: flex-start;
+}
+
 .manageHabitsLink {
   flex-shrink: 0;
-  border-color: var(--support-border);
+  /* --support-border alone is a ~1.1:1 hairline on the support card — below the
+     visibility floor on phone displays. Pull it toward --support-fg so the
+     stroke reads, staying a step lighter than the hover border. */
+  border-color: color-mix(in srgb, var(--support-fg) 32%, var(--support-border));
   color: var(--support-fg);
 }
 
