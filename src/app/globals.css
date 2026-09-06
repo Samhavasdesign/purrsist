@@ -135,6 +135,12 @@ body {
   font-weight: var(--text-body-weight);
   letter-spacing: var(--text-body-tracking);
   line-height: var(--text-body-leading);
+  /* User-entered text (task names, reminders, pasted URLs) can be one long
+   * unbroken string — break it rather than let it overrun a card or a button.
+   * Inherited; `break-word` doesn't affect intrinsic sizing, so it's layout-safe.
+   * Flex rows that sit text beside actions still need their own `min-width: 0`
+   * (+ `overflow-wrap: anywhere` where the text must shrink to near-zero). */
+  overflow-wrap: break-word;
 }
 
 /* Native checkboxes — same box size everywhere (Today, habits, capture, etc.) */

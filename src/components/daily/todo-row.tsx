@@ -2,7 +2,7 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { CSSProperties } from "react";
+import { useCallback, useLayoutEffect, useRef, type CSSProperties } from "react";
 import { CloseIcon, GripIcon } from "@/components/icons/icons";
 import { IconButton } from "@/components/ui/icon-button";
 import styles from "./daily-dashboard.module.css";
@@ -18,7 +18,7 @@ export type TodoRowProps = {
   checkboxLabel: string;
   placeholder: string;
   inputLabel: string;
-  registerInputNode?: (node: HTMLInputElement | null) => void;
+  registerInputNode?: (node: HTMLTextAreaElement | null) => void;
   onToggle: (checked: boolean) => void;
   onTextChange: (text: string) => void;
   onTextBlur: (text: string) => void;
@@ -107,6 +107,29 @@ function TodoRowContent({
   onRemove,
   removeDisabled,
 }: TodoRowProps) {
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const resize = useCallback((el: HTMLTextAreaElement | null) => {
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, []);
+
+  // Re-fit whenever the text changes from outside this row (drag reorder,
+  // server sync, clear) — onChange alone misses those.
+  useLayoutEffect(() => {
+    resize(inputRef.current);
+  }, [text, resize]);
+
+  const setRef = useCallback(
+    (node: HTMLTextAreaElement | null) => {
+      inputRef.current = node;
+      registerInputNode?.(node);
+      resize(node);
+    },
+    [registerInputNode, resize],
+  );
+
   return (
     <>
       <input
@@ -118,19 +141,23 @@ function TodoRowContent({
         onChange={(event) => onToggle(event.target.checked)}
       />
       <div className={styles.slotFields}>
-        <input
-          ref={registerInputNode}
-          className={`${styles.slotInput} ${done ? styles.slotDone : ""}`}
-          type="text"
+        <textarea
+          ref={setRef}
+          className={`${styles.slotInput} ${styles.slotTextarea} ${done ? styles.slotDone : ""}`}
+          rows={1}
           value={text}
           placeholder={placeholder}
           disabled={!editable}
           readOnly={!editable}
           aria-label={inputLabel}
-          onChange={(event) => onTextChange(event.target.value)}
+          onChange={(event) => {
+            onTextChange(event.target.value);
+            resize(event.currentTarget);
+          }}
           onBlur={(event) => onTextBlur(event.target.value)}
           onKeyDown={(event) => {
-            if (event.key === "Enter") {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
               event.currentTarget.blur();
             }
           }}

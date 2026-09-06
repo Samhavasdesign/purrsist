@@ -347,6 +347,9 @@
   margin: 0;
   font-size: var(--text-body-size);
   line-height: 1.4;
+  /* Break long unbroken strings so they never overrun the card or the actions. */
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* Borderless like the Today slot inputs — the row's :focus-within outline is

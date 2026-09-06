@@ -95,6 +95,8 @@ export type DailyEntry = {
   daily_reminder: string | null;
   locked: boolean;
   morning_digest_sent: boolean;
+  /** Set once this day's unresolved tasks have been pulled forward by carryover. */
+  carryover_swept: boolean;
   notes: string | null;
   created_at: string;
 };
@@ -284,4 +286,23 @@ export function listUncheckedFilledItems(entry: DailyEntry): UncheckedItem[] {
   });
 
   return [...fromSlots, ...fromExtras];
+}
+
+/**
+ * How many times an unchecked task may carry forward before the dashboard
+ * stops letting it sit quietly and prompts to move it to the backlog.
+ * The task is entered at count 0, so count >= 5 means it has been carried
+ * five separate days without being checked off.
+ */
+export const STAGNANT_CARRYOVER_COUNT = 5;
+
+/**
+ * Unchecked, still-filled tasks (slots or extras) that have carried forward
+ * at least STAGNANT_CARRYOVER_COUNT times — the ones the 5-day prompt asks
+ * the user to backlog or archive.
+ */
+export function listStagnantItems(entry: DailyEntry): UncheckedItem[] {
+  return listUncheckedFilledItems(entry).filter(
+    (item) => item.carryover_count >= STAGNANT_CARRYOVER_COUNT,
+  );
 }

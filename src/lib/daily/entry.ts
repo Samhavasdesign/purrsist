@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { ensurePastDaysLocked } from "@/lib/daily/archive";
-import { applyCarryoverFromYesterday, dateKey } from "@/lib/daily/carryover";
+import { applyPendingCarryover, dateKey } from "@/lib/daily/carryover";
 import { normalizeDailyEntry } from "@/lib/daily/extra-items";
 import { markSectionFilledOnceIfNeeded } from "@/lib/daily/section-hints";
 import type { DailyEntry, DailySlot } from "@/lib/types/database";
@@ -22,14 +22,6 @@ export const getOrCreateTodayEntry = cache(async function getOrCreateTodayEntry(
 ): Promise<DailyEntry> {
   const supabase = await createClient();
   const date = dateKey(new Date());
-
-  // Same-day-only editing: anything before today becomes locked (PRD §8).
-  // Best-effort — a failure here must not take down the whole page.
-  try {
-    await ensurePastDaysLocked(userId);
-  } catch (error) {
-    console.error("ensurePastDaysLocked:", error);
-  }
 
   const { data: existing, error: selectError } = await supabase
     .from("daily_entries")
@@ -72,14 +64,26 @@ export const getOrCreateTodayEntry = cache(async function getOrCreateTodayEntry(
     }
   }
 
-  // Carryover is a convenience, not load-bearing — if it fails, still hand back
-  // today's entry so the page renders.
+  // Carryover pulls unresolved tasks forward from recent un-swept past days.
+  // It must run before the lock step below — historically the lock ran first
+  // and carryover always bailed on an already-locked yesterday. Not
+  // load-bearing: if it fails, still hand back today's entry so the page renders.
+  let result = normalizeDailyEntry(today);
   try {
-    return await applyCarryoverFromYesterday(userId, today);
+    result = await applyPendingCarryover(userId, today);
   } catch (error) {
-    console.error("applyCarryoverFromYesterday:", error);
-    return normalizeDailyEntry(today);
+    console.error("applyPendingCarryover:", error);
   }
+
+  // Same-day-only editing: anything before today becomes locked (PRD §8).
+  // Best-effort — a failure here must not take down the whole page.
+  try {
+    await ensurePastDaysLocked(userId);
+  } catch (error) {
+    console.error("ensurePastDaysLocked:", error);
+  }
+
+  return result;
 });
 
 export function findOpenSlot(

@@ -1,8 +1,10 @@
 {
+  "id": "/",
   "name": "Purrsist",
   "short_name": "Purrsist",
   "description": "An async capture-and-reference tool — capture a thought, AI sorts it, and the app surfaces it back on its own schedule.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#f4f2ed",
@@ -14,6 +16,12 @@
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/icons/icon-512.png",
