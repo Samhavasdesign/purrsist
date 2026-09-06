@@ -118,8 +118,13 @@
 
 .itemText {
   margin: 0;
+  min-width: 0;
   font-size: var(--text-body-size);
   line-height: 1.4;
+  /* Habit rows render this <p> as a direct flex child, so it needs to shrink
+   * and break long unbroken text rather than overrun the row. */
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .done {
@@ -144,6 +149,7 @@
   font-size: var(--text-body-size);
   line-height: 1.45;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .empty {

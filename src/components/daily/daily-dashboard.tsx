@@ -30,6 +30,7 @@ import { HabitManager } from "@/components/daily/habit-manager";
 import { ReminderManager } from "@/components/daily/reminder-manager";
 import { RescueToast } from "@/components/daily/rescue-toast";
 import { SectionPulseContext } from "@/components/daily/section-pulse-context";
+import { StagnantTasksPrompt } from "@/components/daily/stagnant-tasks-prompt";
 import { SortableTodoRow, TodoRow } from "@/components/daily/todo-row";
 import {
   WinPayoff,
@@ -61,6 +62,7 @@ import {
   type SectionHintFlags,
 } from "@/lib/daily/section-hints";
 import { SECTION_SUBCOPY } from "@/lib/daily/section-subcopy";
+import { notifyActionComplete } from "@/lib/pwa/action-signal";
 import type {
   DailyEntry,
   DailySlot,
@@ -196,8 +198,8 @@ export function DailyDashboard({
   const dirtyDoneSlots = useRef(new Set<DailySlot>());
   const dirtyExtras = useRef(new Set<string>());
   const prevComplete = useRef<Record<DailyItemKind, boolean> | null>(null);
-  const slotInputRefs = useRef(new Map<DailySlot, HTMLInputElement>());
-  const extraInputRefs = useRef(new Map<string, HTMLInputElement>());
+  const slotInputRefs = useRef(new Map<DailySlot, HTMLTextAreaElement>());
+  const extraInputRefs = useRef(new Map<string, HTMLTextAreaElement>());
   const focusEmptyKind = useRef<DailyItemKind | null>(null);
   const focusExtraId = useRef<string | null>(null);
   const focusSlot = useRef<DailySlot | null>(null);
@@ -483,6 +485,7 @@ export function DailyDashboard({
       [col]: done,
       ...(done ? { [countCol]: 0 } : {}),
     }));
+    if (done) notifyActionComplete();
     startTransition(async () => {
       const result = await updateSlotDone(localEntry.id, slot, done);
       dirtyDoneSlots.current.delete(slot);
@@ -585,6 +588,7 @@ export function DailyDashboard({
           : item,
       ),
     }));
+    if (done) notifyActionComplete();
     startTransition(async () => {
       const result = await updateExtraDailyItemDone(
         localEntry.id,
@@ -749,6 +753,7 @@ export function DailyDashboard({
       {editable ? <AddToBacklog /> : null}
 
       {editable ? <EndOfDayNudge entry={localEntry} /> : null}
+      {editable ? <StagnantTasksPrompt entry={localEntry} /> : null}
       {!editable ? (
         <p className={styles.lockedNote}>
           This day is locked and view-only. Browse it in{" "}
@@ -1052,6 +1057,7 @@ export function DailyDashboard({
             complete: true,
           });
           setWinPayoff(sheetDone ? "sheet" : "module");
+          notifyActionComplete();
         }}
       />
 

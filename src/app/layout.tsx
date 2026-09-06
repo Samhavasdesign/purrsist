@@ -93,6 +93,9 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: "#f4f2ed",
   colorScheme: "light",
+  // Let content run under the notch / home indicator so a saved Home Screen app
+  // can paint edge-to-edge and our prompts can honour env(safe-area-inset-*).
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

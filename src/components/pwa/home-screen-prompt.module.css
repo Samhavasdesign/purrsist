@@ -1,20 +1,33 @@
-.banner {
+/* Bottom card shown once a user is a repeat visitor on iPhone. Placement,
+   safe-area insets and the entrance animation come from <ToastShell> (anchor
+   "bottom" — above the floating nav, clear of the top bar). */
+
+.card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-4) var(--space-4);
+  gap: var(--space-3);
+  padding: var(--space-4);
   border: var(--border-default);
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  box-shadow: 0 12px 32px -12px
+    color-mix(in srgb, var(--foreground) 35%, transparent);
+}
+
+/* Focus lands on the card when it opens; show a ring for keyboard users only. */
+.card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.card:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .copy {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  /* At >=640px the banner is a flex row; let the copy shrink so a long
-   * unbroken task name breaks instead of shoving the actions off-edge. */
-  min-width: 0;
+  gap: var(--space-1);
 }
 
 .title {
@@ -25,6 +38,7 @@
   letter-spacing: var(--text-title-tracking);
   line-height: var(--text-title-leading);
   text-transform: none;
+  color: var(--foreground);
 }
 
 .body {
@@ -37,50 +51,16 @@
   color: var(--muted);
 }
 
-.list {
-  list-style: none;
+.steps {
   margin: var(--space-1) 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.list li {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
   font-family: var(--font-ui);
   font-size: var(--text-caption-size);
   line-height: var(--text-caption-leading);
-}
-
-.slot {
-  font-family: var(--font-ui);
-  font-size: var(--text-caption-size);
-  font-weight: 500;
-  letter-spacing: var(--text-caption-tracking);
-  line-height: var(--text-caption-leading);
-  text-transform: none;
-  color: var(--muted);
-}
-
-.text {
   color: var(--foreground);
-  font-size: var(--text-body-size);
-  line-height: var(--text-body-leading);
 }
 
 .actions {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: var(--space-2);
-}
-
-@media (min-width: 640px) {
-  .banner {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
 }
