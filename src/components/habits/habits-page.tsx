@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { archiveHabit, unarchiveHabit } from "@/lib/daily/actions";
-import { PlusIcon } from "@/components/icons/icons";
+import { archiveHabit, removeHabit, unarchiveHabit } from "@/lib/daily/actions";
+import { CloseIcon, PlusIcon } from "@/components/icons/icons";
 import { IconButton } from "@/components/ui/icon-button";
 import { ViewTabs } from "@/components/ui/view-tabs";
 import type { Habit } from "@/lib/types/database";
@@ -75,6 +75,16 @@ export function HabitsPage({
     setArchivedHabits((prev) => prev.filter((row) => row.id !== habit.id));
     startTransition(async () => {
       const result = await unarchiveHabit(habit.id);
+      if (!result.ok) setError(result.error);
+      router.refresh();
+    });
+  }
+
+  function onDelete(habit: Habit) {
+    setError(null);
+    setArchivedHabits((prev) => prev.filter((row) => row.id !== habit.id));
+    startTransition(async () => {
+      const result = await removeHabit(habit.id);
       if (!result.ok) setError(result.error);
       router.refresh();
     });
@@ -187,6 +197,15 @@ export function HabitsPage({
                       >
                         Unarchive
                       </button>
+                      <IconButton
+                        label="Delete permanently"
+                        icon={<CloseIcon />}
+                        iconSize={20}
+                        tone="ghost"
+                        disabled={pending}
+                        title="Delete permanently"
+                        onClick={() => onDelete(habit)}
+                      />
                     </div>
                   </div>
                 </li>

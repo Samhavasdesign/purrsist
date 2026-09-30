@@ -2,7 +2,9 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { unarchiveBacklogItem } from "@/lib/backlog/actions";
+import { deleteBacklogItem, unarchiveBacklogItem } from "@/lib/backlog/actions";
+import { CloseIcon } from "@/components/icons/icons";
+import { IconButton } from "@/components/ui/icon-button";
 import type { BacklogItem } from "@/lib/types/database";
 import styles from "./backlog.module.css";
 
@@ -31,6 +33,22 @@ export function BacklogArchivedPanel({ archivedItems }: Props) {
         setItems(archivedItems);
         setError(
           err instanceof Error ? err.message : "Couldn't unarchive that item.",
+        );
+      }
+    });
+  }
+
+  function onDelete(item: BacklogItem) {
+    setError(null);
+    setItems((prev) => prev.filter((row) => row.id !== item.id));
+    startTransition(async () => {
+      try {
+        await deleteBacklogItem(item.id);
+        router.refresh();
+      } catch (err) {
+        setItems(archivedItems);
+        setError(
+          err instanceof Error ? err.message : "Couldn't delete that item.",
         );
       }
     });
@@ -80,6 +98,15 @@ export function BacklogArchivedPanel({ archivedItems }: Props) {
                     >
                       Unarchive
                     </button>
+                    <IconButton
+                      label="Delete permanently"
+                      icon={<CloseIcon />}
+                      iconSize={20}
+                      tone="ghost"
+                      disabled={pending}
+                      title="Delete permanently"
+                      onClick={() => onDelete(item)}
+                    />
                   </div>
                 </div>
               </li>

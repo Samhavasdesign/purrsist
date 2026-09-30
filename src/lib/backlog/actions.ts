@@ -213,6 +213,22 @@ export async function unarchiveBacklogItem(itemId: string) {
   revalidatePath("/dashboard");
 }
 
+/** Permanent — removes an archived item for good. No undo. */
+export async function deleteBacklogItem(itemId: string) {
+  const user = await requireUser();
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("backlog_items")
+    .delete()
+    .eq("id", itemId)
+    .eq("user_id", user.id)
+    .eq("status", "archived");
+
+  if (error) throw error;
+  revalidatePath("/backlog");
+}
+
 export async function promoteToToday(
   itemId: string,
   input: {
