@@ -485,6 +485,7 @@
 
 .slotTextarea {
   display: block;
+  max-width: 100%;
   resize: none;
   overflow: hidden;
   field-sizing: content;
