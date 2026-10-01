@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { removeExtraDailyItem, updateSlotText } from "@/lib/daily/actions";
 import { isEditableEntry } from "@/lib/daily/entry-rules";
+import { getUserTodayKey } from "@/lib/daily/today";
 import { readExtraItems } from "@/lib/daily/extra-items";
 import { createClient } from "@/lib/supabase/server";
 import type {
@@ -46,7 +47,7 @@ async function loadEditableEntry(entryId: string, userId: string) {
   if (error) return { ok: false as const, error: error.message };
   if (!data) return { ok: false as const, error: "Entry not found." };
   const entry = data as DailyEntry;
-  if (!isEditableEntry(entry)) {
+  if (!isEditableEntry(entry, await getUserTodayKey(userId))) {
     return { ok: false as const, error: "Past days are read-only." };
   }
   return { ok: true as const, supabase, entry };

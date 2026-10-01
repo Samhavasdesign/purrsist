@@ -29,9 +29,13 @@
   font: inherit;
   font-size: var(--text-body-size);
   cursor: pointer;
+  outline: none;
+  transition:
+    border-color var(--duration-base) ease,
+    box-shadow var(--duration-base) ease;
 }
 
-.select:focus-visible {
+.select:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: var(--shadow-focus);

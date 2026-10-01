@@ -1,0 +1,49 @@
+.actions {
+  display: flex;
+}
+
+.primary,
+.secondary {
+  font: inherit;
+  font-family: var(--font-ui);
+  font-size: var(--text-body-size);
+  font-weight: 600;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-base) var(--ease-base),
+    border-color var(--duration-base) var(--ease-base),
+    color var(--duration-base) var(--ease-base);
+}
+
+.primary {
+  border: 1px solid var(--foreground);
+  background: var(--foreground);
+  color: var(--surface);
+}
+
+.primary:hover {
+  background: color-mix(in srgb, var(--foreground) 88%, var(--surface));
+}
+
+.secondary {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--foreground);
+}
+
+.secondary:hover {
+  border-color: var(--muted);
+}
+
+.footnote {
+  margin: 0;
+  font-size: var(--text-caption-size);
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.link {
+  color: var(--foreground);
+}

@@ -11,3 +11,8 @@ export function getResendClient() {
 export function getEmailFrom(): string {
   return process.env.EMAIL_FROM ?? "Purrsist <onboarding@resend.dev>";
 }
+
+/** Public app origin for links in emails. */
+export function getAppUrl(): string {
+  return process.env.APP_URL ?? "https://www.purrsist.co";
+}

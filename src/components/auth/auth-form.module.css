@@ -38,32 +38,11 @@
 }
 
 .submit {
-  margin-top: var(--space-1);
-  border: none;
-  border-radius: var(--radius-full);
-  background: var(--accent);
-  color: var(--accent-foreground);
-  padding: var(--space-4) var(--space-4);
-  font-size: var(--text-body-size);
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    transform var(--duration-base) ease,
-    opacity var(--duration-base) ease,
-    background-color var(--duration-base) ease;
-}
-
-.submit:hover:not(:disabled) {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
-}
-
-.submit:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
+  width: 100%;
 }
 
 .error,
+.warning,
 .message {
   margin: 0;
   font-size: var(--text-caption-size);
@@ -72,6 +51,10 @@
 
 .error {
   color: var(--danger);
+}
+
+.warning {
+  color: var(--warning);
 }
 
 .message {
@@ -93,4 +76,12 @@
 
 .link:hover {
   color: var(--accent);
+}
+
+/* Sign-up disclosure for the morning email. */
+.notice {
+  margin: 0;
+  font-size: var(--text-caption-size);
+  line-height: 1.45;
+  color: var(--muted);
 }

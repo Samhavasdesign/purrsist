@@ -64,7 +64,7 @@ Each task category has a background, foreground, and border token used for full-
 | Quick Win (green) | `#c5d5b8` | `#3d5230` | `#6f8a5e` |
 | Quick Win done | — | `#5c6b50` | — |
 
-Each category also has `--*-bg-fill` and `--*-bg-fill-selected` gradient variants (165deg, two-stop `color-mix` blends).
+Each category also has a `--*-bg-fill` gradient (165deg, two-stop `color-mix` blend). Selected category buttons use the flat `--*-tint` shade plus an `--*-fg` border.
 
 ### 2.3 Support Section Tokens
 
@@ -263,8 +263,6 @@ No shadow tokens defined. All shadows are one-off values:
 
 | Keyframe | File | Description | Duration |
 |---|---|---|---|
-| `ahaIn` | `first-capture-aha.module.css` | Fade + slide up | 260ms |
-| `ahaOut` | `first-capture-aha.module.css` | Fade + slide up | 260ms |
 | `promoteIn` | `backlog.module.css` | Fade + slide down | 180ms |
 | `iconPop` | `button.module.css`, `daily-dashboard.module.css` | Scale 1→1.2→1 | 250ms |
 | `sectionPop` | `daily-dashboard.module.css` | Scale 1→1.03→1 | 250ms |
@@ -309,19 +307,12 @@ All keyframes include `@media (prefers-reduced-motion: reduce)` counterparts tha
 | `ChevronLeftIcon` | Stroke | 20, 24 | Yes |
 | `PlusIcon` | Stroke | 20, 24 | Yes |
 | `CloseIcon` | Stroke | 20, 24 | Yes |
-| `TrashIcon` | Stroke | 20, 24 | Yes |
-| `CheckIcon` | Stroke | 20, 24 | Yes |
-| `StarIcon` | Fill | 20, 24 | Yes |
-| `GripIcon` | Fill | 20, 24 | **Missing** |
-| `PawPrintIcon` | Fill | 20, 24 | Yes |
+| `GripIcon` | Fill | 20, 24 | Yes |
 | `CatHeadIcon` | Hybrid (stroke + fill) | 20, 24 | Yes |
 | `InfoIcon` | Stroke | 20, 24 | Yes |
-| `SettingsIcon` | Stroke | 20, 24 | Yes |
 
 **`IconProps`:** `size?: 20 | 24`, `title?: string`, plus SVG passthrough props.  
 **`ICON_STROKE`:** exported constant `= 2` — stroke width for all stroke icons.
-
-**Issue:** `GripIcon` is exported from `icons.tsx` but missing from `index.ts` re-exports.
 
 ### 7.2 Icon Conventions
 
@@ -360,7 +351,6 @@ All keyframes include `@media (prefers-reduced-motion: reduce)` counterparts tha
 | **Habits** | `HabitsPage`, `HabitRow`, `HabitDraftRow` | Habit CRUD + archive |
 | **Archive** | `ArchiveScreen`, `ArchiveDatePicker`, `ArchiveEntryView` | Past entry review |
 | **Collection** | `CollectionScreen`, `CatPortraits` (SVG set) | Cat rescue gallery |
-| **Capture** | `QuickAdd`, `FirstCaptureAha` | Capture input + first-time moment |
 
 ### 8.4 CSS Module File Index (30 files)
 
@@ -379,8 +369,6 @@ src/components/auth/save-account-form.module.css
 src/components/auth/trial-banner.module.css
 src/components/auth/try-it-button.module.css
 src/components/backlog/backlog.module.css
-src/components/capture/first-capture-aha.module.css
-src/components/capture/quick-add.module.css
 src/components/collection/collection-screen.module.css
 src/components/daily/add-to-backlog.module.css
 src/components/daily/daily-dashboard.module.css

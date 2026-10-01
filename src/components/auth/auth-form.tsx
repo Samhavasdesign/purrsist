@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import styles from "./auth-form.module.css";
 
@@ -108,9 +109,16 @@ export function AuthForm({ mode }: AuthFormProps) {
       {error ? <p className={styles.error}>{error}</p> : null}
       {message ? <p className={styles.message}>{message}</p> : null}
 
-      <button className={styles.submit} type="submit" disabled={loading}>
+      {isLogin ? null : (
+        <p className={styles.notice}>
+          We&apos;ll send a short 7am email with what&apos;s still on your
+          list. Turn it off anytime in Account settings.
+        </p>
+      )}
+
+      <Button variant="primary" type="submit" disabled={loading} className={styles.submit}>
         {loading ? "Please wait…" : isLogin ? "Sign in" : "Create account"}
-      </button>
+      </Button>
 
       <p className={styles.switch}>
         {isLogin ? (

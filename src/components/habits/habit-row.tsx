@@ -6,14 +6,17 @@ import { renameHabit } from "@/lib/daily/actions";
 import type { Habit } from "@/lib/types/database";
 import styles from "./habits-page.module.css";
 
-function formatCreatedDate(iso: string) {
+function formatStarted(iso: string) {
   const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "Unknown date";
-  return date.toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  if (Number.isNaN(date.getTime())) return "Started on an unknown date";
+  const startOfDay = (d: Date) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const days = Math.max(
+    0,
+    Math.round((startOfDay(new Date()) - startOfDay(date)) / 86_400_000),
+  );
+  if (days === 0) return "Started today";
+  return `Started ${days} ${days === 1 ? "day" : "days"} ago`;
 }
 
 type Props = {
@@ -80,7 +83,7 @@ export function HabitRow({ habit, busy = false, onArchive }: Props) {
           <div className={styles.itemBody}>
             <p className={styles.itemMeta}>
               <span className={styles.dateTag}>
-                Created {formatCreatedDate(habit.created_at)}
+                {formatStarted(habit.created_at)}
               </span>
             </p>
             <textarea

@@ -38,8 +38,16 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/login") || pathname.startsWith("/signup");
   const isAuthCallback = pathname.startsWith("/auth/callback");
   const isCronRoute = pathname.startsWith("/api/cron");
+  // Signed links from the morning email work without a session.
+  const isEmailLink =
+    pathname.startsWith("/email/unsubscribe") ||
+    pathname.startsWith("/api/email/unsubscribe");
   const isPublicRoute =
-    pathname === "/" || isAuthRoute || isAuthCallback || isCronRoute;
+    pathname === "/" ||
+    isAuthRoute ||
+    isAuthCallback ||
+    isCronRoute ||
+    isEmailLink;
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();

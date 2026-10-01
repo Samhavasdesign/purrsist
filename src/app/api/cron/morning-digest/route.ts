@@ -31,9 +31,7 @@ async function handle(request: Request) {
 
     return NextResponse.json({
       ok: true,
-      todayKey: summary.todayKey,
-      yesterdayKey: summary.yesterdayKey,
-      timezone: summary.timezone,
+      fallbackTimezone: summary.fallbackTimezone,
       sent,
       skipped,
       errors: errors.map((e) => ({

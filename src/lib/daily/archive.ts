@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { dateKey } from "@/lib/daily/carryover";
 import { normalizeDailyEntry } from "@/lib/daily/extra-items";
+import { getUserTodayKey } from "@/lib/daily/today";
 import type { DailyEntry } from "@/lib/types/database";
 
 export type ArchiveDateOption = {
@@ -17,9 +17,12 @@ export type ArchiveHabitCheck = {
 };
 
 /** Lock every DailyEntry whose calendar date is before today (PRD §6 / §8). */
-export async function ensurePastDaysLocked(userId: string): Promise<void> {
+export async function ensurePastDaysLocked(
+  userId: string,
+  todayKey?: string,
+): Promise<void> {
   const supabase = await createClient();
-  const today = dateKey(new Date());
+  const today = todayKey ?? (await getUserTodayKey(userId));
 
   const { error } = await supabase
     .from("daily_entries")
@@ -33,9 +36,10 @@ export async function ensurePastDaysLocked(userId: string): Promise<void> {
 
 export async function listArchiveDates(
   userId: string,
+  todayKey?: string,
 ): Promise<ArchiveDateOption[]> {
   const supabase = await createClient();
-  const today = dateKey(new Date());
+  const today = todayKey ?? (await getUserTodayKey(userId));
 
   const { data, error } = await supabase
     .from("daily_entries")

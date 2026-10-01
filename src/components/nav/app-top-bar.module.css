@@ -119,13 +119,9 @@
   animation: iconPop 0.25s ease-out 1;
 }
 
-/* Current-page (pressed) state — identical to the collection counter's active look. */
-.right .navControl[aria-current="page"] {
-  color: var(--foreground);
-  border-color: color-mix(in srgb, var(--foreground) 32%, var(--border));
-  background: color-mix(in srgb, var(--foreground) 8%, transparent);
-}
-
+/* Current-page state comes from IconButton's `active` style (same look as the
+   collection counter). This hover only has to out-specify the resting
+   .navControl hover above. */
 .right
   .navControl[aria-current="page"]:hover:not(:disabled):not(
     [aria-disabled="true"]

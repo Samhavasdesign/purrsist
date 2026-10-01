@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import authStyles from "./auth-form.module.css";
 import { LogInInsteadButton } from "./log-in-instead-button";
@@ -115,9 +116,14 @@ export function SaveAccountForm() {
       ) : null}
       {message ? <p className={authStyles.message}>{message}</p> : null}
 
-      <button className={authStyles.submit} type="submit" disabled={loading}>
+      <p className={authStyles.notice}>
+        Saving your account also turns on a short 7am email with what&apos;s
+        still on your list. Turn it off anytime in Account settings.
+      </p>
+
+      <Button variant="primary" type="submit" disabled={loading} className={authStyles.submit}>
         {loading ? "Saving…" : "Save my account"}
-      </button>
+      </Button>
 
       <p className={authStyles.switch}>
         Already have an account? <LogInInsteadButton />

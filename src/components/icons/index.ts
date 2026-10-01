@@ -1,15 +1,10 @@
 export {
   CatHeadIcon,
-  CheckIcon,
   ChevronLeftIcon,
   CloseIcon,
   GripIcon,
   ICON_STROKE,
   InfoIcon,
-  PawPrintIcon,
   PlusIcon,
-  SettingsIcon,
-  StarIcon,
-  TrashIcon,
   type IconProps,
 } from "./icons";

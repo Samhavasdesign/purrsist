@@ -103,16 +103,14 @@
   letter-spacing: var(--text-input-tracking);
   line-height: var(--text-input-leading);
   outline: none;
-  transition: border-color var(--duration-base) ease;
+  transition:
+    border-color var(--duration-base) ease,
+    box-shadow var(--duration-base) ease;
 }
 
 .input:focus {
-  outline: none;
-}
-
-.input:focus-visible {
-  outline: var(--focus-ring-input);
-  outline-offset: var(--focus-ring-input-offset);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-focus);
 }
 
 .input::placeholder {
@@ -138,10 +136,18 @@
   border-color: transparent !important;
 }
 
-.error {
+.error,
+.warning {
   margin: 0;
   font-family: var(--font-ui);
   font-size: var(--text-caption-size);
   line-height: var(--text-caption-leading);
+}
+
+.error {
   color: var(--danger);
+}
+
+.warning {
+  color: var(--warning);
 }

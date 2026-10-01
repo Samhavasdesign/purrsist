@@ -25,7 +25,7 @@ import {
 } from "@/lib/daily/actions";
 import { AddToBacklog } from "@/components/daily/add-to-backlog";
 import { DueReminders } from "@/components/daily/due-reminders";
-import { EndOfDayNudge } from "@/components/daily/end-of-day-nudge";
+import { EndOfDaySheet } from "@/components/daily/end-of-day-sheet";
 import { HabitManager } from "@/components/daily/habit-manager";
 import { ReminderManager } from "@/components/daily/reminder-manager";
 import { RescueToast } from "@/components/daily/rescue-toast";
@@ -752,7 +752,7 @@ export function DailyDashboard({
 
       {editable ? <AddToBacklog /> : null}
 
-      {editable ? <EndOfDayNudge entry={localEntry} /> : null}
+      {editable ? <EndOfDaySheet entry={localEntry} /> : null}
       {editable ? <StagnantTasksPrompt entry={localEntry} /> : null}
       {!editable ? (
         <p className={styles.lockedNote}>

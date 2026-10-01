@@ -256,12 +256,8 @@
 }
 
 .itemTextInput::placeholder {
-  color: color-mix(in srgb, var(--support-fg) 55%, transparent);
-  -webkit-text-fill-color: color-mix(
-    in srgb,
-    var(--support-fg) 55%,
-    transparent
-  );
+  color: var(--support-soft);
+  -webkit-text-fill-color: var(--support-soft);
   font-style: italic;
 }
 
@@ -422,10 +418,18 @@
   color: var(--accent);
 }
 
-.itemError {
+.itemError,
+.itemWarning {
   margin: var(--space-2) 0 0;
   font-size: var(--text-caption-sm);
+}
+
+.itemError {
   color: var(--danger);
+}
+
+.itemWarning {
+  color: var(--warning);
 }
 
 .itemActions {
@@ -573,24 +577,10 @@
   gap: var(--space-2);
 }
 
-.promoteCategory {
-  min-height: 2.75rem;
-  padding: 0 var(--space-3);
-  font-size: var(--text-caption-sm);
-}
-
 .promoteRow {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-}
-
-.promoteEmpty {
-  margin: 0;
-  font-family: var(--font-ui);
-  font-size: var(--text-caption-size);
-  line-height: var(--text-caption-leading);
-  color: var(--muted);
 }
 
 .promoteFooter {

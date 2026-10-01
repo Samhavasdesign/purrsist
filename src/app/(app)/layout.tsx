@@ -1,5 +1,6 @@
 import { AppNav } from "@/components/nav/app-nav";
 import { AppTopBar } from "@/components/nav/app-top-bar";
+import { TimezoneSync } from "@/components/profile/timezone-sync";
 import { HomeScreenPrompt } from "@/components/pwa/home-screen-prompt";
 import { isAnonymousUser, requireUser } from "@/lib/auth";
 import { countRescuedCats } from "@/lib/collection/rescue-toast";
@@ -48,6 +49,7 @@ export default async function AppLayout({
       {children}
       <AppNav />
       <HomeScreenPrompt />
+      <TimezoneSync />
     </>
   );
 }

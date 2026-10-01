@@ -29,7 +29,13 @@ export function formatShortDate(dateKeyStr: string): string {
   });
 }
 
-/** Same-day-only editing (PRD §6 / §8). */
-export function isEditableEntry(entry: DailyEntry, now = new Date()): boolean {
-  return entry.date === dateKeyFromDate(now) && !entry.locked;
+/**
+ * Same-day-only editing (PRD §6 / §8). On the server, pass the user's
+ * `todayKey` (see getUserTodayKey) — the server clock is UTC, not theirs.
+ */
+export function isEditableEntry(
+  entry: DailyEntry,
+  todayKey = dateKeyFromDate(),
+): boolean {
+  return entry.date === todayKey && !entry.locked;
 }

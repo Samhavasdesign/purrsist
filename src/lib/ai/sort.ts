@@ -79,6 +79,8 @@ export async function sortCapture(input: {
   significance: Significance;
   openSlots: DailySlot[];
   forceBacklog?: boolean;
+  /** The user's local YYYY-MM-DD; the server's own clock may be a day off. */
+  todayKey?: string;
 }): Promise<SortResult> {
   if (input.forceBacklog) {
     return fallbackSort(input);
@@ -87,7 +89,7 @@ export async function sortCapture(input: {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return fallbackSort(input);
 
-  const today = todayKey();
+  const today = input.todayKey ?? todayKey();
   const client = new Anthropic({ apiKey });
   const category = categoryLabelForSignificance(input.significance);
   const preferredSlots = defaultSlotsForSignificance(input.significance);

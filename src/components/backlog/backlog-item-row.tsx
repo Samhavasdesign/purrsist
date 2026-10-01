@@ -8,7 +8,6 @@ import {
   updateBacklogItemText,
 } from "@/lib/backlog/actions";
 import {
-  openKindsForEntry,
   openSlotsForSignificance,
   significanceForKind,
 } from "@/lib/capture/placement";
@@ -34,7 +33,7 @@ type Props = {
   onPromoteClose: () => void;
   onPromoted: (payload: {
     itemId: string;
-    slot: DailySlot;
+    slot: DailySlot | null;
     text: string;
   }) => void;
   onExitComplete: () => void;
@@ -59,9 +58,6 @@ export function BacklogItemRow({
   const [text, setText] = useState(item.text);
   const textRef = useRef<HTMLTextAreaElement>(null);
 
-  const openKinds = openKindsForEntry(todayEntry);
-  const openKindSet = new Set(openKinds);
-  const canConfirm = Boolean(kind && openKindSet.has(kind));
 
   useEffect(() => {
     setText(item.text);
@@ -110,7 +106,7 @@ export function BacklogItemRow({
   }
 
   function confirmPromote() {
-    if (!kind || !openKindSet.has(kind) || pending) return;
+    if (!kind || pending) return;
 
     setError(null);
     startTransition(async () => {
@@ -248,63 +244,52 @@ export function BacklogItemRow({
         <div className={styles.promoteMenu} aria-label="Promote to today">
           <div className={styles.promoteBlock}>
             <p className={styles.promoteLabel}>Priority</p>
-            {openKinds.length === 0 ? (
-              <p className={styles.promoteEmpty}>
-                Today&apos;s list is full — free a slot first.
-              </p>
-            ) : (
-              <div
-                className={styles.promoteSigRow}
-                role="group"
-                aria-label="Priority"
-              >
-                {SLOT_OPTIONS.map((slotKind) => {
-                  const available =
-                    openSlotsForSignificance(
-                      todayEntry,
-                      significanceForKind(slotKind),
-                    ).length > 0;
-                  const label = KIND_LABELS[slotKind];
-                  const fullReason = `${label} is full`;
+            <div
+              className={styles.promoteSigRow}
+              role="group"
+              aria-label="Priority"
+            >
+              {SLOT_OPTIONS.map((slotKind) => {
+                const hasOpenSlot =
+                  openSlotsForSignificance(
+                    todayEntry,
+                    significanceForKind(slotKind),
+                  ).length > 0;
+                const label = KIND_LABELS[slotKind];
 
-                  return (
-                    <Button
-                      key={slotKind}
-                      type="button"
-                      variant="category"
-                      category={significanceForKind(slotKind)}
-                      selected={kind === slotKind}
-                      aria-pressed={kind === slotKind}
-                      className={styles.promoteCategory}
-                      disabled={pending || !available}
-                      title={available ? label : fullReason}
-                      onClick={() => {
-                        if (!available) return;
-                        setKind(slotKind);
-                        setError(null);
-                      }}
-                    >
-                      {available ? label : fullReason}
-                    </Button>
-                  );
-                })}
-              </div>
-            )}
+                return (
+                  <Button
+                    key={slotKind}
+                    type="button"
+                    variant="category"
+                    category={significanceForKind(slotKind)}
+                    selected={kind === slotKind}
+                    aria-pressed={kind === slotKind}
+                    disabled={pending}
+                    title={
+                      hasOpenSlot
+                        ? label
+                        : `${label} slots are full — adds as an extra`
+                    }
+                    onClick={() => {
+                      setKind(slotKind);
+                      setError(null);
+                    }}
+                  >
+                    {label}
+                  </Button>
+                );
+              })}
+            </div>
           </div>
 
           <div className={styles.promoteFooter}>
             <Button
               type="button"
               variant="primary"
-              disabled={pending || !canConfirm}
+              disabled={pending || !kind}
               onClick={confirmPromote}
-              title={
-                !kind
-                  ? "Pick a slot"
-                  : !openKindSet.has(kind)
-                    ? `${KIND_LABELS[kind]} is full`
-                    : "Confirm promote"
-              }
+              title={kind ? "Confirm promote" : "Pick a priority"}
             >
               Confirm
             </Button>

@@ -6,6 +6,12 @@ export type Profile = {
   has_filled_must_do_once: boolean;
   has_filled_should_dos_once: boolean;
   has_filled_quick_wins_once: boolean;
+  /** Browser IANA timezone, e.g. "America/Los_Angeles"; null until first seen. */
+  timezone: string | null;
+  /** User-local date the morning email last went out. */
+  last_digest_on: string | null;
+  /** Morning "Still on your list" email on/off. Defaults to on. */
+  digest_enabled: boolean;
 };
 
 export type Significance = "red" | "yellow" | "green";

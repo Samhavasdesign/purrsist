@@ -92,7 +92,7 @@ export function BacklogScreen({
 
   function handlePromoted(payload: {
     itemId: string;
-    slot: DailySlot;
+    slot: DailySlot | null;
     text: string;
   }) {
     setPromotingId(null);
@@ -102,10 +102,14 @@ export function BacklogScreen({
       return next;
     });
     // Keep capacity honest for the next promote without waiting on refresh.
-    setEntrySnapshot((prev) => ({
-      ...prev,
-      [slotTextColumn(payload.slot)]: payload.text,
-    }));
+    // Overflow extras don't change default-slot capacity.
+    const { slot } = payload;
+    if (slot) {
+      setEntrySnapshot((prev) => ({
+        ...prev,
+        [slotTextColumn(slot)]: payload.text,
+      }));
+    }
   }
 
   function handleExitComplete(itemId: string) {

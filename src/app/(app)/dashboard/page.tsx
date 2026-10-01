@@ -29,7 +29,7 @@ export default async function DashboardPage() {
       )
       .eq("id", user.id)
       .maybeSingle(),
-    listDueReminders(supabase, user.id),
+    listDueReminders(supabase, user.id, entry.date),
   ]);
 
   const sectionHints = parseSectionHintFlags(profile);

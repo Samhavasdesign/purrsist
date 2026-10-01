@@ -3,10 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import {
+  kindForSignificance,
   openSlotsForSignificance,
   significanceForKind,
 } from "@/lib/capture/placement";
 import {
+  appendExtraItem,
   clearSlot,
   getOrCreateTodayEntry,
   writeSlot,
@@ -229,11 +231,17 @@ export async function deleteBacklogItem(itemId: string) {
   revalidatePath("/backlog");
 }
 
+/**
+ * Put a backlog item on today's list. Lands in the kind's first open default
+ * slot; once those are taken it overflows as an extra item (same as capture),
+ * unless `overflow` is false.
+ */
 export async function promoteToToday(
   itemId: string,
   input: {
     significance: Significance;
     kind: DailyItemKind;
+    overflow?: boolean;
   },
 ) {
   const user = await requireUser();
@@ -263,19 +271,29 @@ export async function promoteToToday(
     null;
 
   if (!target) {
-    const label =
-      input.kind === "must_do"
-        ? "Must-Do"
-        : input.kind === "should_do"
-          ? "Should-Do"
-          : "Quick Win";
-    return {
-      ok: false as const,
-      error: `${label} is full today.`,
-    };
-  }
+    if (input.overflow === false) {
+      const label =
+        input.kind === "must_do"
+          ? "Must-Do"
+          : input.kind === "should_do"
+            ? "Should-Do"
+            : "Quick Win";
+      return {
+        ok: false as const,
+        error: `${label} is full today.`,
+      };
+    }
 
-  await writeSlot(entry.id, target, item.text);
+    const extraResult = await appendExtraItem(
+      entry.id,
+      user.id,
+      input.kind,
+      item.text,
+    );
+    if (!extraResult.ok) return extraResult;
+  } else {
+    await writeSlot(entry.id, target, item.text);
+  }
 
   const { error: updateError } = await supabase
     .from("backlog_items")
@@ -365,8 +383,10 @@ export async function sendBackToBacklog(itemId: string) {
 
 /**
  * A date-triggered reminder came due — drop it into today's first open slot,
- * trying Must-Do, then Should-Do, then Quick Win. Clears the target_date via
- * promoteToToday (which nulls ai_placement and re-homes the row onto the day).
+ * trying Must-Do, then Should-Do, then Quick Win. If every slot is taken it
+ * overflows as an extra under the item's own priority (Must-Do when it has
+ * none). Clears the target_date via promoteToToday (which nulls ai_placement
+ * and re-homes the row onto the day).
  */
 export async function landReminderOnToday(itemId: string) {
   const kinds: DailyItemKind[] = ["must_do", "should_do", "quick_win"];
@@ -374,13 +394,25 @@ export async function landReminderOnToday(itemId: string) {
     const result = await promoteToToday(itemId, {
       significance: significanceForKind(kind),
       kind,
+      overflow: false,
     });
     if (result.ok) return result;
   }
-  return {
-    ok: false as const,
-    error: "Today's list is full — free up a slot, then add this.",
-  };
+
+  const user = await requireUser();
+  const supabase = await createClient();
+  const { data: item } = await supabase
+    .from("backlog_items")
+    .select("significance")
+    .eq("id", itemId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  const significance: Significance = item?.significance ?? "red";
+  return promoteToToday(itemId, {
+    significance,
+    kind: kindForSignificance(significance),
+  });
 }
 
 /**

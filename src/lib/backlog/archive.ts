@@ -1,3 +1,4 @@
+import { getUserTodayKey } from "@/lib/daily/today";
 import { createClient } from "@/lib/supabase/server";
 
 /** Backlog items untouched this long are swept into the Archive automatically. */
@@ -19,7 +20,7 @@ export async function sweepAgedBacklogItems(userId: string): Promise<void> {
   const cutoff = new Date(
     now.getTime() - BACKLOG_STALE_DAYS * 24 * 60 * 60 * 1000,
   ).toISOString();
-  const todayKey = now.toISOString().slice(0, 10);
+  const todayKey = await getUserTodayKey(userId);
 
   const { error } = await supabase
     .from("backlog_items")

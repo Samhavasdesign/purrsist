@@ -261,12 +261,8 @@
 }
 
 .itemTextInput::placeholder {
-  color: color-mix(in srgb, var(--support-fg) 55%, transparent);
-  -webkit-text-fill-color: color-mix(
-    in srgb,
-    var(--support-fg) 55%,
-    transparent
-  );
+  color: var(--support-soft);
+  -webkit-text-fill-color: var(--support-soft);
   font-style: italic;
 }
 
@@ -303,10 +299,18 @@
   line-height: 1;
 }
 
-.itemError {
+.itemError,
+.itemWarning {
   margin: var(--space-2) 0 0;
   font-size: var(--text-caption-sm);
+}
+
+.itemError {
   color: var(--danger);
+}
+
+.itemWarning {
+  color: var(--warning);
 }
 
 .itemActions {

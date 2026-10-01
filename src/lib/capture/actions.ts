@@ -11,15 +11,10 @@ import {
 } from "@/lib/capture/placement";
 import { formatCaptureReason } from "@/lib/capture/reason";
 import {
+  appendExtraItem,
   getOrCreateTodayEntry,
   writeSlot,
 } from "@/lib/daily/entry";
-import {
-  isMissingExtraItemsColumn,
-  newExtraItem,
-  notesPayloadWithExtras,
-  readExtraItems,
-} from "@/lib/daily/extra-items";
 import { createClient } from "@/lib/supabase/server";
 import type { DailySlot, Significance } from "@/lib/types/database";
 
@@ -34,50 +29,6 @@ export type CaptureResult = {
   usedAi: boolean;
   isFirstCapture: boolean;
 };
-
-async function appendExtraWithText(
-  entryId: string,
-  userId: string,
-  significance: Significance,
-  text: string,
-  notes: string | null,
-) {
-  const kind = kindForSignificance(significance);
-  const item = { ...newExtraItem(kind), text };
-  const supabase = await createClient();
-  const { data: entry, error: loadError } = await supabase
-    .from("daily_entries")
-    .select("*")
-    .eq("id", entryId)
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (loadError || !entry) {
-    return { ok: false as const, error: loadError?.message ?? "Entry not found" };
-  }
-
-  const extras = [...readExtraItems(entry), item];
-  const { error } = await supabase
-    .from("daily_entries")
-    .update({ extra_items: extras })
-    .eq("id", entryId)
-    .eq("user_id", userId)
-    .eq("locked", false);
-
-  if (error && isMissingExtraItemsColumn(error)) {
-    const { error: notesError } = await supabase
-      .from("daily_entries")
-      .update({ notes: notesPayloadWithExtras(notes, extras) })
-      .eq("id", entryId)
-      .eq("user_id", userId)
-      .eq("locked", false);
-    if (notesError) return { ok: false as const, error: notesError.message };
-    return { ok: true as const };
-  }
-
-  if (error) return { ok: false as const, error: error.message };
-  return { ok: true as const };
-}
 
 export async function captureItem(input: {
   text: string;
@@ -113,6 +64,7 @@ export async function captureItem(input: {
     significance: input.significance,
     openSlots,
     forceBacklog,
+    todayKey: entry.date,
   });
 
   let placement = sort.placement;
@@ -175,12 +127,11 @@ export async function captureItem(input: {
   if (placement) {
     await writeSlot(entry.id, placement, text);
   } else if (placedAsExtra) {
-    const extraResult = await appendExtraWithText(
+    const extraResult = await appendExtraItem(
       entry.id,
       user.id,
-      input.significance,
+      kindForSignificance(input.significance),
       text,
-      entry.notes,
     );
     if (!extraResult.ok) {
       return { ok: false, error: extraResult.error };

@@ -1,9 +1,4 @@
 .page {
-  --ds-shadow:
-    0 1px 2px color-mix(in srgb, var(--foreground) 6%, transparent),
-    0 12px 28px -18px color-mix(in srgb, var(--foreground) 30%, transparent);
-  --ds-surface-2: color-mix(in srgb, var(--surface) 88%, var(--foreground));
-
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -25,7 +20,6 @@
 .eyebrow {
   margin: 0;
   font: var(--text-eyebrow);
-  letter-spacing: var(--text-eyebrow-tracking);
   text-transform: uppercase;
   color: var(--accent);
 }
@@ -72,14 +66,6 @@
   font: var(--text-label);
   letter-spacing: var(--text-label-tracking);
   color: var(--foreground);
-}
-
-.card {
-  background: var(--surface);
-  border: var(--border-default);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--ds-shadow);
-  padding: clamp(var(--space-4), 3vw, var(--space-6));
 }
 
 /* shared code chips */
@@ -192,15 +178,6 @@
   font-size: 0.6875rem;
   opacity: 0.85;
   overflow-wrap: anywhere;
-}
-
-.categorySelectedStrip {
-  margin-top: var(--space-1);
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-caption-xs);
-  font-weight: 600;
-  border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
 }
 
 /* ---------- typography ---------- */
@@ -317,23 +294,353 @@
   border: 1.5px solid var(--accent);
 }
 
-/* ---------- motion ---------- */
-.motionWrap {
+/* ---------- inputs ---------- */
+.inputFamilies {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.inputFamily {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.inputFamily > .subhead,
+.inputFamily > .typeNote {
+  margin: 0;
+}
+
+.inputGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+
+.inputTile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.inputState {
+  font: var(--text-eyebrow);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.inputRows {
+  gap: var(--space-3);
+}
+
+.inputStateRow {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.inputStateBody {
+  min-width: 0;
+}
+
+/* ---------- breakpoints ---------- */
+.bpWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.bpNow {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-caption-size);
+}
+
+.bpList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bpRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.bpHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.bpName {
+  font: var(--text-label);
+  color: var(--foreground);
+}
+
+.bpOn,
+.bpOff {
+  flex-shrink: 0;
+  padding: 0.15rem var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-caption-xs);
+}
+
+.bpOn {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.bpOff {
+  border: var(--border-muted-default);
+  color: var(--muted);
+}
+
+/* ---------- button specs ---------- */
+.btnSpec {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4);
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.btnSpec > .typeNote {
+  margin: 0;
+}
+
+.btnSpecHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.btnTokens {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  padding-top: var(--space-3);
+  border-top: var(--border-muted-default);
+}
+
+.btnTokens > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.btnTokens dt {
+  color: var(--muted);
+  font-size: var(--text-caption-xs);
+}
+
+.btnTokens dd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.btnStates {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.btnNa {
+  display: flex;
+  align-items: center;
+  min-height: var(--btn-height);
+  color: var(--muted);
+}
+
+/* ---------- icon buttons in context ---------- */
+.iconContexts {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
 }
 
-.motionToggle {
-  align-self: flex-start;
-  min-height: var(--btn-height);
-  padding: 0 var(--btn-pad-x);
+.iconContext {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.iconToneGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+
+.iconToneCard {
+  gap: var(--space-3);
+}
+
+.iconTopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-4);
   border: var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--background);
+}
+
+/* ---------- geometry ---------- */
+.geoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: var(--space-3);
+}
+
+.geoCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.geoWide {
+  grid-column: 1 / -1;
+}
+
+.geoStage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 5.5rem;
+  margin-bottom: var(--space-1);
+  padding: var(--space-3);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.geoNote {
+  color: var(--muted);
+  font-size: var(--text-caption-xs);
+}
+
+/* Neutral stand-in for a button — shape only, no variant colour */
+.geoButton {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--btn-height);
+  padding-inline: var(--btn-pad-x);
+  border: var(--border-width) solid var(--border);
   border-radius: var(--btn-radius-soft);
-  background: var(--foreground);
-  color: var(--background);
+  background: var(--background);
+  color: var(--foreground);
   font: var(--text-label);
-  cursor: pointer;
+  white-space: nowrap;
+}
+
+.geoHeightWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Dimension bracket: a vertical rule with end caps */
+.geoHeightRule {
+  width: 6px;
+  border-block: 1.5px solid var(--accent);
+  background: linear-gradient(var(--accent), var(--accent)) center / 1.5px 100% no-repeat;
+}
+
+/* Padding shown as hatched bands either side of the label */
+.geoPad {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--accent-soft) 0 4px,
+    color-mix(in srgb, var(--accent) 22%, var(--accent-soft)) 4px 6px
+  );
+  border-color: var(--accent);
+}
+
+.geoPadLabel {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  background: var(--background);
+}
+
+.geoRadius {
+  width: 100%;
+  height: 3.5rem;
+  background: var(--accent-soft);
+  border: 1.5px solid var(--accent);
+}
+
+.geoCheckWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.geoCheckZoom {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-caption-xs);
+}
+
+.geoCheck {
+  box-sizing: border-box;
+  border: 1.5px solid var(--muted);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.geoTransition {
+  cursor: default;
+  transition: var(--btn-transition);
+}
+
+.geoTransition:hover,
+.geoTransition:focus-visible {
+  background: var(--foreground);
+  border-color: var(--foreground);
+  color: var(--background);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .geoTransition:hover,
+  .geoTransition:focus-visible {
+    transform: none;
+  }
+}
+
+/* ---------- motion ---------- */
+.motionWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
 }
 
 .motionGroup {
@@ -434,24 +741,6 @@
   gap: var(--space-4);
 }
 
-.focusButton {
-  min-height: var(--btn-height);
-  padding: 0 var(--btn-pad-x);
-  border: var(--border-default);
-  border-radius: var(--btn-radius-soft);
-  background: var(--surface);
-  color: var(--foreground);
-  font: var(--text-label);
-  cursor: pointer;
-}
-.focusButton:focus-visible {
-  outline: var(--focus-ring);
-  outline-offset: var(--focus-ring-offset);
-}
-.focusButton code {
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-}
-
 .focusInput {
   min-height: var(--btn-height);
   min-width: min(20rem, 100%);
@@ -478,4 +767,27 @@
   .motionRow .scaleValue {
     display: none;
   }
+}
+
+.iconGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-3);
+}
+
+.iconCell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--foreground);
+}
+
+.iconGlyphs {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
 }

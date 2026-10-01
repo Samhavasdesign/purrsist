@@ -1,15 +1,22 @@
 import type { Metadata } from "next";
 import {
+  BreakpointList,
   ButtonShowcase,
   CategoryTokens,
   ColorSwatches,
   FocusRingDemo,
+  GeometrySpecimens,
   GradientSwatches,
+  IconButtonShowcase,
+  IconGallery,
+  InputStates,
   MotionSpecimens,
   RadiusScale,
   SpaceScale,
+  TodaySectionSpecimens,
   TokenTable,
   TypeSpecimens,
+  ViewTabsShowcase,
 } from "./tokens-explorer";
 import styles from "./design-system.module.css";
 
@@ -29,9 +36,12 @@ const SEMANTIC_COLORS = [
   "--accent-soft",
   "--danger",
   "--success",
+  "--warning",
   "--surface-glass",
   "--border-muted",
 ];
+
+const CATEGORY_HUES = ["--must-do-hue", "--should-do-hue", "--quick-win-hue"];
 
 const GRADIENTS = ["--background-fill"];
 
@@ -58,21 +68,9 @@ const BORDER_TOKENS = [
   "--border-muted-default",
 ];
 
-const FONT_TOKENS = ["--font-display", "--font-ui"];
+const FONT_TOKENS = ["--font-display", "--font-ui", "--font-eyebrow"];
 
 const DENSE_TEXT_TOKENS = ["--text-caption-sm", "--text-caption-xs"];
-
-const BUTTON_TOKENS = [
-  "--btn-height",
-  "--btn-pad-x",
-  "--btn-pad-x-compact",
-  "--btn-radius-pill",
-  "--btn-radius-soft",
-  "--btn-radius-category",
-  "--btn-icon-size",
-  "--btn-icon-size-lg",
-  "--check-size",
-];
 
 const FOCUS_TOKENS = [
   "--focus-ring",
@@ -146,9 +144,13 @@ export default function DesignSystemPage() {
       <Section
         id="category"
         title="Category tokens"
-        note="Full-bleed Must-Do / Should-Do / Quick Win blocks plus the Support wash for Habits and the Daily Reminder. Each card below is painted with its own -bg-fill gradient and -border; the chips are bg / fg / border."
+        note="Full-bleed Must-Do / Should-Do / Quick Win blocks plus the Support wash for Habits and the Daily Reminder. Each card below is painted with its own -bg-fill gradient and -border; the first chips are bg / fg / border, the second are the tint / soft shades painted on top (rows and hovers; subtitles, placeholders and icons). In the Backlog the same colours read as Big deal / Matters / Eventually."
       >
+        <h3 className={styles.subhead}>Source hues</h3>
+        <ColorSwatches tokens={CATEGORY_HUES} />
         <CategoryTokens />
+        <h3 className={styles.subhead}>Today modules</h3>
+        <TodaySectionSpecimens />
       </Section>
 
       <Section
@@ -201,8 +203,28 @@ export default function DesignSystemPage() {
         note="Shared geometry for every interactive variant — hierarchy comes from variant styles, not one-off sizes. Live <Button> components below."
       >
         <ButtonShowcase />
+        <h3 className={styles.subhead}>Icon buttons</h3>
+        <IconButtonShowcase />
+        <h3 className={styles.subhead}>View tabs</h3>
+        <ViewTabsShowcase />
         <h3 className={styles.subhead}>Geometry tokens</h3>
-        <TokenTable tokens={BUTTON_TOKENS} />
+        <GeometrySpecimens />
+      </Section>
+
+      <Section
+        id="icons"
+        title="Icons"
+        note="The icons the app uses, from src/components/icons, shown at 20px and 24px. Stroke icons use a 2px stroke with round caps; all draw in currentColor."
+      >
+        <IconGallery />
+      </Section>
+
+      <Section
+        id="inputs"
+        title="Inputs & states"
+        note="Every field family in the app and its states. Boxed fields share one focus look (accent border + soft halo); row fields light up the row border in their card colour. Error, warning and success are messages under the field (or a banner on Today), never a coloured field border. Warning examples are reference copy — no screen raises a warning yet."
+      >
+        <InputStates />
       </Section>
 
       <Section
@@ -221,6 +243,14 @@ export default function DesignSystemPage() {
         note="Keeps app screens and the top bar aligned. Pad values step up at the 640px breakpoint."
       >
         <TokenTable tokens={LAYOUT_TOKENS} />
+      </Section>
+
+      <Section
+        id="breakpoints"
+        title="Breakpoints"
+        note="Every @media width in the codebase. 640px is the one app breakpoint; 900 and 1200 are landing-page only. Resize the window to see which ones match."
+      >
+        <BreakpointList />
       </Section>
     </main>
   );

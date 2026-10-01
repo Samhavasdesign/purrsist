@@ -1,10 +1,21 @@
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { ensurePastDaysLocked } from "@/lib/daily/archive";
-import { applyPendingCarryover, dateKey } from "@/lib/daily/carryover";
-import { normalizeDailyEntry } from "@/lib/daily/extra-items";
+import { applyPendingCarryover } from "@/lib/daily/carryover";
+import {
+  isMissingExtraItemsColumn,
+  newExtraItem,
+  normalizeDailyEntry,
+  notesPayloadWithExtras,
+  readExtraItems,
+} from "@/lib/daily/extra-items";
 import { markSectionFilledOnceIfNeeded } from "@/lib/daily/section-hints";
-import type { DailyEntry, DailySlot } from "@/lib/types/database";
+import { getUserTodayKey } from "@/lib/daily/today";
+import type {
+  DailyEntry,
+  DailyItemKind,
+  DailySlot,
+} from "@/lib/types/database";
 import { DAILY_SLOTS, slotTextColumn } from "@/lib/types/database";
 
 function dbError(error: { message?: string } | null, fallback: string): Error {
@@ -21,7 +32,7 @@ export const getOrCreateTodayEntry = cache(async function getOrCreateTodayEntry(
   userId: string,
 ): Promise<DailyEntry> {
   const supabase = await createClient();
-  const date = dateKey(new Date());
+  const date = await getUserTodayKey(userId);
 
   const { data: existing, error: selectError } = await supabase
     .from("daily_entries")
@@ -64,6 +75,22 @@ export const getOrCreateTodayEntry = cache(async function getOrCreateTodayEntry(
     }
   }
 
+  // Locking and sweeping only ever apply to days before today. A today-dated
+  // row that has either flag was hit while the server read "today" off its UTC
+  // clock (evenings, west of UTC), so reopen it. Carryover skips tasks already
+  // on the next day, so clearing carryover_swept can't duplicate anything.
+  if (today.locked || today.carryover_swept) {
+    const { data: reopened, error: reopenError } = await supabase
+      .from("daily_entries")
+      .update({ locked: false, carryover_swept: false })
+      .eq("id", today.id)
+      .eq("user_id", userId)
+      .select("*")
+      .single();
+    if (reopenError) console.error("reopen today's entry:", reopenError);
+    else today = normalizeDailyEntry(reopened as DailyEntry);
+  }
+
   // Carryover pulls unresolved tasks forward from recent un-swept past days.
   // It must run before the lock step below — historically the lock ran first
   // and carryover always bailed on an already-locked yesterday. Not
@@ -78,7 +105,7 @@ export const getOrCreateTodayEntry = cache(async function getOrCreateTodayEntry(
   // Same-day-only editing: anything before today becomes locked (PRD §8).
   // Best-effort — a failure here must not take down the whole page.
   try {
-    await ensurePastDaysLocked(userId);
+    await ensurePastDaysLocked(userId, date);
   } catch (error) {
     console.error("ensurePastDaysLocked:", error);
   }
@@ -139,4 +166,51 @@ export async function clearSlot(
     .eq("id", entryId);
 
   if (error) throw dbError(error, "Failed to clear slot");
+}
+
+/**
+ * Append a filled extra item to a day — the overflow path once a kind's
+ * default slots are taken. Falls back to the notes payload when the
+ * extra_items column migration isn't applied.
+ */
+export async function appendExtraItem(
+  entryId: string,
+  userId: string,
+  kind: DailyItemKind,
+  text: string,
+) {
+  const item = { ...newExtraItem(kind), text };
+  const supabase = await createClient();
+  const { data: entry, error: loadError } = await supabase
+    .from("daily_entries")
+    .select("*")
+    .eq("id", entryId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (loadError || !entry) {
+    return { ok: false as const, error: loadError?.message ?? "Entry not found" };
+  }
+
+  const extras = [...readExtraItems(entry), item];
+  const { error } = await supabase
+    .from("daily_entries")
+    .update({ extra_items: extras })
+    .eq("id", entryId)
+    .eq("user_id", userId)
+    .eq("locked", false);
+
+  if (error && isMissingExtraItemsColumn(error)) {
+    const { error: notesError } = await supabase
+      .from("daily_entries")
+      .update({ notes: notesPayloadWithExtras(entry.notes, extras) })
+      .eq("id", entryId)
+      .eq("user_id", userId)
+      .eq("locked", false);
+    if (notesError) return { ok: false as const, error: notesError.message };
+    return { ok: true as const };
+  }
+
+  if (error) return { ok: false as const, error: error.message };
+  return { ok: true as const };
 }

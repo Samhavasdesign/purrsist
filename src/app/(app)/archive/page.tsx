@@ -7,7 +7,7 @@ import {
   listHabitChecksForDate,
 } from "@/lib/daily/archive";
 import type { ArchiveHabitCheck } from "@/lib/daily/archive";
-import { dateKey } from "@/lib/daily/carryover";
+import { getUserTodayKey } from "@/lib/daily/today";
 import type { DailyEntry } from "@/lib/types/database";
 
 type SearchParams = Promise<{ date?: string | string[] }>;
@@ -18,14 +18,14 @@ export default async function ArchiveRoutePage({
   searchParams: SearchParams;
 }) {
   const user = await requireUser();
-  await ensurePastDaysLocked(user.id);
+  const todayKey = await getUserTodayKey(user.id);
+  await ensurePastDaysLocked(user.id, todayKey);
 
   const params = await searchParams;
   const raw = params.date;
   const requested = Array.isArray(raw) ? raw[0] : raw;
 
-  const dates = await listArchiveDates(user.id);
-  const todayKey = dateKey(new Date());
+  const dates = await listArchiveDates(user.id, todayKey);
   const selectedDate =
     requested &&
     /^\d{4}-\d{2}-\d{2}$/.test(requested) &&

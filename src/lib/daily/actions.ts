@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { isEditableEntry } from "@/lib/daily/entry-rules";
+import { getUserTodayKey } from "@/lib/daily/today";
 import {
   isMissingExtraItemsColumn,
   newExtraItem,
@@ -55,7 +56,7 @@ async function requireEditableEntry(entryId: string, userId: string) {
   if (error) throw error;
   if (!data) throw new Error("Entry not found");
   const entry = data as DailyEntry;
-  if (!isEditableEntry(entry)) {
+  if (!isEditableEntry(entry, await getUserTodayKey(userId))) {
     throw new Error("Past days are read-only.");
   }
   return { supabase, entry };
@@ -241,6 +242,62 @@ export async function updateExtraDailyItemDone(
       : item,
   );
   return saveExtraItems(entryId, user.id, extras, entry.notes);
+}
+
+/** A ticked task to untick, with the carry count it had before it was ticked. */
+export type UndoneTarget =
+  | { source: "slot"; slot: DailySlot; carryover_count: number }
+  | { source: "extra"; id: string; carryover_count: number };
+
+/**
+ * Untick tasks and put their carry counts back. Ticking resets the count to 0,
+ * so a plain untick would restart a five-day-old task at day one — this is the
+ * undo path for the end-of-day sheet (single untick and "Check all").
+ */
+export async function restoreUndone(entryId: string, targets: UndoneTarget[]) {
+  const user = await requireUser();
+  const { supabase, entry } = await requireEditableEntry(entryId, user.id);
+
+  const slotPatch: Record<string, boolean | number> = {};
+  for (const target of targets) {
+    if (target.source !== "slot") continue;
+    slotPatch[slotDoneColumn(target.slot)] = false;
+    slotPatch[slotCarryoverColumn(target.slot)] = target.carryover_count;
+  }
+
+  if (Object.keys(slotPatch).length > 0) {
+    const { error } = await supabase
+      .from("daily_entries")
+      .update(slotPatch)
+      .eq("id", entryId)
+      .eq("user_id", user.id)
+      .eq("locked", false);
+    if (error) return { ok: false as const, error: error.message };
+  }
+
+  const extraCounts = new Map(
+    targets.flatMap((target) =>
+      target.source === "extra"
+        ? [[target.id, target.carryover_count] as const]
+        : [],
+    ),
+  );
+  if (extraCounts.size > 0) {
+    const extras = readExtraItems(entry).map((item) =>
+      extraCounts.has(item.id)
+        ? {
+            ...item,
+            done: false,
+            carryover_count: extraCounts.get(item.id) ?? item.carryover_count,
+          }
+        : item,
+    );
+    const result = await saveExtraItems(entryId, user.id, extras, entry.notes);
+    if (!result.ok) return result;
+  }
+
+  revalidateDashboard();
+  return { ok: true as const };
 }
 
 export async function removeExtraDailyItem(entryId: string, itemId: string) {
