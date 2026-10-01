@@ -124,3 +124,14 @@ export function InfoIcon({ title, ...props }: IconProps) {
     </svg>
   );
 }
+
+/** AI marker — a four-point sparkle with a small companion, for things Claude worked out. */
+export function SparkleIcon({ title, ...props }: IconProps) {
+  return (
+    <svg {...baseAttrs(props)}>
+      {title ? <title>{title}</title> : null}
+      <path d="M10 3.5c.5 3.6 2.4 5.5 6 6-3.6.5-5.5 2.4-6 6-.5-3.6-2.4-5.5-6-6 3.6-.5 5.5-2.4 6-6z" />
+      <path d="M18 14.5c.25 1.6 1 2.35 2.5 2.5-1.5.15-2.25.9-2.5 2.5-.25-1.6-1-2.35-2.5-2.5 1.5-.15 2.25-.9 2.5-2.5z" />
+    </svg>
+  );
+}

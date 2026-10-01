@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { addToBacklog } from "@/lib/backlog/actions";
 import { localTodayKey } from "@/lib/dates/parse-due-date";
+import { showScheduledToast } from "@/lib/ui/scheduled-toast-store";
 import styles from "./backlog.module.css";
 
 type Props = {
@@ -48,7 +49,8 @@ export function BacklogDraftRow({ onSaved, onDiscard }: Props) {
     setError(null);
     startTransition(async () => {
       try {
-        const result = await addToBacklog(trimmed, localTodayKey());
+        const todayKey = localTodayKey();
+        const result = await addToBacklog(trimmed, todayKey);
 
         if (!result.ok) {
           setError(result.error);
@@ -57,6 +59,7 @@ export function BacklogDraftRow({ onSaved, onDiscard }: Props) {
           return;
         }
 
+        if (result.due) showScheduledToast({ ...result.due, todayKey });
         router.refresh();
         onSaved();
       } catch {

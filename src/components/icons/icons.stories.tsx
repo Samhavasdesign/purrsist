@@ -6,6 +6,7 @@ import {
   GripIcon,
   InfoIcon,
   PlusIcon,
+  SparkleIcon,
 } from "./icons";
 
 const ICONS = {
@@ -15,6 +16,7 @@ const ICONS = {
   GripIcon,
   InfoIcon,
   PlusIcon,
+  SparkleIcon,
 };
 
 function Gallery({ size }: { size: 20 | 24 }) {

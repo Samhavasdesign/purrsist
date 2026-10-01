@@ -13,6 +13,7 @@ import {
 } from "@/lib/capture/placement";
 import { formatTargetDate, toDateKey } from "@/lib/backlog/group";
 import { localTodayKey } from "@/lib/dates/parse-due-date";
+import { showScheduledToast } from "@/lib/ui/scheduled-toast-store";
 import { formatShortDate } from "@/lib/daily/entry-rules";
 import type {
   BacklogItem,
@@ -146,17 +147,15 @@ export function BacklogItemRow({
     setError(null);
     startTransition(async () => {
       try {
-        const result = await updateBacklogItemText(
-          item.id,
-          trimmed,
-          localTodayKey(),
-        );
+        const todayKey = localTodayKey();
+        const result = await updateBacklogItemText(item.id, trimmed, todayKey);
         if (!result.ok) {
           setText(item.text);
           setError(result.error);
           return;
         }
         setText(trimmed);
+        if (result.due) showScheduledToast({ ...result.due, todayKey });
       } catch (err) {
         setText(item.text);
         setError(err instanceof Error ? err.message : "Something went wrong");

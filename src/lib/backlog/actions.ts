@@ -39,6 +39,9 @@ function isSignificanceNotNullViolation(
   return error.code === "23502" && /significance/i.test(error.message ?? "");
 }
 
+/** Where a saved item's date came from, for the "Scheduled for…" toast. */
+export type DueDateFound = { date: string; fromAi: boolean };
+
 /**
  * The date a note names ("call mom sunday"), read in code first and by the
  * AI only when the wording looks date-ish but the code didn't catch it.
@@ -47,11 +50,13 @@ function isSignificanceNotNullViolation(
 async function dueDateFor(
   text: string,
   clientToday: string | undefined,
-): Promise<string | null> {
+): Promise<DueDateFound | null> {
   const today = isDateKey(clientToday) ? clientToday : localTodayKey();
   const parsed = parseDueDate(text, today);
-  if (parsed) return parsed;
-  return mightMentionDate(text) ? aiDueDate(text, today) : null;
+  if (parsed) return { date: parsed, fromAi: false };
+  if (!mightMentionDate(text)) return null;
+  const fromAi = await aiDueDate(text, today);
+  return fromAi ? { date: fromAi, fromAi: true } : null;
 }
 
 /** Least-urgent bucket, used only when the column cannot hold NULL. */
@@ -72,7 +77,7 @@ export async function addToBacklog(text: string, clientToday?: string) {
 
   const supabase = await createClient();
   const now = new Date().toISOString();
-  const targetDate = await dueDateFor(trimmed, clientToday);
+  const due = await dueDateFor(trimmed, clientToday);
 
   const row = {
     user_id: user.id,
@@ -80,7 +85,7 @@ export async function addToBacklog(text: string, clientToday?: string) {
     normalized_text: trimmed.toLowerCase(),
     significance: null as Significance | null,
     tag: "task" as const,
-    target_date: targetDate,
+    target_date: due?.date ?? null,
     ai_placement: null,
     promoted_to_entry_id: null,
     promoted_to_slot: null,
@@ -106,7 +111,7 @@ export async function addToBacklog(text: string, clientToday?: string) {
 
   revalidatePath("/backlog");
   revalidatePath("/dashboard");
-  return { ok: true as const };
+  return { ok: true as const, due };
 }
 
 export async function updateBacklogItemText(
@@ -125,7 +130,7 @@ export async function updateBacklogItemText(
 
   const { data: item, error: itemError } = await supabase
     .from("backlog_items")
-    .select("promoted_to_entry_id, promoted_to_slot")
+    .select("promoted_to_entry_id, promoted_to_slot, target_date")
     .eq("id", itemId)
     .eq("user_id", user.id)
     .eq("status", "active")
@@ -137,9 +142,11 @@ export async function updateBacklogItemText(
 
   // Adding a date while editing schedules the item; edits without one keep
   // whatever date it already had. Items already on today aren't rescheduled.
-  const targetDate = item.promoted_to_entry_id
+  const found = item.promoted_to_entry_id
     ? null
     : await dueDateFor(trimmed, clientToday);
+  // Only a new or changed date is news worth a toast.
+  const due = found && found.date !== item.target_date ? found : null;
 
   const { error } = await supabase
     .from("backlog_items")
@@ -147,7 +154,7 @@ export async function updateBacklogItemText(
       text: trimmed,
       normalized_text: trimmed.toLowerCase(),
       last_touched_at: new Date().toISOString(),
-      ...(targetDate ? { target_date: targetDate } : {}),
+      ...(due ? { target_date: due.date } : {}),
     })
     .eq("id", itemId)
     .eq("user_id", user.id)
@@ -163,7 +170,7 @@ export async function updateBacklogItemText(
 
   revalidatePath("/backlog");
   revalidatePath("/dashboard");
-  return { ok: true as const };
+  return { ok: true as const, due };
 }
 
 export async function checkOffInPlace(itemId: string) {

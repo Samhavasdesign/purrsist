@@ -6,6 +6,7 @@ import { PlusIcon } from "@/components/icons/icons";
 import { Button } from "@/components/ui/button";
 import { addToBacklog } from "@/lib/backlog/actions";
 import { localTodayKey } from "@/lib/dates/parse-due-date";
+import { showScheduledToast } from "@/lib/ui/scheduled-toast-store";
 import styles from "./add-to-backlog.module.css";
 
 export function AddToBacklog() {
@@ -50,13 +51,15 @@ export function AddToBacklog() {
     const trimmed = text.trim();
     setError(null);
     startTransition(async () => {
-      const result = await addToBacklog(trimmed, localTodayKey());
+      const todayKey = localTodayKey();
+      const result = await addToBacklog(trimmed, todayKey);
 
       if (!result.ok) {
         setError(result.error);
         return;
       }
 
+      if (result.due) showScheduledToast({ ...result.due, todayKey });
       setText("");
       setOpen(false);
       setError(null);
