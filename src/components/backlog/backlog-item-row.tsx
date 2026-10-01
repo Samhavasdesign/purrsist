@@ -11,10 +11,9 @@ import {
   openSlotsForSignificance,
   significanceForKind,
 } from "@/lib/capture/placement";
-import { formatTargetDate, toDateKey } from "@/lib/backlog/group";
+import { formatTargetDate } from "@/lib/backlog/group";
 import { localTodayKey } from "@/lib/dates/parse-due-date";
 import { showScheduledToast } from "@/lib/ui/scheduled-toast-store";
-import { formatShortDate } from "@/lib/daily/entry-rules";
 import type {
   BacklogItem,
   DailyEntry,
@@ -177,22 +176,21 @@ export function BacklogItemRow({
       <div className={styles.itemTop}>
         <div className={styles.itemMain}>
           <div className={styles.itemBody}>
-            <p className={styles.itemMeta}>
-              {showTag ? (
-                <span className={styles.tag}>
-                  {BACKLOG_TAGS.find((row) => row.tag === item.tag)?.label ??
-                    item.tag}
-                </span>
-              ) : null}
-              <span className={`${styles.metaAdded} ${styles.dateTag}`}>
-                Added {formatShortDate(toDateKey(item.created_at))}
-              </span>
-              {item.target_date ? (
-                <span className={styles.metaDate}>
-                  {formatTargetDate(item.target_date)}
-                </span>
-              ) : null}
-            </p>
+            {showTag || item.target_date ? (
+              <p className={styles.itemMeta}>
+                {showTag ? (
+                  <span className={styles.tag}>
+                    {BACKLOG_TAGS.find((row) => row.tag === item.tag)?.label ??
+                      item.tag}
+                  </span>
+                ) : null}
+                {item.target_date ? (
+                  <span className={styles.metaDate}>
+                    {formatTargetDate(item.target_date)}
+                  </span>
+                ) : null}
+              </p>
+            ) : null}
             <textarea
               ref={textRef}
               className={styles.itemTextInput}
