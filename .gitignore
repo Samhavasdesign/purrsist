@@ -53,4 +53,5 @@ public/fallback-*.js
 
 # storybook
 storybook-static
+public/storybook
 *storybook.log

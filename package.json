@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build --webpack",
+    "build": "storybook build -o public/storybook --quiet && next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "icons": "node scripts/generate-icons.mjs",

@@ -4,6 +4,9 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 # Purrsist component library
 
+Hosted at [purrsist.co/storybook](https://www.purrsist.co/storybook) — `npm run build`
+builds it into `public/storybook` before the Next build, so it ships with every deploy.
+
 Every story renders the real component with the app's `tokens.css` and
 `globals.css`, so what you see here is what ships.
 
@@ -34,8 +37,8 @@ Every story renders the real component with the app's `tokens.css` and
 - **Routing** uses the Next.js framework mocks — set the current path with
   `parameters.nextjs.navigation.pathname`.
 - **Dev-only preview hatches** (`?eod=demo`, `?a2hsPreview=1`) are applied with
-  `withSearchParam` from `src/stories/decorators.tsx`; those stories only open
-  in `npm run storybook`, not in a production `build-storybook`.
+  `withSearchParam` from `src/stories/decorators.tsx`. A small Vite plugin in
+  `.storybook/main.ts` keeps them working in the hosted (static) build too.
 
 ## Adding a story
 

@@ -2,8 +2,8 @@ import type { Decorator } from "@storybook/nextjs-vite";
 
 /**
  * Adds a query flag to the preview iframe's URL before the story renders —
- * for components with dev-only `?flag` preview hatches (they're compiled out
- * of production builds, so these stories only open under `npm run storybook`).
+ * for components with dev-only `?flag` preview hatches. `.storybook/main.ts`
+ * keeps those hatches live in the static Storybook build too.
  */
 export function withSearchParam(key: string, value: string): Decorator {
   return function WithSearchParam(Story) {
