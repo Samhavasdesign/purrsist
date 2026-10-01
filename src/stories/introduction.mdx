@@ -1,0 +1,43 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Introduction" />
+
+# Purrsist component library
+
+Every story renders the real component with the app's `tokens.css` and
+`globals.css`, so what you see here is what ships.
+
+## Sections
+
+- **Foundations** — tokens (color, category triads, type roles, spacing, radius), icons, logo
+- **UI** — `Button`, `IconButton`, `ViewTabs`, `ToastShell`
+- **Nav** — `AppTopBar`, `AppNav`, `AccountMenu`
+- **Today** — the full `DailyDashboard` plus each module: `TodoRow`, `AddToBacklog`,
+  `HabitManager`, `ReminderManager`, `DueReminders`, `StagnantTasksPrompt`,
+  `EndOfDaySheet`, `WinPayoff`, `RescueToast`
+- **Backlog**, **Habits**, **Archive**, **Collection**, **Auth**, **Settings**, **PWA**, **Marketing**
+
+## How data works
+
+- **Server actions are mocked.** `.storybook/preview.tsx` automocks every
+  `"use server"` module and makes each action resolve `{ ok: true }`. To show a
+  failure, override it in a story:
+
+  ```ts
+  beforeEach() {
+    mocked(addToBacklog).mockResolvedValue({ ok: false, error: "Nope" });
+  }
+  ```
+
+- **Fixtures** live in `src/stories/fixtures.ts` — daily entries, habits, and
+  backlog items shaped like the Supabase rows. Dates are relative to today.
+- **Routing** uses the Next.js framework mocks — set the current path with
+  `parameters.nextjs.navigation.pathname`.
+- **Dev-only preview hatches** (`?eod=demo`, `?a2hsPreview=1`) are applied with
+  `withSearchParam` from `src/stories/decorators.tsx`; those stories only open
+  in `npm run storybook`, not in a production `build-storybook`.
+
+## Adding a story
+
+Put `thing.stories.tsx` next to `thing.tsx`. Use `appColumn` for full screens
+so they sit in the same content column as the app.
