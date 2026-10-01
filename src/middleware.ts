@@ -11,8 +11,8 @@ export const config = {
      * Skip Next internals, static assets, PWA files, and the generated
      * metadata image routes (opengraph-image / twitter-image) so the service
      * worker, manifest, and link-preview crawlers are never redirected
-     * through auth.
+     * through auth. The static Storybook (public/storybook) is public too.
      */
-    "/((?!_next/static|_next/image|favicon.ico|manifest\\.json|sw\\.js|workbox-.*\\.js|swe-worker-.*\\.js|icons/|opengraph-image|twitter-image|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|manifest\\.json|sw\\.js|workbox-.*\\.js|swe-worker-.*\\.js|icons/|storybook/|opengraph-image|twitter-image|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

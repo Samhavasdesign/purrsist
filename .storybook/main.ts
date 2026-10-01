@@ -29,9 +29,11 @@ const config: StorybookConfig = {
     name: "@storybook/nextjs-vite",
     options: {},
   },
-  staticDirs: ["../public"],
   async viteFinal(config) {
     config.plugins = [keepPreviewHatches(), ...(config.plugins ?? [])];
+    // The build is written into public/storybook — don't copy public/ (the
+    // app's service worker, or a previous Storybook build) into itself.
+    config.publicDir = false;
     return config;
   },
 };
