@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { DigestOptIn } from "./digest-opt-in";
 import styles from "./auth-form.module.css";
 
 type AuthMode = "login" | "signup";
@@ -17,6 +18,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [digestEnabled, setDigestEnabled] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -52,6 +54,8 @@ export function AuthForm({ mode }: AuthFormProps) {
       email,
       password,
       options: {
+        // Read by handle_new_user() into profiles.digest_enabled.
+        data: { digest_enabled: digestEnabled },
         emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
       },
     });
@@ -110,10 +114,11 @@ export function AuthForm({ mode }: AuthFormProps) {
       {message ? <p className={styles.message}>{message}</p> : null}
 
       {isLogin ? null : (
-        <p className={styles.notice}>
-          We&apos;ll send a short 7am email with what&apos;s still on your
-          list. Turn it off anytime in Account settings.
-        </p>
+        <DigestOptIn
+          id="digest-opt-in"
+          checked={digestEnabled}
+          onChange={setDigestEnabled}
+        />
       )}
 
       <Button variant="primary" type="submit" disabled={loading} className={styles.submit}>

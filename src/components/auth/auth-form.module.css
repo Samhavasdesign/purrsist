@@ -78,10 +78,18 @@
   color: var(--accent);
 }
 
-/* Sign-up disclosure for the morning email. */
-.notice {
-  margin: 0;
+/* Sign-up checkbox for the morning email. */
+.optIn {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
   font-size: var(--text-caption-size);
   line-height: 1.45;
   color: var(--muted);
+  cursor: pointer;
+}
+
+.optIn input {
+  margin-top: 0.05em;
+  cursor: pointer;
 }
