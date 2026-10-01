@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { setDigestEnabled as saveDigestEnabled } from "@/lib/profile/actions";
 import { createClient } from "@/lib/supabase/client";
 import authStyles from "./auth-form.module.css";
+import { ConfirmEmailNotice } from "./confirm-email-notice";
 import { DigestOptIn } from "./digest-opt-in";
 import { LogInInsteadButton } from "./log-in-instead-button";
+import { PasswordField } from "./password-field";
 import styles from "./save-account-form.module.css";
 
 function isEmailAlreadyRegistered(error: {
@@ -26,17 +28,23 @@ export function SaveAccountForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmationSentTo, setConfirmationSentTo] = useState<string | null>(null);
   const [digestEnabled, setDigestEnabled] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [emailTaken, setEmailTaken] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
     setEmailTaken(false);
-    setMessage(null);
+
+    if (password !== confirmPassword) {
+      setError("Passwords don't match.");
+      return;
+    }
+
     setLoading(true);
 
     const supabase = createClient();
@@ -69,11 +77,19 @@ export function SaveAccountForm() {
       return;
     }
 
-    setMessage(
-      "Check your email to confirm — once you do, this trial becomes your account and your data stays.",
-    );
+    setConfirmationSentTo(email);
     setLoading(false);
     router.refresh();
+  }
+
+  if (confirmationSentTo) {
+    return (
+      <div className={styles.form}>
+        <ConfirmEmailNotice email={confirmationSentTo}>
+          Once you confirm, this trial becomes your account and your data stays.
+        </ConfirmEmailNotice>
+      </div>
+    );
   }
 
   return (
@@ -98,30 +114,36 @@ export function SaveAccountForm() {
         />
       </div>
 
-      <div className={authStyles.field}>
-        <label className={authStyles.label} htmlFor="save-password">
-          Password
-        </label>
-        <input
-          id="save-password"
-          className={authStyles.input}
-          type="password"
-          autoComplete="new-password"
-          required
-          minLength={6}
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-        />
-      </div>
+      <PasswordField
+        id="save-password"
+        label="Password"
+        value={password}
+        onChange={setPassword}
+        autoComplete="new-password"
+        minLength={6}
+        hint="At least 6 characters."
+      />
 
-      {error ? <p className={authStyles.error}>{error}</p> : null}
+      <PasswordField
+        id="save-confirm-password"
+        label="Confirm password"
+        value={confirmPassword}
+        onChange={setConfirmPassword}
+        autoComplete="new-password"
+        invalid={confirmPassword.length > 0 && confirmPassword !== password}
+      />
+
+      {error ? (
+        <p className={authStyles.error} role="alert">
+          {error}
+        </p>
+      ) : null}
       {emailTaken ? (
         <p className={styles.takenNote}>
           That email already has an account.{" "}
           <LogInInsteadButton>Log in instead</LogInInsteadButton>.
         </p>
       ) : null}
-      {message ? <p className={authStyles.message}>{message}</p> : null}
 
       <DigestOptIn
         id="save-digest-opt-in"

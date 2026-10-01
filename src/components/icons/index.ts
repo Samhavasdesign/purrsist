@@ -1,7 +1,10 @@
 export {
   CatHeadIcon,
+  CheckCircleIcon,
   ChevronLeftIcon,
   CloseIcon,
+  EyeIcon,
+  EyeOffIcon,
   GripIcon,
   ICON_STROKE,
   InfoIcon,
