@@ -3,8 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
+import { setDigestEnabled as saveDigestEnabled } from "@/lib/profile/actions";
 import { createClient } from "@/lib/supabase/client";
 import authStyles from "./auth-form.module.css";
+import { DigestOptIn } from "./digest-opt-in";
 import { LogInInsteadButton } from "./log-in-instead-button";
 import styles from "./save-account-form.module.css";
 
@@ -24,6 +26,7 @@ export function SaveAccountForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [digestEnabled, setDigestEnabled] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [emailTaken, setEmailTaken] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -56,6 +59,10 @@ export function SaveAccountForm() {
       setLoading(false);
       return;
     }
+
+    // The trial's profile row already exists (default on), so only an
+    // opt-out needs saving.
+    if (!digestEnabled) await saveDigestEnabled(false);
 
     if (data.user && !data.user.is_anonymous) {
       router.refresh();
@@ -116,10 +123,11 @@ export function SaveAccountForm() {
       ) : null}
       {message ? <p className={authStyles.message}>{message}</p> : null}
 
-      <p className={authStyles.notice}>
-        Saving your account also turns on a short 7am email with what&apos;s
-        still on your list. Turn it off anytime in Account settings.
-      </p>
+      <DigestOptIn
+        id="save-digest-opt-in"
+        checked={digestEnabled}
+        onChange={setDigestEnabled}
+      />
 
       <Button variant="primary" type="submit" disabled={loading} className={authStyles.submit}>
         {loading ? "Saving…" : "Save my account"}

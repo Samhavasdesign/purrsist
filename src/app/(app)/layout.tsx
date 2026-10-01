@@ -1,3 +1,4 @@
+import { ScheduledToastHost } from "@/components/backlog/scheduled-toast";
 import { AppNav } from "@/components/nav/app-nav";
 import { AppTopBar } from "@/components/nav/app-top-bar";
 import { TimezoneSync } from "@/components/profile/timezone-sync";
@@ -50,6 +51,7 @@ export default async function AppLayout({
       <AppNav />
       <HomeScreenPrompt />
       <TimezoneSync />
+      <ScheduledToastHost />
     </>
   );
 }

@@ -1,0 +1,110 @@
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-2) var(--space-1) var(--space-2) var(--space-3);
+  border: var(--border-width) solid
+    color-mix(in srgb, var(--accent) 32%, var(--border));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  box-shadow: 0 14px 36px color-mix(in srgb, #000 40%, transparent);
+  animation-duration: var(--duration-aha);
+  animation-timing-function: ease;
+  animation-fill-mode: both;
+}
+
+.leaving {
+  animation: toastOut var(--duration-exit) ease forwards;
+  pointer-events: none;
+}
+
+.badge {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: var(--border-muted-default);
+  color: var(--accent);
+}
+
+.badgeAi {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+}
+
+.badgeAi svg {
+  animation: sparkleIn 520ms ease both;
+}
+
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.copy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.text {
+  font-family: var(--font-ui);
+  font-size: var(--text-body-size);
+  font-weight: 500;
+  letter-spacing: var(--text-body-tracking);
+  line-height: var(--text-body-leading);
+  color: var(--foreground);
+}
+
+.hint {
+  font-family: var(--font-ui);
+  font-size: var(--text-caption-size);
+  font-weight: var(--text-caption-weight);
+  letter-spacing: var(--text-caption-tracking);
+  line-height: var(--text-caption-leading);
+  color: var(--muted);
+}
+
+.dismiss {
+  flex-shrink: 0;
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes sparkleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-20deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .leaving,
+  .badgeAi svg {
+    animation: none;
+  }
+
+  .leaving {
+    opacity: 0;
+  }
+}

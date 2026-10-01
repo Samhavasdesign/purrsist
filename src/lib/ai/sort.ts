@@ -96,7 +96,7 @@ export async function sortCapture(input: {
 
   try {
     const response = await client.messages.create({
-      model: "claude-3-5-haiku-latest",
+      model: "claude-haiku-4-5",
       max_tokens: 300,
       messages: [
         {
