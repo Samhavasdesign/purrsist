@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { PlusIcon } from "@/components/icons/icons";
 import { Button } from "@/components/ui/button";
 import { addToBacklog } from "@/lib/backlog/actions";
+import { localTodayKey } from "@/lib/dates/parse-due-date";
 import styles from "./add-to-backlog.module.css";
 
 export function AddToBacklog() {
@@ -49,7 +50,7 @@ export function AddToBacklog() {
     const trimmed = text.trim();
     setError(null);
     startTransition(async () => {
-      const result = await addToBacklog(trimmed);
+      const result = await addToBacklog(trimmed, localTodayKey());
 
       if (!result.ok) {
         setError(result.error);

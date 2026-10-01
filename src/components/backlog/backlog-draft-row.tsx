@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { addToBacklog } from "@/lib/backlog/actions";
+import { localTodayKey } from "@/lib/dates/parse-due-date";
 import styles from "./backlog.module.css";
 
 type Props = {
@@ -47,7 +48,7 @@ export function BacklogDraftRow({ onSaved, onDiscard }: Props) {
     setError(null);
     startTransition(async () => {
       try {
-        const result = await addToBacklog(trimmed);
+        const result = await addToBacklog(trimmed, localTodayKey());
 
         if (!result.ok) {
           setError(result.error);
