@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { ConfirmEmailNotice } from "./confirm-email-notice";
 import { DigestOptIn } from "./digest-opt-in";
+import { PasswordField } from "./password-field";
 import styles from "./auth-form.module.css";
 
 type AuthMode = "login" | "signup";
@@ -18,6 +20,8 @@ export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmationSentTo, setConfirmationSentTo] = useState<string | null>(null);
   const [digestEnabled, setDigestEnabled] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -29,6 +33,12 @@ export function AuthForm({ mode }: AuthFormProps) {
     event.preventDefault();
     setError(null);
     setMessage(null);
+
+    if (!isLogin && password !== confirmPassword) {
+      setError("Passwords don't match.");
+      return;
+    }
+
     setLoading(true);
 
     const supabase = createClient();
@@ -73,8 +83,21 @@ export function AuthForm({ mode }: AuthFormProps) {
       return;
     }
 
-    setMessage("Check your email to confirm your account, then sign in.");
+    setConfirmationSentTo(email);
     setLoading(false);
+  }
+
+  if (confirmationSentTo) {
+    return (
+      <div className={styles.form}>
+        <ConfirmEmailNotice email={confirmationSentTo} />
+        <p className={styles.switch}>
+          <Link className={styles.link} href="/login">
+            Back to sign in
+          </Link>
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -94,23 +117,32 @@ export function AuthForm({ mode }: AuthFormProps) {
         />
       </div>
 
-      <div className={styles.field}>
-        <label className={styles.label} htmlFor="password">
-          Password
-        </label>
-        <input
-          id="password"
-          className={styles.input}
-          type="password"
-          autoComplete={isLogin ? "current-password" : "new-password"}
-          required
-          minLength={6}
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-        />
-      </div>
+      <PasswordField
+        id="password"
+        label="Password"
+        value={password}
+        onChange={setPassword}
+        autoComplete={isLogin ? "current-password" : "new-password"}
+        minLength={6}
+        hint={isLogin ? undefined : "At least 6 characters."}
+      />
 
-      {error ? <p className={styles.error}>{error}</p> : null}
+      {isLogin ? null : (
+        <PasswordField
+          id="confirm-password"
+          label="Confirm password"
+          value={confirmPassword}
+          onChange={setConfirmPassword}
+          autoComplete="new-password"
+          invalid={confirmPassword.length > 0 && confirmPassword !== password}
+        />
+      )}
+
+      {error ? (
+        <p className={styles.error} role="alert">
+          {error}
+        </p>
+      ) : null}
       {message ? <p className={styles.message}>{message}</p> : null}
 
       {isLogin ? null : (

@@ -135,3 +135,37 @@ export function SparkleIcon({ title, ...props }: IconProps) {
     </svg>
   );
 }
+
+/** Show password — an eye. */
+export function EyeIcon({ title, ...props }: IconProps) {
+  return (
+    <svg {...baseAttrs(props)}>
+      {title ? <title>{title}</title> : null}
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+      <circle cx="12" cy="12" r="2.75" />
+    </svg>
+  );
+}
+
+/** Hide password — an eye with a slash. */
+export function EyeOffIcon({ title, ...props }: IconProps) {
+  return (
+    <svg {...baseAttrs(props)}>
+      {title ? <title>{title}</title> : null}
+      <path d="M2.5 12S6 5.5 12 5.5c1.3 0 2.5.3 3.5.8M21.5 12S18 18.5 12 18.5c-1.3 0-2.5-.3-3.5-.8" />
+      <path d="M9.9 9.9a2.75 2.75 0 0 0 4.2 3.6" />
+      <path d="M4 4l16 16" />
+    </svg>
+  );
+}
+
+/** Success — a check in a circle. */
+export function CheckCircleIcon({ title, ...props }: IconProps) {
+  return (
+    <svg {...baseAttrs(props)}>
+      {title ? <title>{title}</title> : null}
+      <circle cx="12" cy="12" r="9.25" />
+      <path d="M8 12.25l2.75 2.75L16 9.5" />
+    </svg>
+  );
+}

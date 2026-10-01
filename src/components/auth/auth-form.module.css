@@ -93,3 +93,76 @@
   margin-top: 0.05em;
   cursor: pointer;
 }
+
+/* Password field with show/hide toggle. */
+.passwordWrap {
+  position: relative;
+}
+
+.passwordInput {
+  padding-right: 3rem;
+}
+
+.reveal {
+  position: absolute;
+  top: 50%;
+  right: var(--space-2);
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.reveal:hover {
+  color: var(--foreground);
+}
+
+.reveal:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.hint {
+  margin: 0;
+  font-size: var(--text-caption-sm);
+  color: var(--muted);
+}
+
+/* Post-sign-up "check your email" panel. */
+.notice {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-4);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--success) 10%, var(--surface));
+}
+
+.noticeIcon {
+  flex: none;
+  color: var(--success);
+  margin-top: 0.1rem;
+}
+
+.noticeTitle {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-body-size);
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.noticeBody {
+  margin: 0;
+  font-size: var(--text-caption-size);
+  line-height: 1.5;
+  color: var(--foreground);
+  overflow-wrap: anywhere;
+}
