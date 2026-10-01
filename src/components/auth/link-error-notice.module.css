@@ -1,0 +1,51 @@
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-1) var(--space-3) var(--space-4);
+  border: var(--border-width) solid
+    color-mix(in srgb, var(--warning) 40%, var(--border));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--warning) 10%, var(--surface));
+  box-shadow: 0 14px 36px color-mix(in srgb, #000 40%, transparent);
+  animation-duration: var(--duration-aha);
+  animation-timing-function: ease;
+  animation-fill-mode: both;
+}
+
+.copy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.title {
+  font-family: var(--font-ui);
+  font-size: var(--text-body-size);
+  font-weight: 500;
+  letter-spacing: var(--text-body-tracking);
+  line-height: var(--text-body-leading);
+  color: var(--foreground);
+}
+
+.detail {
+  font-family: var(--font-ui);
+  font-size: var(--text-caption-size);
+  font-weight: var(--text-caption-weight);
+  letter-spacing: var(--text-caption-tracking);
+  line-height: var(--text-caption-leading);
+  color: var(--muted);
+}
+
+.dismiss {
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}

@@ -13,7 +13,23 @@ export async function GET(request: Request) {
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     }
+
+    // Keep the reason so LinkErrorNotice can explain it on /login.
+    const failed = new URLSearchParams({
+      error: "exchange_failed",
+      error_code: error.code ?? "exchange_failed",
+      error_description: error.message,
+    });
+    return NextResponse.redirect(`${origin}/login?${failed}`);
   }
 
-  return NextResponse.redirect(`${origin}/login`);
+  // Supabase sends `error`, `error_code` and `error_description` here when the
+  // link itself was rejected (e.g. otp_expired); pass them through.
+  const forwarded = new URLSearchParams();
+  for (const key of ["error", "error_code", "error_description"]) {
+    const value = searchParams.get(key);
+    if (value) forwarded.set(key, value);
+  }
+  const query = forwarded.size ? `?${forwarded}` : "";
+  return NextResponse.redirect(`${origin}/login${query}`);
 }

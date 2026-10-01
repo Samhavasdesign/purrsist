@@ -7,6 +7,7 @@ import {
   Hanken_Grotesk,
   IBM_Plex_Mono,
 } from "next/font/google";
+import { LinkErrorNotice } from "@/components/auth/link-error-notice";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -113,7 +114,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#f4f2ed" />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <LinkErrorNotice />
+      </body>
     </html>
   );
 }
